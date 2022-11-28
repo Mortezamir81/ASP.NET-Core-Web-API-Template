@@ -56,6 +56,19 @@ builder.Services.AddEasyCaching(options =>
 {
 	options.UseInMemory();
 });
+
+builder.Services.AddApiVersioning(options =>
+{
+	options.AssumeDefaultVersionWhenUnspecified = true;
+	options.DefaultApiVersion = new ApiVersion(majorVersion: 1, minorVersion: 0);
+	options.ReportApiVersions = true;
+});
+
+builder.Services.AddVersionedApiExplorer(options =>
+{
+	options.GroupNameFormat = "'v'VVV";
+	options.SubstituteApiVersionInUrl = true;
+});
 //******************************
 #endregion /Services
 

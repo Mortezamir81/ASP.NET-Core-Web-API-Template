@@ -39,6 +39,9 @@ public class TokenServices : ITokenServices
 					ValidateAudience = false,
 					ValidateIssuerSigningKey = true,
 
+					RequireExpirationTime = true,
+					ValidateLifetime = true,
+
 					IssuerSigningKey =
 						new SymmetricSecurityKey(key: key),
 

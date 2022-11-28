@@ -4,12 +4,12 @@ public static class SwaggerExtentions
 {
 	public static void AddCustomSwaggerGen(this IServiceCollection services)
 	{
+		services.AddTransient<IConfigureOptions<SwaggerGenOptions>, SwaggerConfigureOptions>();
+
 		services.AddSwaggerSchemaBuilder();
 
 		services.AddSwaggerGen(options =>
 		{
-			options.SwaggerDoc("v1", new OpenApiInfo { Title = "API V1", Version = "v1" });
-
 			options.EnableAnnotations();
 
 			#region Include XML Docs
@@ -18,6 +18,12 @@ public static class SwaggerExtentions
 
 			var xmlDocPath =
 				Path.Combine(AppContext.BaseDirectory, $"{currentProjectName}.xml");
+
+			var xmlDocPathForSharedProject =
+				Path.Combine(AppContext.BaseDirectory, $"Shared.xml");
+
+			options.IncludeXmlComments
+				(filePath: xmlDocPathForSharedProject);
 
 			options.IncludeXmlComments
 				(filePath: xmlDocPath, includeControllerXmlComments: true);
@@ -55,6 +61,9 @@ public static class SwaggerExtentions
 	{
 		app.UseSwagger();
 
+		var apiVersionDescriptionProvider =
+			app.ApplicationServices.GetService<IApiVersionDescriptionProvider>();
+
 		app.UseSwaggerUI(options =>
 		{
 			#region Customizing
@@ -62,7 +71,13 @@ public static class SwaggerExtentions
 			options.DocExpansion(DocExpansion.None);
 			#endregion
 
-			options.SwaggerEndpoint("/swagger/v1/swagger.json", "V1 Docs");
+			if (apiVersionDescriptionProvider == null)
+				return;
+
+			foreach (var desc in apiVersionDescriptionProvider.ApiVersionDescriptions)
+			{
+				options.SwaggerEndpoint($"../swagger/{desc.GroupName}/swagger.json", $"V{desc.ApiVersion.MajorVersion}");
+			}
 		});
 	}
 }

@@ -1,4 +1,4 @@
-﻿namespace Server.Controllers;
+﻿namespace Server.Controllers.V1;
 
 /// <summary>
 /// User Managment and Authentication or Authorization
@@ -27,7 +27,7 @@ public class UsersController : BaseControllerWithDatabase
 	/// Login user with username and password
 	/// </summary>
 	[HttpPost("Login")]
-	public async Task<ActionResult<Result<LoginResponseViewModel>>>
+	public virtual async Task<ActionResult<Result<LoginResponseViewModel>>>
 		LoginAsync([FromBody] LoginRequestViewModel requestViewModel)
 	{
 		var serviceResult =
@@ -119,8 +119,7 @@ public class UsersController : BaseControllerWithDatabase
 	[LogInputParameter(InputLogLevel.Warning)]
 	[Authorize(UserRoleEnum.SystemAdministrator, UserRoleEnum.Admin)]
 	[HttpDelete("UserSoftDelete/{userId:long?}")]
-	public async Task<ActionResult<Result>>
-		UserSoftDeleteAsync(long? userId)
+	public async Task<ActionResult<Result>> UserSoftDeleteAsync(long? userId)
 	{
 		var serviceResult =
 			await _userServices.UserSoftDeleteAsync(userId: userId);

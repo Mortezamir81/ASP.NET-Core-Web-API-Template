@@ -42,3 +42,4 @@ global using System.Text;
 global using Domain.SeedWork;
 global using AutoMapper;
 global using Dtat.Utilities;
+global using Microsoft.AspNetCore.Mvc.ApiExplorer;
