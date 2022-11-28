@@ -1,0 +1,333 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AccessDeniedForChangeRole" xml:space="preserve">
+    <value>You can not change the role of this user</value>
+  </data>
+  <data name="AccessDeniedForChangeThisRole" xml:space="preserve">
+    <value>You can not add this role to other user!</value>
+  </data>
+  <data name="AccessDeniedForRemovePostByUploader" xml:space="preserve">
+    <value>You are not the uploader of this post</value>
+  </data>
+  <data name="AccessDeniedForUpdateThisUser" xml:space="preserve">
+    <value>You can not update this user (Access Denied)!</value>
+  </data>
+  <data name="AccessModifireNotFound" xml:space="preserve">
+    <value>The AccessModifre not found</value>
+  </data>
+  <data name="ArtistNotFound" xml:space="preserve">
+    <value>The artist with id: {0} was not found</value>
+  </data>
+  <data name="CommentNotFound" xml:space="preserve">
+    <value>The comment not found</value>
+  </data>
+  <data name="ContactUsNotFound" xml:space="preserve">
+    <value>The contact not found</value>
+  </data>
+  <data name="ContentFileNull" xml:space="preserve">
+    <value>You did not specify any content file for uploading!</value>
+  </data>
+  <data name="ContentNotFound" xml:space="preserve">
+    <value>The Content not found</value>
+  </data>
+  <data name="DuplicateKey" xml:space="preserve">
+    <value>This value already exists</value>
+  </data>
+  <data name="EmailExist" xml:space="preserve">
+    <value>This email has already been registered</value>
+  </data>
+  <data name="FavoriteExist" xml:space="preserve">
+    <value>This favorite item is already exist</value>
+  </data>
+  <data name="FavoriteListsEmpty" xml:space="preserve">
+    <value>The favorite lists is empty</value>
+  </data>
+  <data name="FavoriteNotFound" xml:space="preserve">
+    <value>The favorite post not found</value>
+  </data>
+  <data name="FileDoesNotHaveExtention" xml:space="preserve">
+    <value>File {0} does not have any extension!</value>
+  </data>
+  <data name="FileExtentionDoesNotSupport" xml:space="preserve">
+    <value>Site does not support file {0} extension!</value>
+  </data>
+  <data name="FileNotUploaded" xml:space="preserve">
+    <value>File {0} did not uploaded successfully!</value>
+  </data>
+  <data name="FileNull" xml:space="preserve">
+    <value>You did not specify any file for uploading!</value>
+  </data>
+  <data name="InvalidContactId" xml:space="preserve">
+    <value>ContactId value is invalid</value>
+  </data>
+  <data name="InvalidContentIdStructure" xml:space="preserve">
+    <value>Content Id structure is invalid</value>
+  </data>
+  <data name="InvalidDirectionValue" xml:space="preserve">
+    <value>Invalid direction value , correct value : rtl or ltr</value>
+  </data>
+  <data name="InvalidEmailStructure" xml:space="preserve">
+    <value>Email structure is invalid</value>
+  </data>
+  <data name="InvalidJwtToken" xml:space="preserve">
+    <value>Validation token invalid signiture</value>
+  </data>
+  <data name="InvalidMusicKind" xml:space="preserve">
+    <value>MusicKind value is invalid</value>
+  </data>
+  <data name="InvalidPlayListId" xml:space="preserve">
+    <value>PlayListId value is invalid</value>
+  </data>
+  <data name="InvalidPostId" xml:space="preserve">
+    <value>PostId value is invalid</value>
+  </data>
+  <data name="InvalidPostType" xml:space="preserve">
+    <value>PostType value is invalid</value>
+  </data>
+  <data name="InvalidQuestionCountValue" xml:space="preserve">
+    <value>The question count must between 1 and 100</value>
+  </data>
+  <data name="InvalidRefreshToken" xml:space="preserve">
+    <value>The refresh token is invalid</value>
+  </data>
+  <data name="InvalidRoleId" xml:space="preserve">
+    <value>RoleId value is invalid</value>
+  </data>
+  <data name="InvalidUserAndOrPass" xml:space="preserve">
+    <value>Invalid Username and/or Password</value>
+  </data>
+  <data name="InvalidUserId" xml:space="preserve">
+    <value>UserId value is invalid</value>
+  </data>
+  <data name="InvalidVerbTenseValue" xml:space="preserve">
+    <value>The verb tense id must between 1 and 17</value>
+  </data>
+  <data name="InvalidWordTypeStructure" xml:space="preserve">
+    <value>You passing verb tense but your word type is not verb!</value>
+  </data>
+  <data name="InvalidWordTypeValue" xml:space="preserve">
+    <value>The word type id must between 1 and 6</value>
+  </data>
+  <data name="LableInContentNotFound" xml:space="preserve">
+    <value>The lable in content not found</value>
+  </data>
+  <data name="LableNotFound" xml:space="preserve">
+    <value>The lable not found</value>
+  </data>
+  <data name="MaxLength" xml:space="preserve">
+    <value>The {0} can not greater than {1} character</value>
+  </data>
+  <data name="MostNotBeNull" xml:space="preserve">
+    <value>The {0} must not be null or empty</value>
+  </data>
+  <data name="MusicKindExist" xml:space="preserve">
+    <value>This music kind is already exist</value>
+  </data>
+  <data name="MusicKindNotFound" xml:space="preserve">
+    <value>The music kind not found</value>
+  </data>
+  <data name="NotEnoughAnswers" xml:space="preserve">
+    <value>The number of words is not enough to make an answer</value>
+  </data>
+  <data name="NotificationNotFound" xml:space="preserve">
+    <value>The notification not found</value>
+  </data>
+  <data name="NotificationsListEmpty" xml:space="preserve">
+    <value>The notifications list is empty</value>
+  </data>
+  <data name="PhoneNumberExist" xml:space="preserve">
+    <value>This phone number is already exist</value>
+  </data>
+  <data name="PlayListCountLimit" xml:space="preserve">
+    <value>The number of playlists can not be more than {0}</value>
+  </data>
+  <data name="PlayListExist" xml:space="preserve">
+    <value>This play list is already exist</value>
+  </data>
+  <data name="PlayListNotFound" xml:space="preserve">
+    <value>The play list not found</value>
+  </data>
+  <data name="PlayListPostEmpty" xml:space="preserve">
+    <value>play list posts is empty</value>
+  </data>
+  <data name="PlayListPostExist" xml:space="preserve">
+    <value>This post in this play list is already exist</value>
+  </data>
+  <data name="PlayListPostNotFound" xml:space="preserve">
+    <value>The play list post not found</value>
+  </data>
+  <data name="PlayListsEmpty" xml:space="preserve">
+    <value>The play lists is empty</value>
+  </data>
+  <data name="PostImageNull" xml:space="preserve">
+    <value>You did not specify any post image file for uploading!</value>
+  </data>
+  <data name="PostNotFound" xml:space="preserve">
+    <value>The post not found</value>
+  </data>
+  <data name="PostsListEmpty" xml:space="preserve">
+    <value>The posts list is empty</value>
+  </data>
+  <data name="PostTitleExist" xml:space="preserve">
+    <value>The post title has already exist</value>
+  </data>
+  <data name="PostTypeExist" xml:space="preserve">
+    <value>This post type is already exist</value>
+  </data>
+  <data name="PostTypeNotFound" xml:space="preserve">
+    <value>The post type not found</value>
+  </data>
+  <data name="RefreshTokenIsNotActive" xml:space="preserve">
+    <value>The refresh token is not active!</value>
+  </data>
+  <data name="RelatedContentsNotFound" xml:space="preserve">
+    <value>The related contents not found</value>
+  </data>
+  <data name="RoleNotFound" xml:space="preserve">
+    <value>The role not found</value>
+  </data>
+  <data name="UnkonwnError" xml:space="preserve">
+    <value>An unknown error occurred</value>
+  </data>
+  <data name="UserBanned" xml:space="preserve">
+    <value>This account has been blocked please contact support</value>
+  </data>
+  <data name="UserListEmpty" xml:space="preserve">
+    <value>The users list is empty</value>
+  </data>
+  <data name="UsernameExist" xml:space="preserve">
+    <value>This username has already been registered</value>
+  </data>
+  <data name="UserNotFound" xml:space="preserve">
+    <value>The user not found</value>
+  </data>
+  <data name="WordNotFound" xml:space="preserve">
+    <value>The word not found</value>
+  </data>
+  <data name="WordNotFoundWithIn" xml:space="preserve">
+    <value>The word: {0} in {1} not found</value>
+  </data>
+  <data name="WordsListEmpty" xml:space="preserve">
+    <value>The words list is empty</value>
+  </data>
+  <data name="WrongValue" xml:space="preserve">
+    <value>The value {0} for {1} property is wrong</value>
+  </data>
+</root>
