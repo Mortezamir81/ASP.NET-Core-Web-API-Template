@@ -18,17 +18,18 @@ public class UnauthorizedResponsesOperationFilter : IOperationFilter
 
 	public void Apply(OpenApiOperation operation, OperationFilterContext context)
 	{
-		var filters =
-			context.ApiDescription.ActionDescriptor.FilterDescriptors;
+		var hasAllowAnonymous = context.MethodInfo
+			.GetCustomAttributes(true)
+			.OfType<AllowAnonymousAttribute>()
+			.Any();
 
-		var hasAnonymous =
-			filters.Any(p => p.Filter is AllowAnonymousFilter);
-
-		if (hasAnonymous)
+		if (hasAllowAnonymous)
 			return;
 
-		var hasAuthorize =
-			filters.Any(p => p.Filter is Infrastructure.Attributes.AuthorizeAttribute);
+		var hasAuthorize = context.MethodInfo
+			.GetCustomAttributes(true)
+			.OfType<AuthorizeAttribute>()
+			.Any();
 
 		if (!hasAuthorize)
 			return;
@@ -52,9 +53,10 @@ public class UnauthorizedResponsesOperationFilter : IOperationFilter
 					}
 				};
 
-			operation.Responses.TryAdd("401", new OpenApiResponse 
-			{ 
-				Description = "Unauthorized", Content = unauthorizedResponse 
+			operation.Responses.TryAdd("401", new OpenApiResponse
+			{
+				Description = "Unauthorized",
+				Content = unauthorizedResponse
 			});
 			#endregion /Unauthorized Response
 
@@ -76,8 +78,9 @@ public class UnauthorizedResponsesOperationFilter : IOperationFilter
 				};
 
 			operation.Responses.TryAdd("403", new OpenApiResponse
-			{ 
-				Description = "Forbidden", Content = forbiddenResponse
+			{
+				Description = "Forbidden",
+				Content = forbiddenResponse
 			});
 			#endregion /Forbidden Response
 		}

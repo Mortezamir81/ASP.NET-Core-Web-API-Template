@@ -6,14 +6,6 @@ public static class ExtensionMethods
 	{
 	}
 
-
-	public static IApplicationBuilder
-		UseCustomJwtMiddleware(this IApplicationBuilder app)
-
-	{
-		return app.UseMiddleware<JwtMiddleware>();
-	}
-
 	public static IApplicationBuilder
 		UseGlobalExceptionMiddleware(this IApplicationBuilder app)
 

@@ -1,4 +1,6 @@
-﻿namespace Server.Controllers.V1;
+﻿using Microsoft.VisualBasic;
+
+namespace Server.Controllers.V1;
 
 /// <summary>
 /// User Managment and Authentication or Authorization
@@ -84,8 +86,8 @@ public class UsersController : BaseControllerWithDatabase
 	/// <summary>
 	/// Change user role by userId and roleId
 	/// </summary>
+	[Authorize(Roles = $"{Constants.Role.SystemAdmin},{Constants.Role.Admin}")]
 	[LogInputParameter(InputLogLevel.Warning)]
-	[Authorize(UserRoleEnum.SystemAdministrator, UserRoleEnum.Admin)]
 	[HttpPut("ChangeUserRole")]
 	public async Task<ActionResult<Result>>
 		ChangeUserRoleAsync([FromBody] ChangeUserRoleRequestViewModel changeUserRoleRequestViewModel)
@@ -100,7 +102,7 @@ public class UsersController : BaseControllerWithDatabase
 	/// Update user informations by admin (by userId)
 	/// </summary>
 	[LogInputParameter(InputLogLevel.Warning)]
-	[Authorize(UserRoleEnum.SystemAdministrator, UserRoleEnum.Admin)]
+	[Authorize(Roles = $"{Constants.Role.SystemAdmin},{Constants.Role.Admin}")]
 	[HttpPut("UpdateUserByAdmin")]
 	public async Task<ActionResult>
 		UpdateUserByAdminAsync(UpdateUserByAdminRequestViewModel requestViewModel)
@@ -116,8 +118,8 @@ public class UsersController : BaseControllerWithDatabase
 	/// <summary>
 	/// Delete a user by userId
 	/// </summary>
+	[Authorize(Roles = $"{Constants.Role.SystemAdmin},{Constants.Role.Admin}")]
 	[LogInputParameter(InputLogLevel.Warning)]
-	[Authorize(UserRoleEnum.SystemAdministrator, UserRoleEnum.Admin)]
 	[HttpDelete("UserSoftDelete/{userId:long?}")]
 	public async Task<ActionResult<Result>> UserSoftDeleteAsync(long? userId)
 	{

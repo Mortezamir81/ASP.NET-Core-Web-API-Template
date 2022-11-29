@@ -250,18 +250,13 @@ public partial class UserServices : BaseServices, IUserServices
 
 		await SaveChangesAsync();
 
-		var claims =
-			new ClaimsIdentity(new[]
-			{
-				new Claim
-					(type: nameof(userLogin.User.Id), value: userLogin.User.Id.ToString()),
-
-				new Claim
-					(type: nameof(userLogin.User.RoleId), value: userLogin?.User?.RoleId?.ToString() ?? string.Empty),
-
-				new Claim
-					(type: nameof(userLogin.User.SecurityStamp), value: userLogin?.User?.SecurityStamp?.ToString() ?? string.Empty),
-			});
+		var claims = GenerateClaims(new UserClaims
+		{
+			Id = userLogin.User.Id.ToString(),
+			RoleName = userLogin.User?.UserRole?.Title,
+			RoleId = userLogin.User?.RoleId.ToString(),
+			SecurityStamp = userLogin.User?.SecurityStamp.ToString(),
+		});
 
 		var expiredTime =
 			DateTime.UtcNow.AddMinutes(_applicationSettings.JwtSettings?.TokenExpiresTime ?? 15);
@@ -354,8 +349,10 @@ public partial class UserServices : BaseServices, IUserServices
 		var user =
 			_mapper.Map<User>(source: registerRequestViewModel);
 
-		user.HashedPassword = 
+		user.HashedPassword =
 			Security.HashDataBySHA1(registerRequestViewModel.Password);
+
+		user.RoleId = Constants.Role.UserRoleId;
 
 		user.SecurityStamp = Guid.NewGuid();
 
@@ -538,18 +535,13 @@ public partial class UserServices : BaseServices, IUserServices
 
 		await SaveChangesAsync();
 
-		var claims =
-			new ClaimsIdentity(new[]
-			{
-					new Claim
-						(type: nameof(foundedUser.Id), value: foundedUser.Id.ToString()),
-
-					new Claim
-						(type: nameof(foundedUser.RoleId), value: foundedUser.RoleId.ToString()),
-
-					new Claim
-						(type: nameof(foundedUser.SecurityStamp), value: foundedUser.SecurityStamp.ToString()),
-			});
+		var claims = GenerateClaims(new UserClaims
+		{
+			Id = foundedUser.Id.ToString(),
+			RoleName = foundedUser.RoleName,
+			RoleId = foundedUser.RoleId.ToString(),
+			SecurityStamp = foundedUser.SecurityStamp.ToString(),
+		});
 
 		string token =
 			_tokenServices.GenerateJwtToken
@@ -607,7 +599,7 @@ public partial class UserServices : BaseServices, IUserServices
 		if (result.IsFailed == true)
 			return result;
 
-		var isRoleExist = 
+		var isRoleExist =
 			await CheckRoleExist(requestViewModel.RoleId);
 
 		if (!isRoleExist)
@@ -731,18 +723,13 @@ public partial class UserServices : BaseServices, IUserServices
 
 		await SaveChangesAsync();
 
-		var claims =
-			new ClaimsIdentity(new[]
-			{
-					new Claim
-						(type: nameof(foundedUser.Id), value: foundedUser.Id.ToString()),
-
-					new Claim
-						(type: nameof(foundedUser.RoleId), value: foundedUser.RoleId.ToString()),
-
-					new Claim
-						(type: nameof(foundedUser.SecurityStamp), value: foundedUser.SecurityStamp.ToString()),
-			});
+		var claims = GenerateClaims(new UserClaims
+		{
+			Id = foundedUser.Id.ToString(),
+			RoleName = foundedUser.RoleName,
+			RoleId = foundedUser.RoleId.ToString(),
+			SecurityStamp = foundedUser.SecurityStamp.ToString(),
+		});
 
 		string token =
 			_tokenServices.GenerateJwtToken
@@ -777,6 +764,28 @@ public partial class UserServices : BaseServices, IUserServices
 		});
 
 		return result;
+	}
+
+
+	private ClaimsIdentity GenerateClaims(UserClaims userClaims)
+	{
+		var claims =
+			new ClaimsIdentity(new[]
+			{
+				new Claim
+					(type: ClaimTypes.NameIdentifier, value: userClaims.Id),
+
+				new Claim
+					(type: nameof(userClaims.RoleId), value: userClaims.RoleId),
+
+				new Claim
+					(type: ClaimTypes.Role, value: userClaims.RoleName),
+
+				new Claim
+					(type: nameof(userClaims.SecurityStamp), value: userClaims.SecurityStamp),
+			});
+
+		return claims;
 	}
 	#endregion /Methods
 }

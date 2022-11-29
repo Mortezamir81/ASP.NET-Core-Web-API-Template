@@ -13,10 +13,34 @@ public abstract class BaseServices
 
 	public UserInformationInToken? GetUserFromContext()
 	{
-		var user =
-			(HttpContextAccessor?.HttpContext?.Items["User"] as UserInformationInToken);
+		var userContext = 
+			HttpContextAccessor?.HttpContext?.User;
 
-		return user;
+		if (userContext?.Identity?.IsAuthenticated == true) 
+		{
+			var stringUserId =
+				userContext?.Claims.FirstOrDefault(current => current.Type == ClaimTypes.NameIdentifier)?.Value;
+
+			var stringRoleId =
+				userContext?.Claims.FirstOrDefault(current => current.Type == nameof(User.RoleId))?.Value;
+
+			if (stringUserId == null || stringRoleId == null)
+				return default;
+
+			var userId = long.Parse(stringUserId);
+			var roleId = int.Parse(stringRoleId);
+
+			var user =
+				new UserInformationInToken
+				{
+					Id = userId,
+					RoleId = roleId,
+				};
+
+			return user;
+		}
+
+		return default;
 	}
 
 

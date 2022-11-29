@@ -173,7 +173,7 @@ public partial class UserServices
 				.AsNoTracking()
 				.Where(current => current.Username == username)
 				.Where(current => current.HashedPassword == hashedPassword)
-				.Select(current => new LoginViewModel(current.Username, current.RoleId!.Value)
+				.Select(current => new LoginViewModel(current.Username, current.RoleId!.Value, current.UserRole!.Title)
 				{
 					Id = current.Id,
 					SecurityStamp = current.SecurityStamp!.Value,

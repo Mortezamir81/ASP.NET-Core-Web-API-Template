@@ -21,17 +21,17 @@ internal class UserConfiguration : IEntityTypeConfiguration<User>
 
 		builder.Property
 			(current => current.Username)
-				.HasMaxLength(maxLength: Constant.MaxLength.CellPhoneNumber)
+				.HasMaxLength(maxLength: Constants.MaxLength.CellPhoneNumber)
 				.IsRequired();
 
 		builder.Property
 			(current => current.Email)
-				.HasMaxLength(maxLength: Constant.MaxLength.EmailAddress)
+				.HasMaxLength(maxLength: Constants.MaxLength.EmailAddress)
 				.IsRequired(false);
 
 		builder.Property
 			(current => current.FullName)
-				.HasMaxLength(maxLength: Constant.MaxLength.FullName)
+				.HasMaxLength(maxLength: Constants.MaxLength.FullName)
 				.IsRequired(false);
 
 		builder.Property
@@ -41,7 +41,6 @@ internal class UserConfiguration : IEntityTypeConfiguration<User>
 
 		builder.Property
 			(current => current.RoleId)
-			.HasDefaultValue(6)
 				.IsRequired();
 		//********************
 

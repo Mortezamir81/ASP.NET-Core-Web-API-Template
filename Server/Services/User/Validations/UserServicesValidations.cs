@@ -97,11 +97,11 @@ public partial class UserServices
 		if (result.IsFailed)
 			return result;
 
-		if (loginRequestViewModel.Username?.Length > Constant.MaxLength.CellPhoneNumber)
+		if (loginRequestViewModel.Username?.Length > Constants.MaxLength.CellPhoneNumber)
 		{
 			string errorMessage = string.Format
 				(Resources.Messages.ErrorMessages.MaxLength,
-					nameof(loginRequestViewModel.Username), Constant.MaxLength.CellPhoneNumber);
+					nameof(loginRequestViewModel.Username), Constants.MaxLength.CellPhoneNumber);
 
 			result.AddErrorMessage(errorMessage);
 		}
@@ -264,11 +264,11 @@ public partial class UserServices
 		if (result.IsFailed)
 			return result;
 
-		if (registerRequestViewModel.Username?.Length > Constant.MaxLength.CellPhoneNumber)
+		if (registerRequestViewModel.Username?.Length > Constants.MaxLength.CellPhoneNumber)
 		{
 			string errorMessage = string.Format
 				(Resources.Messages.ErrorMessages.MaxLength,
-					nameof(registerRequestViewModel.Username), Constant.MaxLength.EmailAddress);
+					nameof(registerRequestViewModel.Username), Constants.MaxLength.EmailAddress);
 
 			result.AddErrorMessage(errorMessage);
 		}

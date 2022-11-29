@@ -29,15 +29,15 @@ internal class RoleConfiguration : IEntityTypeConfiguration<Role>
 		//********************
 		builder.HasData(new List<Role>()
 		{
-			new Role(title: "SystemAdministrator")
+			new Role(title: Constants.Role.SystemAdmin)
 			{
 				Id = 1,
 			},
-			new Role(title: "Admin")
+			new Role(title: Constants.Role.Admin)
 			{
 				Id = 2,
 			},
-			new Role(title: "User")
+			new Role(title: Constants.Role.User)
 			{
 				Id = 3,
 			},

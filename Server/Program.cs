@@ -6,8 +6,6 @@ var builder =
 
 #region Services
 //******************************
-builder.Services.AddCustomSwaggerGen();
-
 builder.Services.Configure<ApplicationSettings>
 	(builder.Configuration.GetSection(ApplicationSettings.KeyName));
 
@@ -69,6 +67,11 @@ builder.Services.AddVersionedApiExplorer(options =>
 	options.GroupNameFormat = "'v'VVV";
 	options.SubstituteApiVersionInUrl = true;
 });
+
+builder.Services.AddCustomJwtAuthentication
+	(builder.Configuration.GetSection(nameof(ApplicationSettings)).GetSection(nameof(JwtSettings)).Get<JwtSettings>());
+
+builder.Services.AddCustomSwaggerGen();
 //******************************
 #endregion /Services
 
@@ -88,8 +91,6 @@ if (app.Environment.IsProduction())
 
 app.UseCors("DevCorsPolicy");
 
-app.UseCustomJwtMiddleware();
-
 if (app.Environment.IsDevelopment())
 {
 	app.UseDeveloperExceptionPage();
@@ -98,6 +99,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseEndpoints(endpoints =>

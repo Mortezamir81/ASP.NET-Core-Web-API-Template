@@ -48,7 +48,7 @@ public static class SwaggerExtentions
 				{
 					Password = new OpenApiOAuthFlow()
 					{
-						TokenUrl = new Uri("https://localhost:7200/api/users/LoginByOAuth"),
+						TokenUrl = new Uri("https://localhost:7200/api/v1/users/LoginByOAuth"),
 					},
 				},
 				
