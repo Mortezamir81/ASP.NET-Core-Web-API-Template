@@ -8,5 +8,5 @@ public class ApplicationSettings
     {
     }
 
-    public JwtSettings? JwtSettings { get; set; }
-	}
+    public required JwtSettings JwtSettings { get; set; }
+}

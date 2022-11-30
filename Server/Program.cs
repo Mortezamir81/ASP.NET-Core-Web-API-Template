@@ -1,6 +1,4 @@
 //******************************
-using Persistence.Repositories.Base;
-
 var builder =
 	WebApplication.CreateBuilder(args);
 //******************************
@@ -11,68 +9,27 @@ var builder =
 builder.Services.Configure<ApplicationSettings>
 	(builder.Configuration.GetSection(ApplicationSettings.KeyName));
 
-builder.Services.AddDbContextPool<DatabaseContext>(option =>
-{
-	option.UseSqlServer(connectionString: builder.Configuration.GetConnectionString("MySqlServerConnectionString"));
-});
+builder.Services.AddCustomDbContext
+	(connectionString: builder.Configuration.GetConnectionString("MySqlServerConnectionString"));
 
-builder.Services.AddCors(options =>
-{
-	options.AddPolicy("DevCorsPolicy", builder =>
-	{
-		builder
-			.AllowAnyOrigin()
-			.AllowAnyMethod()
-			.AllowAnyHeader();
-	});
-});
+builder.Services.AddCustomCORS();
 
 builder.Services.AddHttpContextAccessor();
 
-builder.Services.AddTransient
-	(serviceType: typeof(Dtat.Logging.ILogger<>),
-		implementationType: typeof(Dtat.Logging.NLog.NLogAdapter<>));
+builder.Services.AddCustomLogger();
 
-builder.Services
-	.AddScoped<IUserServices, UserServices>()
-	.AddScoped<IUserRepository, UserRepository>()
-	.AddScoped<IUnitOfWork, UnitOfWork>()
-	.AddScoped<ITokenServices, TokenServices>()
-	.AddScoped<LogInputParameterAttribute>();
+builder.Services.AddScopedServices();
 
-builder.Services.AddAutoMapper(typeof(Infrastructure.AutoMapperProfiles.UserProfile));
+builder.Services.AddAutoMapper(typeof(Program));
 
-builder.Services.AddControllers(config =>
-{
-	config.Filters.Add<ValidationAttribute>();
-	config.Filters.Add<CustomExceptionHandlerAttribute>();
-	config.Filters.Add(new LogInputParameterAttribute(InputLogLevel.Debug));
-})
-.ConfigureApiBehaviorOptions(options =>
-{
-	options.SuppressModelStateInvalidFilter = true;
-});
+builder.Services.AddCustomCaching();
 
-builder.Services.AddEasyCaching(options =>
-{
-	options.UseInMemory();
-});
+builder.Services.AddCustomApiVersioning();
 
-builder.Services.AddApiVersioning(options =>
-{
-	options.AssumeDefaultVersionWhenUnspecified = true;
-	options.DefaultApiVersion = new ApiVersion(majorVersion: 1, minorVersion: 0);
-	options.ReportApiVersions = true;
-});
-
-builder.Services.AddVersionedApiExplorer(options =>
-{
-	options.GroupNameFormat = "'v'VVV";
-	options.SubstituteApiVersionInUrl = true;
-});
+builder.Services.AddCustomController();
 
 builder.Services.AddCustomJwtAuthentication
-	(builder.Configuration.GetSection(nameof(ApplicationSettings)).GetSection(nameof(JwtSettings)).Get<JwtSettings>());
+	(builder.Configuration.GetSection($"{nameof(ApplicationSettings)}:{nameof(JwtSettings)}").Get<JwtSettings>());
 
 builder.Services.AddCustomSwaggerGen();
 //******************************
@@ -87,28 +44,27 @@ var app =
 
 #region Middlewares
 //******************************
-if (app.Environment.IsProduction())
-{
-	app.UseGlobalExceptionMiddleware();
-}
-
-app.UseCors("DevCorsPolicy");
-
 if (app.Environment.IsDevelopment())
 {
 	app.UseDeveloperExceptionPage();
-	app.UseCustomSwaggerAndUI();
 }
+else
+{
+	app.UseGlobalExceptionMiddleware();
+
+	app.UseSwaggerBasicAuthorization();
+}
+
+app.UseCustomSwaggerAndUI();
+
+app.UseCors("DevCorsPolicy");
 
 app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseEndpoints(endpoints =>
-{
-	endpoints.MapControllers();
-});
+app.MapControllers();
 //******************************
 #endregion /Middlewares
 

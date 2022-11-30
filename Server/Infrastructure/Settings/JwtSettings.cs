@@ -6,9 +6,9 @@ public class JwtSettings
 	{
 	}
 
-	public string? SecretKeyForToken { get; set; }
+	public required string SecretKeyForToken { get; set; }
 
-	public int? TokenExpiresTime { get; set; }
+	public required int TokenExpiresTime { get; set; }
 
-	public string? SecretKeyForEncryptionToken { get; set; }
+	public required string SecretKeyForEncryptionToken { get; set; }
 }

@@ -47,3 +47,5 @@ global using Infrastructure.Extentions;
 global using Microsoft.AspNetCore.Authorization;
 global using System.Net;
 global using Persistence.Repositories;
+global using Common.Utilities;
+global using SwaggerAuthorization.Extensions;

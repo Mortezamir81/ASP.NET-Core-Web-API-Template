@@ -258,9 +258,9 @@ public partial class UserServices : BaseServices, IUserServices
 		var claims = GenerateClaims(new UserClaims
 		{
 			Id = userLogin.User.Id.ToString(),
-			RoleName = userLogin.User?.UserRole?.Title,
-			RoleId = userLogin.User?.RoleId.ToString(),
-			SecurityStamp = userLogin.User?.SecurityStamp.ToString(),
+			RoleName = userLogin.User?.UserRole?.Title!,
+			RoleId = userLogin.User?.RoleId?.ToString()!,
+			SecurityStamp = userLogin.User?.SecurityStamp.ToString()!,
 		});
 
 		var expiredTime =

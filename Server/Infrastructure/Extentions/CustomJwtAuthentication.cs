@@ -2,8 +2,10 @@
 
 public static class CustomJwtAuthentication
 {
-	public static void AddCustomJwtAuthentication(this IServiceCollection services, JwtSettings jwtSettings)
+	public static void AddCustomJwtAuthentication(this IServiceCollection services, JwtSettings? jwtSettings)
 	{
+		Assert.NotNull(obj: services, name: nameof(services));
+
 		services.AddAuthentication(options =>
 		{
 			options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
