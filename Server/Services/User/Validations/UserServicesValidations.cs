@@ -277,7 +277,7 @@ public partial class UserServices
 			return result;
 
 		var isPhoneNumberExist =
-			await CheckUsernameExist(registerRequestViewModel.Username);
+			await _userRepository.CheckUsernameExist(registerRequestViewModel.Username);
 
 		if (isPhoneNumberExist)
 		{
@@ -290,7 +290,7 @@ public partial class UserServices
 		if (!string.IsNullOrWhiteSpace(registerRequestViewModel.Email))
 		{
 			var isEmailExist =
-				await CheckEmailExist(registerRequestViewModel.Email);
+				await _userRepository.CheckEmailExist(registerRequestViewModel.Email);
 
 			if (isEmailExist)
 			{

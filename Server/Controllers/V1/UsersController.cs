@@ -5,16 +5,14 @@ namespace Server.Controllers.V1;
 /// <summary>
 /// User Managment and Authentication or Authorization
 /// </summary>
-public class UsersController : BaseControllerWithDatabase
+public class UsersController : BaseController
 {
 	#region Fields
 	private readonly IUserServices _userServices;
 	#endregion /Fields
 
 	#region Constractor
-	public UsersController
-		(IUserServices userServices,
-		DatabaseContext databaseContext) : base(databaseContext)
+	public UsersController(IUserServices userServices) : base()
 	{
 		_userServices = userServices;
 	}

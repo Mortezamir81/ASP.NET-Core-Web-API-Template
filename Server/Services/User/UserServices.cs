@@ -1,4 +1,6 @@
-﻿namespace Services;
+﻿using Common.Utilities;
+
+namespace Services;
 
 public partial class UserServices : BaseServices, IUserServices
 {
@@ -6,8 +8,8 @@ public partial class UserServices : BaseServices, IUserServices
 	private readonly IMapper _mapper;
 	private readonly IEasyCachingProvider _cache;
 	private readonly ITokenServices _tokenServices;
-	private readonly Dtat.Logging.ILogger<UserServices> _logger;
-	private readonly DatabaseContext _databaseContext;
+	private readonly ILogger<UserServices> _logger;
+	private readonly IUserRepository _userRepository;
 	private readonly ApplicationSettings _applicationSettings;
 	#endregion /Fields
 
@@ -16,8 +18,8 @@ public partial class UserServices : BaseServices, IUserServices
 		(IMapper mapper,
 		IEasyCachingProvider cache,
 		ITokenServices tokenServices,
-		Dtat.Logging.ILogger<UserServices> logger,
-		DatabaseContext databaseContext,
+		ILogger<UserServices> logger,
+		IUserRepository userRepository,
 		IOptions<ApplicationSettings> options,
 		IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
 	{
@@ -25,7 +27,7 @@ public partial class UserServices : BaseServices, IUserServices
 		_cache = cache;
 		_tokenServices = tokenServices;
 		_logger = logger;
-		_databaseContext = databaseContext;
+		_userRepository = userRepository;
 		_applicationSettings = options.Value;
 	}
 	#endregion /Constractor
@@ -68,7 +70,7 @@ public partial class UserServices : BaseServices, IUserServices
 		}
 
 		var foundedUser =
-			await GetUserById(userId: userId.Value, isTracking: true);
+			await _userRepository.GetUserById(userId: userId.Value, isTracking: true);
 
 		if (foundedUser == null)
 		{
@@ -82,7 +84,7 @@ public partial class UserServices : BaseServices, IUserServices
 		foundedUser.IsBanned = !foundedUser.IsBanned;
 		foundedUser.SecurityStamp = Guid.NewGuid();
 
-		await SaveChangesAsync();
+		await _userRepository.SaveChangesAsync();
 
 		await _cache.RemoveByPrefixAsync($"userId-{foundedUser.Id}");
 
@@ -104,8 +106,11 @@ public partial class UserServices : BaseServices, IUserServices
 	}
 
 
-	public async Task AddUserExistToCache(long userId)
+	public async Task AddUserExistToCache<TKey>(TKey? userId)
 	{
+		if (userId == null)
+			throw new ArgumentNullException(nameof(userId));
+
 		await _cache.TrySetAsync
 			($"userId-{userId}-exist", true, TimeSpan.FromHours(1));
 	}
@@ -159,7 +164,7 @@ public partial class UserServices : BaseServices, IUserServices
 		}
 
 		var foundedUser =
-			await GetUserById(userId: userId.Value, isTracking: true);
+			await _userRepository.GetUserById(userId: userId.Value, isTracking: true);
 
 		if (foundedUser == null)
 		{
@@ -173,7 +178,7 @@ public partial class UserServices : BaseServices, IUserServices
 		foundedUser.IsDeleted = true;
 		foundedUser.SecurityStamp = Guid.NewGuid();
 
-		await SaveChangesAsync();
+		await _userRepository.SaveChangesAsync();
 
 		await _cache.RemoveByPrefixAsync($"userId-{foundedUser.Id}");
 
@@ -210,7 +215,7 @@ public partial class UserServices : BaseServices, IUserServices
 		}
 
 		var userLogin =
-		  await GetUserLoginsAsync
+		  await _userRepository.GetUserLoginsAsync
 			(refreshToken: inputRefreshToken, includeUser: true);
 
 
@@ -248,7 +253,7 @@ public partial class UserServices : BaseServices, IUserServices
 		userLogin.RefreshToken = newRefreshToken.RefreshToken;
 		userLogin.CreatedByIp = ipAddress;
 
-		await SaveChangesAsync();
+		await _userRepository.SaveChangesAsync();
 
 		var claims = GenerateClaims(new UserClaims
 		{
@@ -271,22 +276,22 @@ public partial class UserServices : BaseServices, IUserServices
 			new LoginResponseViewModel()
 			{
 				Token = jwtToken,
-				Username = userLogin!.User.Username,
+				Username = userLogin!.User?.Username,
 				RefreshToken = newRefreshToken.RefreshToken,
 			};
 
 		result.Value = response;
 
-		await AddUserExistToCache(userId: userLogin!.User.Id);
+		await AddUserExistToCache(userId: userLogin!.User?.Id);
 
 		string successMessage = string.Format
 			(Resources.Messages.SuccessMessages.RefreshTokenSuccessfull);
 
 		result.AddSuccessMessage(successMessage);
 
-		_logger.LogWarning(Resources.Resource.UserRefreshTokenSuccessfulInformation, parameters: new List<object>
+		_logger.LogWarning(Resources.Resource.UserRefreshTokenSuccessfulInformation, parameters: new List<object?>
 		{
-			userLogin.User.Username,
+			userLogin.User?.Username,
 		});
 
 		return result;
@@ -311,7 +316,7 @@ public partial class UserServices : BaseServices, IUserServices
 		}
 
 		var userLogin =
-		  await GetUserLoginsAsync
+		  await _userRepository.GetUserLoginsAsync
 			(refreshToken: inputRefreshToken, includeUser: false);
 
 		if (userLogin == null)
@@ -323,10 +328,9 @@ public partial class UserServices : BaseServices, IUserServices
 			return result;
 		}
 
+		_userRepository.DeleteUserLogin(userLogin);
 
-		_databaseContext.UserLogins?.Remove(userLogin);
-
-		await SaveChangesAsync();
+		await _userRepository.SaveChangesAsync();
 
 		string successMessage = string.Format
 			(Resources.Messages.SuccessMessages.RefreshTokenRevoked);
@@ -356,9 +360,9 @@ public partial class UserServices : BaseServices, IUserServices
 
 		user.SecurityStamp = Guid.NewGuid();
 
-		await AddUserAsync(user: user);
+		await _userRepository.AddAsync(entity: user);
 
-		await SaveChangesAsync();
+		await _userRepository.SaveChangesAsync();
 
 		string successMessage = string.Format
 			(Resources.Messages.SuccessMessages.RegisterSuccessful);
@@ -393,7 +397,7 @@ public partial class UserServices : BaseServices, IUserServices
 		}
 
 		var user =
-			await GetUserById(userId: requestViewModel.UserId, isTracking: false);
+			await _userRepository.GetUserById(userId: requestViewModel.UserId, isTracking: false);
 
 		if (user == null)
 		{
@@ -434,7 +438,7 @@ public partial class UserServices : BaseServices, IUserServices
 		if (user.Username != requestViewModel.Username)
 		{
 			var isPhoneNumberExist =
-				await CheckUsernameExist(username: requestViewModel.Username);
+				await _userRepository.CheckUsernameExist(username: requestViewModel.Username);
 
 			if (isPhoneNumberExist)
 			{
@@ -450,7 +454,7 @@ public partial class UserServices : BaseServices, IUserServices
 		if (user.Email != requestViewModel.Email)
 		{
 			var isEmailExist =
-				await CheckEmailExist(email: requestViewModel.Email);
+				await _userRepository.CheckEmailExist(email: requestViewModel.Email);
 
 			if (isEmailExist)
 			{
@@ -469,9 +473,9 @@ public partial class UserServices : BaseServices, IUserServices
 		updatedUser.Id = requestViewModel.UserId;
 		updatedUser.SecurityStamp = Guid.NewGuid();
 
-		UpdateUserByAdmin(updatedUser);
+		_userRepository.UpdateUserByAdmin(updatedUser);
 
-		await SaveChangesAsync();
+		await _userRepository.SaveChangesAsync();
 
 		await _cache.RemoveByPrefixAsync($"userId-{updatedUser.Id}");
 
@@ -502,7 +506,7 @@ public partial class UserServices : BaseServices, IUserServices
 			Security.HashDataBySHA1(loginRequestViewModel.Password);
 
 		var foundedUser =
-			await LoginAsync(username: loginRequestViewModel.Username, hashedPassword: hashedPassword);
+			await _userRepository.LoginAsync(username: loginRequestViewModel.Username, hashedPassword: hashedPassword);
 
 		if (foundedUser == null)
 		{
@@ -531,9 +535,9 @@ public partial class UserServices : BaseServices, IUserServices
 
 		refreshToken.UserId = foundedUser.Id;
 
-		await AddUserLoginAsync(refreshToken);
+		await _userRepository.AddUserLoginAsync(refreshToken);
 
-		await SaveChangesAsync();
+		await _userRepository.SaveChangesAsync();
 
 		var claims = GenerateClaims(new UserClaims
 		{
@@ -600,7 +604,7 @@ public partial class UserServices : BaseServices, IUserServices
 			return result;
 
 		var isRoleExist =
-			await CheckRoleExist(requestViewModel.RoleId);
+			await _userRepository.CheckRoleExist(requestViewModel.RoleId);
 
 		if (!isRoleExist)
 		{
@@ -612,7 +616,7 @@ public partial class UserServices : BaseServices, IUserServices
 		}
 
 		var foundedUser =
-			await GetUserById(userId: requestViewModel.UserId, isTracking: true);
+			await _userRepository.GetUserById(userId: requestViewModel.UserId, isTracking: true);
 
 		if (foundedUser == null)
 		{
@@ -659,7 +663,7 @@ public partial class UserServices : BaseServices, IUserServices
 		foundedUser.RoleId = requestViewModel.RoleId;
 		foundedUser.SecurityStamp = Guid.NewGuid();
 
-		await SaveChangesAsync();
+		await _userRepository.SaveChangesAsync();
 
 		await _cache.RemoveByPrefixAsync($"userId-{foundedUser.Id}");
 
@@ -690,7 +694,7 @@ public partial class UserServices : BaseServices, IUserServices
 			Security.HashDataBySHA1(requestViewModel.Password);
 
 		var foundedUser =
-			await LoginAsync(username: requestViewModel.Username, hashedPassword: hashedPassword);
+			await _userRepository.LoginAsync(username: requestViewModel.Username, hashedPassword: hashedPassword);
 
 		if (foundedUser == null)
 		{
@@ -719,9 +723,9 @@ public partial class UserServices : BaseServices, IUserServices
 
 		refreshToken.UserId = foundedUser.Id;
 
-		await AddUserLoginAsync(refreshToken);
+		await _userRepository.AddUserLoginAsync(refreshToken);
 
-		await SaveChangesAsync();
+		await _userRepository.SaveChangesAsync();
 
 		var claims = GenerateClaims(new UserClaims
 		{

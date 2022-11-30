@@ -1,4 +1,6 @@
 //******************************
+using Persistence.Repositories.Base;
+
 var builder =
 	WebApplication.CreateBuilder(args);
 //******************************
@@ -31,11 +33,12 @@ builder.Services.AddTransient
 	(serviceType: typeof(Dtat.Logging.ILogger<>),
 		implementationType: typeof(Dtat.Logging.NLog.NLogAdapter<>));
 
-builder.Services.AddScoped<IUserServices, UserServices>();
-
-builder.Services.AddScoped<ITokenServices, TokenServices>();
-
-builder.Services.AddScoped<LogInputParameterAttribute>();
+builder.Services
+	.AddScoped<IUserServices, UserServices>()
+	.AddScoped<IUserRepository, UserRepository>()
+	.AddScoped<IUnitOfWork, UnitOfWork>()
+	.AddScoped<ITokenServices, TokenServices>()
+	.AddScoped<LogInputParameterAttribute>();
 
 builder.Services.AddAutoMapper(typeof(Infrastructure.AutoMapperProfiles.UserProfile));
 

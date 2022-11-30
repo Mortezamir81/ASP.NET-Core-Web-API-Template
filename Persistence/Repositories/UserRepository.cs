@@ -1,42 +1,39 @@
-﻿namespace Services;
+﻿namespace Persistence.Repositories;
 
-public partial class UserServices
+public class UserRepository : RepositoryBase<User>, IUserRepository
 {
-	public async Task SaveChangesAsync()
+	#region Constractor
+	public UserRepository(DatabaseContext dbContext) : base(dbContext)
 	{
-		await _databaseContext.SaveChangesAsync();
 	}
+	#endregion /Constractor
 
-
-	public void DeleteUser(User user)
-	{
-		_databaseContext.Users?.Remove(user);
-	}
-
-
-	public async Task AddUserAsync(User user)
-	{
-		await _databaseContext.Users!.AddAsync(user);
-	}
-
-
+	#region Methods
 	public void UpdateUserByAdmin(User user)
 	{
-		if (user == null)
-			throw new ArgumentNullException(paramName: nameof(user));
+		Assert.NotNull(obj: user, nameof(user));
 
-		_databaseContext.Users?.Attach(user);
-		_databaseContext.Entry(user).Property(x => x.FullName).IsModified = true;
-		_databaseContext.Entry(user).Property(x => x.Username).IsModified = true;
-		_databaseContext.Entry(user).Property(x => x.Email).IsModified = true;
-		_databaseContext.Entry(user).Property(x => x.SecurityStamp).IsModified = true;
+		Attach(user);
+
+		DatabaseContext.Entry(user).Property(x => x.FullName).IsModified = true;
+		DatabaseContext.Entry(user).Property(x => x.Username).IsModified = true;
+		DatabaseContext.Entry(user).Property(x => x.Email).IsModified = true;
+		DatabaseContext.Entry(user).Property(x => x.SecurityStamp).IsModified = true;
+	}
+
+
+	public void DeleteUserLogin(UserLogin? userLogin)
+	{
+		Assert.NotNull(obj: userLogin, nameof(userLogin));
+
+		DatabaseContext.Remove(userLogin!);
 	}
 
 
 	public async Task<bool> CheckRoleExist(int roleId)
 	{
 		var isRoleExist =
-			await _databaseContext.Roles!
+			await DatabaseContext.Roles!
 			.Select(current => current.Id)
 			.Where(current => current == roleId)
 			.AnyAsync();
@@ -49,7 +46,7 @@ public partial class UserServices
 
 	{
 		var result =
-			await _databaseContext.Users!
+			await Entities!
 				.AsNoTracking()
 				.Select(current => current.Email)
 				.Where(current => current == email)
@@ -63,8 +60,7 @@ public partial class UserServices
 	public async Task<int> GetRoleAsync(int roleId)
 	{
 		return
-			await _databaseContext
-				.Roles!
+			await DatabaseContext.Roles!
 				.AsNoTracking()
 				.Select(current => current.Id)
 				.Where(current => current == roleId)
@@ -75,14 +71,14 @@ public partial class UserServices
 
 	public async Task AddUserLoginAsync(UserLogin userLogin)
 	{
-		await _databaseContext.UserLogins!.AddAsync(userLogin);
+		await DatabaseContext.UserLogins!.AddAsync(userLogin);
 	}
 
 
 	public async Task<bool> CheckUsernameExist(string? username)
 	{
 		var result =
-			await _databaseContext.Users!
+			await DatabaseContext.Users!
 				.AsNoTracking()
 				.Select(current => current.Username)
 				.Where(current => current == username)
@@ -96,7 +92,7 @@ public partial class UserServices
 	public async Task<User?> GetUserByPhoneNumberAsync(string phoneNumber)
 	{
 		return
-			await _databaseContext.Users!
+			await DatabaseContext.Users!
 				.AsNoTracking()
 				.Where(current => current.Username.ToLower() == phoneNumber.ToLower())
 				.FirstOrDefaultAsync()
@@ -111,7 +107,7 @@ public partial class UserServices
 		if (isTracking)
 		{
 			user =
-				await _databaseContext
+				await DatabaseContext
 					.Users!
 					.Where(current => current.Id == userId)
 					.FirstOrDefaultAsync()
@@ -120,7 +116,7 @@ public partial class UserServices
 		else
 		{
 			user =
-				await _databaseContext
+				await DatabaseContext
 					.Users!
 					.AsNoTracking()
 					.Where(current => current.Id == userId)
@@ -139,7 +135,7 @@ public partial class UserServices
 		if (includeUser)
 		{
 			userLogin =
-				await _databaseContext.UserLogins!
+				await DatabaseContext.UserLogins!
 					.Include(current => current.User)
 					.Where(current => current.RefreshToken == refreshToken)
 					.FirstOrDefaultAsync();
@@ -147,7 +143,7 @@ public partial class UserServices
 		else
 		{
 			userLogin =
-				await _databaseContext.UserLogins!
+				await DatabaseContext.UserLogins!
 					.Where(current => current.RefreshToken == refreshToken)
 					.FirstOrDefaultAsync();
 		}
@@ -158,18 +154,12 @@ public partial class UserServices
 
 	public async Task<LoginViewModel?> LoginAsync(string? username, string hashedPassword)
 	{
-		if (string.IsNullOrWhiteSpace(username))
-		{
-			throw new ArgumentNullException(paramName: username);
-		}
+		Assert.NotEmpty(obj: username, nameof(username));
 
-		if (string.IsNullOrWhiteSpace(hashedPassword))
-		{
-			throw new ArgumentNullException(paramName: hashedPassword);
-		}
+		Assert.NotEmpty(obj: username, nameof(hashedPassword));
 
 		var result =
-			await _databaseContext.Users!
+			await DatabaseContext.Users!
 				.AsNoTracking()
 				.Where(current => current.Username == username)
 				.Where(current => current.HashedPassword == hashedPassword)
@@ -184,4 +174,5 @@ public partial class UserServices
 
 		return result;
 	}
+	#endregion /Methods
 }
