@@ -5,19 +5,16 @@ public class TokenServices : ITokenServices
 	#region Constractor
 	public TokenServices
 		(ILogger<TokenServices> logger,
-		DatabaseContext databaseContext,
 		IEasyCachingProvider cache)
 	{
 		Cache = cache;
 		Logger = logger;
-		DatabaseContext = databaseContext;
 	}
 	#endregion /Constractor
 
 	#region Properties
 	public IEasyCachingProvider Cache { get; }
 	private ILogger<TokenServices> Logger { get; }
-	public DatabaseContext DatabaseContext { get; }
 	#endregion /Properties
 
 	#region MainMethods
@@ -58,20 +55,6 @@ public class TokenServices : ITokenServices
 			new SigningCredentials(key: symmetricSecurityKey, algorithm: securityAlgorithm);
 
 		return signingCredentional;
-	}
-
-
-	private async Task<bool> CheckUserSecurityStampAsync(Guid securityStamp, long userId)
-	{
-		var result =
-			await DatabaseContext.Users!
-				.AsNoTracking()
-				.Select(current => new { current.Id, current.SecurityStamp })
-				.Where(current => current.SecurityStamp == securityStamp && current.Id == userId)
-				.AnyAsync()
-				;
-
-		return result;
 	}
 
 

@@ -1,6 +1,7 @@
 ﻿namespace Persistence.Repositories.Base;
 
-public class RepositoryBase<TEntity> : IRepositoryBase<TEntity> where TEntity : class
+public class RepositoryBase<TEntity> : 
+	IRepositoryBase<TEntity> where TEntity : class
 {
 	#region Constractor
 	public RepositoryBase(DatabaseContext dbContext)

@@ -1,4 +1,6 @@
-﻿namespace Persistence.Repositories;
+﻿using Shared.Enums;
+
+namespace Persistence.Repositories;
 
 public interface IUserRepository : IRepositoryBase<User>
 {
@@ -14,7 +16,7 @@ public interface IUserRepository : IRepositoryBase<User>
 	void DeleteUserLogin(UserLogin userLogin);
 
 
-	Task<int> GetRoleAsync(int roleId);
+	Task<int> GetRoleIdInDatabaseAsync(int roleId);
 
 
 	Task AddUserLoginAsync(UserLogin userLogin);
@@ -33,4 +35,7 @@ public interface IUserRepository : IRepositoryBase<User>
 
 
 	Task<LoginViewModel?> LoginAsync(string? username, string hashedPassword);
+
+
+	Task<int?> GetUserRoleAsync(int userId);
 }

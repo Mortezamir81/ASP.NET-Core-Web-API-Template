@@ -1,4 +1,6 @@
-﻿namespace Persistence.Repositories;
+﻿using Shared.Enums;
+
+namespace Persistence.Repositories;
 
 public class UserRepository : RepositoryBase<User>, IUserRepository
 {
@@ -57,7 +59,7 @@ public class UserRepository : RepositoryBase<User>, IUserRepository
 	}
 
 
-	public async Task<int> GetRoleAsync(int roleId)
+	public async Task<int> GetRoleIdInDatabaseAsync(int roleId)
 	{
 		return
 			await DatabaseContext.Roles!
@@ -173,6 +175,21 @@ public class UserRepository : RepositoryBase<User>, IUserRepository
 				;
 
 		return result;
+	}
+
+
+	public async Task<int?> GetUserRoleAsync(int userId)
+	{
+		var roleId =
+			await Entities
+			.Where(current => current.Id == userId)
+			.Select(current => current.RoleId)
+			.FirstOrDefaultAsync();
+
+		if (!roleId.HasValue || roleId == 0)
+			return null;
+
+		return roleId;
 	}
 	#endregion /Methods
 }

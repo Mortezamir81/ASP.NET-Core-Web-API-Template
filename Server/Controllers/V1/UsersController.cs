@@ -88,10 +88,12 @@ public class UsersController : BaseController
 	[LogInputParameter(InputLogLevel.Warning)]
 	[HttpPut("ChangeUserRole")]
 	public async Task<ActionResult<Result>>
-		ChangeUserRoleAsync([FromBody] ChangeUserRoleRequestViewModel changeUserRoleRequestViewModel)
+		ChangeUserRoleAsync([FromBody] ChangeUserRoleRequestViewModel requestViewModel)
 	{
+		var userRequestedId = GetUserId();
+
 		var serviceResult =
-			await _userServices.ChangeUserRoleAsync(changeUserRoleRequestViewModel);
+			await _userServices.ChangeUserRoleAsync(requestViewModel, adminId: userRequestedId);
 
 		return serviceResult.ApiResult();
 	}
@@ -105,8 +107,10 @@ public class UsersController : BaseController
 	public async Task<ActionResult>
 		UpdateUserByAdminAsync(UpdateUserByAdminRequestViewModel requestViewModel)
 	{
+		var userRequestedId = GetUserId();
+
 		var serviceResult =
-			await _userServices.UpdateUserByAdminAsync(viewModel: requestViewModel);
+			await _userServices.UpdateUserByAdminAsync(viewModel: requestViewModel, adminId: userRequestedId);
 
 		return serviceResult.ApiResult();
 	}

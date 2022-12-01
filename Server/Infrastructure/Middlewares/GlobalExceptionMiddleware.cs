@@ -1,19 +1,19 @@
 ﻿namespace Infrastructure.Middlewares;
 
-    public class GlobalExceptionMiddleware
-    {
+public class GlobalExceptionMiddleware
+{
 	public GlobalExceptionMiddleware(RequestDelegate next, Dtat.Logging.ILogger<GlobalExceptionMiddleware> logger) : base()
 	{
 		Next = next;
-            Logger = logger;
-        }
+		Logger = logger;
+	}
 
 
 	protected RequestDelegate Next { get; }
-        public Dtat.Logging.ILogger<GlobalExceptionMiddleware> Logger { get; }
+	public Dtat.Logging.ILogger<GlobalExceptionMiddleware> Logger { get; }
 
 
-        public async Task InvokeAsync(HttpContext httpContext)
+	public async Task InvokeAsync(HttpContext httpContext)
 	{
 		try
 		{

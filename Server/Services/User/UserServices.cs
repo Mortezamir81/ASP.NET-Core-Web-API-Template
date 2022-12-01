@@ -1,6 +1,4 @@
-﻿using Common.Utilities;
-
-namespace Services;
+﻿namespace Services;
 
 public partial class UserServices : BaseServices, IUserServices
 {
@@ -20,8 +18,7 @@ public partial class UserServices : BaseServices, IUserServices
 		ITokenServices tokenServices,
 		ILogger<UserServices> logger,
 		IUserRepository userRepository,
-		IOptions<ApplicationSettings> options,
-		IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
+		IOptions<ApplicationSettings> options) : base()
 	{
 		_mapper = mapper;
 		_cache = cache;
@@ -51,18 +48,6 @@ public partial class UserServices : BaseServices, IUserServices
 		{
 			string errorMessage = string.Format
 				(Resources.Messages.ErrorMessages.InvalidUserId);
-
-			result.AddErrorMessage(errorMessage);
-
-			return result;
-		}
-
-		var adminUserInContext = GetUserFromContext();
-
-		if (adminUserInContext == null)
-		{
-			string errorMessage = string.Format
-				(Resources.Messages.ErrorMessages.UserNotFound);
 
 			result.AddErrorMessage(errorMessage);
 
@@ -145,18 +130,6 @@ public partial class UserServices : BaseServices, IUserServices
 		{
 			string errorMessage = string.Format
 				(Resources.Messages.ErrorMessages.InvalidUserId);
-
-			result.AddErrorMessage(errorMessage);
-
-			return result;
-		}
-
-		var adminUserInContext = GetUserFromContext();
-
-		if (adminUserInContext == null)
-		{
-			string errorMessage = string.Format
-				(Resources.Messages.ErrorMessages.UserNotFound);
 
 			result.AddErrorMessage(errorMessage);
 
@@ -373,8 +346,8 @@ public partial class UserServices : BaseServices, IUserServices
 	}
 
 
-	public async Task<Result>
-		UpdateUserByAdminAsync(UpdateUserByAdminRequestViewModel requestViewModel)
+	public async Task<Result> UpdateUserByAdminAsync
+		(UpdateUserByAdminRequestViewModel requestViewModel, int? adminId)
 	{
 		var result =
 			UpdateUserByAdminValidation(viewModel: requestViewModel);
@@ -384,12 +357,23 @@ public partial class UserServices : BaseServices, IUserServices
 			return result;
 		}
 
-		var adminInContext = GetUserFromContext();
-
-		if (adminInContext == null)
+		if (!adminId.HasValue)
 		{
 			string errorMessage = string.Format
-				(Resources.Messages.ErrorMessages.UserNotFound);
+				(Resources.Messages.ErrorMessages.MostNotBeNull, nameof(adminId));
+
+			result.AddErrorMessage(errorMessage);
+
+			return result;
+		}
+
+		var adminRoleId =
+			await _userRepository.GetUserRoleAsync(adminId.Value);
+
+		if (!adminRoleId.HasValue)
+		{
+			var errorMessage =
+				string.Format(nameof(HttpStatusCode.Unauthorized));
 
 			result.AddErrorMessage(errorMessage);
 
@@ -409,21 +393,22 @@ public partial class UserServices : BaseServices, IUserServices
 			return result;
 		}
 
-		if (user.Id != adminInContext.Id)
+		if (user.Id != adminId)
 		{
-			if (user.RoleId == adminInContext.RoleId)
+			if (user.RoleId == adminRoleId)
 			{
 				string errorMessage = string.Format
 					(Resources.Messages.ErrorMessages.AccessDeniedForUpdateThisUser);
 
 				result.AddErrorMessage(errorMessage);
+
 				return result;
 			}
 		}
 
-		if (adminInContext.RoleId == (int)UserRoleEnum.Admin)
+		if (adminRoleId == (int) UserRoleEnum.Admin)
 		{
-			if (user.RoleId == (int)UserRoleEnum.SystemAdministrator)
+			if (user.RoleId == (int) UserRoleEnum.SystemAdministrator)
 			{
 				string errorMessage = string.Format
 					(Resources.Messages.ErrorMessages.AccessDeniedForUpdateThisUser);
@@ -582,26 +567,37 @@ public partial class UserServices : BaseServices, IUserServices
 	}
 
 
-	public async Task<Result>
-		ChangeUserRoleAsync(ChangeUserRoleRequestViewModel requestViewModel)
+	public async Task<Result> ChangeUserRoleAsync
+		(ChangeUserRoleRequestViewModel requestViewModel, int? adminId)
 	{
 		var result =
 			ChangeUserRoleValidation(requestViewModel);
 
-		var adminInContext = GetUserFromContext();
+		if (result.IsFailed)
+			return result;
 
-		if (adminInContext == null)
+		if (!adminId.HasValue)
 		{
 			string errorMessage = string.Format
-				(Resources.Messages.ErrorMessages.UserNotFound);
+				(Resources.Messages.ErrorMessages.MostNotBeNull, nameof(adminId));
 
 			result.AddErrorMessage(errorMessage);
 
 			return result;
 		}
 
-		if (result.IsFailed == true)
+		var adminRoleId =
+			await _userRepository.GetUserRoleAsync(adminId.Value);
+
+		if (!adminRoleId.HasValue)
+		{
+			var errorMessage =
+				string.Format(nameof(HttpStatusCode.Unauthorized));
+
+			result.AddErrorMessage(errorMessage);
+
 			return result;
+		}
 
 		var isRoleExist =
 			await _userRepository.CheckRoleExist(requestViewModel.RoleId);
@@ -612,6 +608,7 @@ public partial class UserServices : BaseServices, IUserServices
 				(Resources.Messages.ErrorMessages.RoleNotFound);
 
 			result.AddErrorMessage(errorMessage);
+
 			return result;
 		}
 
@@ -627,7 +624,7 @@ public partial class UserServices : BaseServices, IUserServices
 			return result;
 		}
 
-		if (foundedUser.RoleId == adminInContext.RoleId)
+		if (foundedUser.RoleId == adminRoleId)
 		{
 			string errorMessage = string.Format
 				(Resources.Messages.ErrorMessages.AccessDeniedForChangeRole);
@@ -636,7 +633,7 @@ public partial class UserServices : BaseServices, IUserServices
 			return result;
 		}
 
-		if (adminInContext.RoleId == (int)UserRoleEnum.Admin)
+		if (adminRoleId == (int) UserRoleEnum.Admin)
 		{
 			if (foundedUser.RoleId == (int)UserRoleEnum.SystemAdministrator)
 			{
