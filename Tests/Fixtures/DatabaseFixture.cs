@@ -3,9 +3,6 @@
 public class DatabaseFixture : IDisposable
 {
 	#region Fields
-	private const string ConnectionString =
-		@"Data Source=.;Initial Catalog=Templete_Test;Integrated Security=true; TrustServerCertificate=True";
-
 	private static readonly object _lock = new();
 	private static bool _databaseInitialized;
 	#endregion /Fields
@@ -45,7 +42,7 @@ public class DatabaseFixture : IDisposable
 	{
 		var dbOptions =
 			new DbContextOptionsBuilder<DatabaseContext>()
-			.UseSqlServer(ConnectionString)
+			.UseSqlServer(Consts.ConnectionString)
 			.Options;
 
 		return new DatabaseContext(dbOptions);
