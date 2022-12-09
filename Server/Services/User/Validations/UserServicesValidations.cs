@@ -73,6 +73,7 @@ public partial class UserServices
 				nameof(loginRequestViewModel));
 
 			result.AddErrorMessage(errorMessage);
+
 			return result;
 		}
 
@@ -90,18 +91,6 @@ public partial class UserServices
 			string errorMessage = string.Format
 				(Resources.Messages.ErrorMessages.MostNotBeNull,
 					nameof(loginRequestViewModel.Password));
-
-			result.AddErrorMessage(errorMessage);
-		}
-
-		if (result.IsFailed)
-			return result;
-
-		if (loginRequestViewModel.Username?.Length > Constants.MaxLength.CellPhoneNumber)
-		{
-			string errorMessage = string.Format
-				(Resources.Messages.ErrorMessages.MaxLength,
-					nameof(loginRequestViewModel.Username), Constants.MaxLength.CellPhoneNumber);
 
 			result.AddErrorMessage(errorMessage);
 		}

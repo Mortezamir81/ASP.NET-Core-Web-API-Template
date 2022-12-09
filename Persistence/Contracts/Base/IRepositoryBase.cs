@@ -2,12 +2,6 @@
 
 public interface IRepositoryBase<TEntity> where TEntity : class
 {
-	#region Properties
-	DbSet<TEntity> Entities { get; }
-	IQueryable<TEntity> Table { get; }
-	IQueryable<TEntity> TableNoTracking { get; }
-	#endregion /Properties
-
 	#region Add
 	void Add(TEntity entity, bool saveNow = true);
 	Task AddAsync(TEntity entity, CancellationToken cancellationToken = default, bool saveNow = true);

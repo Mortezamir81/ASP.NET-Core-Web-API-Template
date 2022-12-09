@@ -1,0 +1,15 @@
+global using Xunit;
+global using AutoMapper;
+global using Domain.UserManagment;
+global using Dtat.Logging;
+global using EasyCaching.Core;
+global using Infrastructure.Settings;
+global using Microsoft.Extensions.Options;
+global using Moq;
+global using Persistence.Repositories;
+global using Services;
+global using System.Security.Claims;
+global using ViewModels.General;
+global using Microsoft.EntityFrameworkCore;
+global using Persistence;
+global using Shared.Enums;

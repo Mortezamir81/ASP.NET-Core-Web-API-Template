@@ -486,9 +486,9 @@ public partial class UserServices : BaseServices, IUserServices
 
 		if (result.IsFailed == true)
 			return result;
-
+		
 		var hashedPassword =
-			Security.HashDataBySHA1(loginRequestViewModel.Password);
+			Security.GetSha256(loginRequestViewModel.Password);
 
 		var foundedUser =
 			await _userRepository.LoginAsync(username: loginRequestViewModel.Username, hashedPassword: hashedPassword);
@@ -559,7 +559,7 @@ public partial class UserServices : BaseServices, IUserServices
 		{
 			new
 			{
-				PhoneNumber = loginRequestViewModel.Username,
+				Username = loginRequestViewModel.Username,
 			}
 		});
 

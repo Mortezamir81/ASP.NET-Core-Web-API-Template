@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "Dtat.Logging.NLog": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:3351;http://localhost:3355"
+    }
+  }
+}

@@ -4,7 +4,9 @@ public class DatabaseContext : DbContext
 {
 	public DatabaseContext(DbContextOptions dbContextOptions) : base(dbContextOptions)
 	{
+#if DEBUG
 		Database.EnsureCreated();
+#endif
 	}
 
 

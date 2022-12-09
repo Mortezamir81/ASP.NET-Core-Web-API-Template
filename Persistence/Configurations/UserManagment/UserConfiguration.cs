@@ -21,7 +21,6 @@ internal class UserConfiguration : IEntityTypeConfiguration<User>
 
 		builder.Property
 			(current => current.Username)
-				.HasMaxLength(maxLength: Constants.MaxLength.CellPhoneNumber)
 				.IsRequired();
 
 		builder.Property
@@ -41,6 +40,10 @@ internal class UserConfiguration : IEntityTypeConfiguration<User>
 
 		builder.Property
 			(current => current.RoleId)
+				.IsRequired();
+
+		builder.Property
+			(current => current.SecurityStamp)
 				.IsRequired();
 		//********************
 
