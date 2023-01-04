@@ -3,5 +3,5 @@
 public interface ITokenServices
 {
 	string GenerateJwtToken
-		(string securityKey, ClaimsIdentity claimsIdentity, DateTime dateTime);
+		(string? securityKey, ClaimsIdentity claimsIdentity, DateTime dateTime);
 }

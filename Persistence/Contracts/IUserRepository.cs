@@ -1,8 +1,6 @@
-﻿using Shared.Enums;
+﻿namespace Persistence.Repositories;
 
-namespace Persistence.Repositories;
-
-public interface IUserRepository : IRepositoryBase<User>
+public interface IUserRepository
 {
 	void UpdateUserByAdmin(User user);
 
@@ -16,19 +14,13 @@ public interface IUserRepository : IRepositoryBase<User>
 	void DeleteUserLogin(UserLogin userLogin);
 
 
-	Task<int> GetRoleIdInDatabaseAsync(int roleId);
-
-
 	Task AddUserLoginAsync(UserLogin userLogin);
 
 
 	Task<bool> CheckUsernameExist(string? username);
 
 
-	Task<User?> GetUserByPhoneNumberAsync(string phoneNumber);
-
-
-	Task<User?> GetUserById(long userId, bool isTracking);
+	Task<User?> GetUserById(int userId, bool isTracking);
 
 
 	Task<UserLogin?> GetUserLoginsAsync(Guid refreshToken, bool includeUser);
@@ -38,4 +30,11 @@ public interface IUserRepository : IRepositoryBase<User>
 
 
 	Task<int?> GetUserRoleAsync(int userId);
+
+
+	Task AddAsync
+		(User entity, CancellationToken cancellationToken = default);
+
+
+	Task<int> SaveChangesAsync();
 }

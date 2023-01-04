@@ -1,6 +1,4 @@
-﻿using Microsoft.VisualBasic;
-
-namespace Server.Controllers.V1;
+﻿namespace Server.Controllers.V1;
 
 /// <summary>
 /// User Managment and Authentication or Authorization
@@ -73,6 +71,19 @@ public class UsersController : BaseController
 	[HttpPost("RefreshToken/{refreshToken?}")]
 	public async Task<ActionResult<Result<LoginResponseViewModel>>> RefreshToken(string refreshToken)
 	{
+		if (string.IsNullOrWhiteSpace(refreshToken))
+		{
+			var result = 
+				new Result<LoginResponseViewModel>();
+
+			string errorMessage = string.Format
+				(Resources.Messages.ErrorMessages.MostNotBeNull, nameof(refreshToken));
+
+			result.AddErrorMessage(errorMessage);
+
+			return result.ApiResult();
+		}
+
 		var serviceResult =
 			await _userServices.RefreshTokenAsync(token: refreshToken, ipAddress: GetIPAddress());
 
@@ -90,13 +101,42 @@ public class UsersController : BaseController
 	public async Task<ActionResult<Result>>
 		ChangeUserRoleAsync([FromBody] ChangeUserRoleRequestViewModel requestViewModel)
 	{
+		var result = new Result();
+
 		var userRequestedId = GetUserId();
 
+		if (!userRequestedId.HasValue)
+		{
+			var errorMessage =
+				string.Format(nameof(HttpStatusCode.Unauthorized));
+
+			result.AddErrorMessage(errorMessage);
+
+			return result;
+		}
+
 		var serviceResult =
-			await _userServices.ChangeUserRoleAsync(requestViewModel, adminId: userRequestedId);
+			await _userServices.ChangeUserRoleAsync(requestViewModel, adminId: userRequestedId.Value);
 
 		return serviceResult.ApiResult();
 	}
+
+
+	/// <summary>
+	/// Ban or UnBan user by admin
+	/// </summary>
+	[Authorize(Roles = $"{Constants.Role.SystemAdmin},{Constants.Role.Admin}")]
+	[LogInputParameter(InputLogLevel.Warning)]
+	[HttpPut("ToggleBanUser")]
+	public async Task<ActionResult<Result>>
+		ToggleBanUserAsync(ToggleBanUserRequestViewModel requestViewModel)
+	{
+		var serviceResult =
+			await _userServices.ToggleBanUser(userId: requestViewModel.UserId!.Value);
+
+		return serviceResult.ApiResult();
+	}
+
 
 	/// <summary>
 	/// Update user informations by admin (by userId)
@@ -118,15 +158,16 @@ public class UsersController : BaseController
 
 	#region HttpDelete
 	/// <summary>
-	/// Delete a user by userId
+	/// Delete a user by system admin
 	/// </summary>
-	[Authorize(Roles = $"{Constants.Role.SystemAdmin},{Constants.Role.Admin}")]
+	[Authorize(Roles = $"{Constants.Role.SystemAdmin}")]
 	[LogInputParameter(InputLogLevel.Warning)]
-	[HttpDelete("UserSoftDelete/{userId:long?}")]
-	public async Task<ActionResult<Result>> UserSoftDeleteAsync(long? userId)
+	[HttpDelete("UserDelete")]
+	public async Task<ActionResult<Result>> 
+		UserSoftDeleteAsync([FromQuery] UserSoftDeleteRequestViewModel requestViewModel)
 	{
 		var serviceResult =
-			await _userServices.UserSoftDeleteAsync(userId: userId);
+			await _userServices.UserSoftDeleteAsync(userId: requestViewModel.UserId!.Value);
 
 		return serviceResult.ApiResult();
 	}
@@ -137,6 +178,18 @@ public class UsersController : BaseController
 	[HttpDelete("Logout/{refreshToken?}")]
 	public async Task<ActionResult<Result>> LogoutToken(string refreshToken)
 	{
+		if (string.IsNullOrWhiteSpace(refreshToken))
+		{
+			var result = new Result();
+
+			string errorMessage = string.Format
+				(Resources.Messages.ErrorMessages.MostNotBeNull, nameof(refreshToken));
+
+			result.AddErrorMessage(errorMessage);
+
+			return result.ApiResult();
+		}
+
 		var serviceResult = await
 			_userServices.LogoutAsync(refreshToken);
 

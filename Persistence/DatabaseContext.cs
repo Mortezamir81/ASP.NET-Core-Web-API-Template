@@ -1,22 +1,28 @@
-﻿namespace Persistence;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
-public class DatabaseContext : DbContext
+namespace Persistence;
+
+public class DatabaseContext : IdentityDbContext<User, Role, int>
 {
+	#region Constractor
 	public DatabaseContext(DbContextOptions dbContextOptions) : base(dbContextOptions)
 	{
 #if DEBUG
 		Database.EnsureCreated();
 #endif
 	}
+	#endregion /Constractor
 
-
-	public DbSet<User>? Users { get; set; }
+	#region Properties
 	public DbSet<UserLogin>? UserLogins { get; set; }
-	public DbSet<Role>? Roles { get; set; }
+	#endregion /Properties
 
-
+	#region Methods
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
+		base.OnModelCreating(modelBuilder);
+
 		modelBuilder.ApplyConfigurationsFromAssembly(GetType().Assembly);
 	}
+	#endregion /Methods
 }

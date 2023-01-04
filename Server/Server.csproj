@@ -52,7 +52,12 @@
     <ProjectReference Include="..\Softmax Libraries\Softmax.Logging\Dtat.Logging.csproj" />
     <ProjectReference Include="..\Softmax Libraries\Softmax.Result.Server\Dtat.Result.Server.csproj" />
     <ProjectReference Include="..\Softmax Libraries\Softmax.Utilities.Security\Softmax.Utilities.Security.csproj" />
-    <ProjectReference Include="..\Softmax Libraries\Softmax.Utilities.Validation\Softmax.Utilities.Validation.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="web.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>

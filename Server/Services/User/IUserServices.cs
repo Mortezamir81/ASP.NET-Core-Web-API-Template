@@ -5,7 +5,10 @@ public interface IUserServices
 	Task<Result> LogoutAsync(string token);
 
 
-	Task<Result> UserSoftDeleteAsync(long? userId);
+	Task<Result> UserSoftDeleteAsync(int userId);
+
+
+	Task<Result> ToggleBanUser(int userId);
 
 
 	Task<Result> RegisterAsync
@@ -25,7 +28,7 @@ public interface IUserServices
 
 
 	Task<Result>ChangeUserRoleAsync
-		(ChangeUserRoleRequestViewModel changeUserRoleRequestViewModel, int? adminId);
+		(ChangeUserRoleRequestViewModel changeUserRoleRequestViewModel, int adminId);
 
 
 	Task<Result<LoginResponseViewModel>> RefreshTokenAsync(string token, string? ipAddress);

@@ -15,5 +15,5 @@ public class LoginViewModel
 	public bool IsBanned { get; set; }
 	public string RoleName { get; set; }
 	public string Username { get; set; }
-	public Guid SecurityStamp { get; set; }
+	public required string SecurityStamp { get; set; }
 }

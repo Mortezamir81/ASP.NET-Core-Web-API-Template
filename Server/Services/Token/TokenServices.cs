@@ -2,30 +2,24 @@
 
 public class TokenServices : ITokenServices
 {
-	#region Constractor
-	public TokenServices
-		(ILogger<TokenServices> logger,
-		IEasyCachingProvider cache)
-	{
-		Cache = cache;
-		Logger = logger;
-	}
-	#endregion /Constractor
-
-	#region Properties
-	public IEasyCachingProvider Cache { get; }
-	private ILogger<TokenServices> Logger { get; }
-	#endregion /Properties
-
 	#region MainMethods
+	/// <summary>
+	/// Generate jwt access token
+	/// </summary>
+	/// <param name="securityKey"></param>
+	/// <param name="claimsIdentity"></param>
+	/// <param name="dateTime"></param>
+	/// <returns></returns>
 	public string GenerateJwtToken
-		(string securityKey, ClaimsIdentity claimsIdentity, DateTime dateTime)
+		(string? securityKey, ClaimsIdentity claimsIdentity, DateTime dateTime)
 	{
+		Assert.NotEmpty(securityKey, nameof(securityKey));
+
 		var signingCredentional =
-			GetSigningCredentional(securityKey);
+			GenerateSigningCredentional(securityKey!);
 
 		var tokenDescriptor =
-			GetTokenDescriptor(claimsIdentity, dateTime, signingCredentional);
+			GenerateTokenDescriptor(claimsIdentity, dateTime, signingCredentional);
 
 		var tokenHandler = new JwtSecurityTokenHandler();
 
@@ -40,7 +34,7 @@ public class TokenServices : ITokenServices
 	#endregion /MainMethods
 
 	#region SubMethods
-	private SigningCredentials GetSigningCredentional(string securityKey)
+	private SigningCredentials GenerateSigningCredentional(string securityKey)
 	{
 		byte[] key =
 			Encoding.ASCII.GetBytes(securityKey);
@@ -58,7 +52,7 @@ public class TokenServices : ITokenServices
 	}
 
 
-	private SecurityTokenDescriptor GetTokenDescriptor
+	private SecurityTokenDescriptor GenerateTokenDescriptor
 		(ClaimsIdentity claimsIdentity, DateTime dateTime, SigningCredentials signingCredentional)
 	{
 		var tokenDescriptor =

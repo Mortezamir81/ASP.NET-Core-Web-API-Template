@@ -1,4 +1,6 @@
 //******************************
+using Infrastructure.Extentions;
+
 var builder =
 	WebApplication.CreateBuilder(args);
 //******************************
@@ -11,6 +13,9 @@ builder.Services.Configure<ApplicationSettings>
 
 builder.Services.AddCustomDbContext
 	(connectionString: builder.Configuration.GetConnectionString("MySqlServerConnectionString"));
+
+builder.Services.AddCustomIdentity
+	(builder.Configuration.GetSection($"{nameof(ApplicationSettings)}:{nameof(IdentitySettings)}").Get<IdentitySettings>());
 
 builder.Services.AddCustomCORS();
 
@@ -44,6 +49,8 @@ var app =
 
 #region Middlewares
 //******************************
+await app.IntializeDatabase();
+
 if (app.Environment.IsDevelopment())
 {
 	app.UseDeveloperExceptionPage();

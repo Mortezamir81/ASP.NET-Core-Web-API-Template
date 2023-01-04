@@ -1,4 +1,6 @@
-﻿namespace Services;
+﻿using Microsoft.AspNetCore.Http;
+
+namespace Services;
 
 public partial class UserServices : BaseServices, IUserServices
 {
@@ -8,6 +10,8 @@ public partial class UserServices : BaseServices, IUserServices
 	private readonly ITokenServices _tokenServices;
 	private readonly ILogger<UserServices> _logger;
 	private readonly IUserRepository _userRepository;
+	private readonly UserManager<User> _userManager;
+	private readonly RoleManager<Role> _roleManager;
 	private readonly ApplicationSettings _applicationSettings;
 	#endregion /Fields
 
@@ -18,6 +22,8 @@ public partial class UserServices : BaseServices, IUserServices
 		ITokenServices tokenServices,
 		ILogger<UserServices> logger,
 		IUserRepository userRepository,
+		UserManager<User> userManager,
+		RoleManager<Role> roleManager,
 		IOptions<ApplicationSettings> options) : base()
 	{
 		_mapper = mapper;
@@ -25,37 +31,24 @@ public partial class UserServices : BaseServices, IUserServices
 		_tokenServices = tokenServices;
 		_logger = logger;
 		_userRepository = userRepository;
+		_userManager = userManager;
+		_roleManager = roleManager;
 		_applicationSettings = options.Value;
 	}
 	#endregion /Constractor
 
-	#region Methods
-	public async Task<Result> ToggleBanUser(long? userId)
+	#region Public Methods
+	/// <summary>
+	/// Ban or UnBan user by userId
+	/// </summary>
+	/// <param name="userId"></param>
+	/// <returns>Success or Failed Result</returns>
+	public async Task<Result> ToggleBanUser(int userId)
 	{
 		var result = new Result();
 
-		if (userId == null)
-		{
-			string errorMessage = string.Format
-				(Resources.Messages.ErrorMessages.MostNotBeNull, "UserId");
-
-			result.AddErrorMessage(errorMessage);
-
-			return result;
-		}
-
-		if (userId <= 0)
-		{
-			string errorMessage = string.Format
-				(Resources.Messages.ErrorMessages.InvalidUserId);
-
-			result.AddErrorMessage(errorMessage);
-
-			return result;
-		}
-
 		var foundedUser =
-			await _userRepository.GetUserById(userId: userId.Value, isTracking: true);
+			await _userManager.FindByIdAsync(userId: userId.ToString());
 
 		if (foundedUser == null)
 		{
@@ -63,15 +56,17 @@ public partial class UserServices : BaseServices, IUserServices
 				(Resources.Messages.ErrorMessages.UserNotFound);
 
 			result.AddErrorMessage(errorMessage);
+
 			return result;
 		}
 
 		foundedUser.IsBanned = !foundedUser.IsBanned;
-		foundedUser.SecurityStamp = Guid.NewGuid();
+
+		await _userManager.UpdateSecurityStampAsync(foundedUser);
 
 		await _userRepository.SaveChangesAsync();
 
-		await _cache.RemoveByPrefixAsync($"userId-{foundedUser.Id}");
+		//await _cache.RemoveByPrefixAsync($"userId-{foundedUser.Id}");
 
 		string successMessage =
 			foundedUser.IsBanned == true
@@ -82,62 +77,26 @@ public partial class UserServices : BaseServices, IUserServices
 
 		result.AddSuccessMessage(successMessage);
 
-		_logger.LogWarning(Resources.Resource.UpdateSuccessful, parameters: new List<object>
+		_logger.LogWarning(successMessage, parameters: new List<object>
 		{
-			userId.Value
+			userId
 		});
 
 		return result;
 	}
 
 
-	public async Task AddUserExistToCache<TKey>(TKey? userId)
-	{
-		if (userId == null)
-			throw new ArgumentNullException(nameof(userId));
-
-		await _cache.TrySetAsync
-			($"userId-{userId}-exist", true, TimeSpan.FromHours(1));
-	}
-
-
-	private UserLogin GenerateRefreshToken(string? ipAddress)
-	{
-		return new UserLogin(refreshToken: Guid.NewGuid())
-		{
-			Expires = DateTime.UtcNow.AddDays(30),
-			Created = DateTime.UtcNow,
-			CreatedByIp = ipAddress
-		};
-	}
-
-
-	public async Task<Result> UserSoftDeleteAsync(long? userId)
+	/// <summary>
+	/// Set user IsDelete field to true in database
+	/// </summary>
+	/// <param name="userId"></param>
+	/// <returns>Success or Failed Result</returns>
+	public async Task<Result> UserSoftDeleteAsync(int userId)
 	{
 		var result = new Result();
 
-		if (userId == null)
-		{
-			string errorMessage = string.Format
-				(Resources.Messages.ErrorMessages.MostNotBeNull, "UserId");
-
-			result.AddErrorMessage(errorMessage);
-
-			return result;
-		}
-
-		if (userId <= 0)
-		{
-			string errorMessage = string.Format
-				(Resources.Messages.ErrorMessages.InvalidUserId);
-
-			result.AddErrorMessage(errorMessage);
-
-			return result;
-		}
-
 		var foundedUser =
-			await _userRepository.GetUserById(userId: userId.Value, isTracking: true);
+			await _userManager.FindByIdAsync(userId.ToString());
 
 		if (foundedUser == null)
 		{
@@ -145,15 +104,16 @@ public partial class UserServices : BaseServices, IUserServices
 				(Resources.Messages.ErrorMessages.UserNotFound);
 
 			result.AddErrorMessage(errorMessage);
+
 			return result;
 		}
 
 		foundedUser.IsDeleted = true;
-		foundedUser.SecurityStamp = Guid.NewGuid();
+		await _userManager.UpdateSecurityStampAsync(foundedUser);
 
 		await _userRepository.SaveChangesAsync();
 
-		await _cache.RemoveByPrefixAsync($"userId-{foundedUser.Id}");
+		//await _cache.RemoveByPrefixAsync($"userId-{foundedUser.Id}");
 
 		string successMessage = string.Format
 			(Resources.Messages.SuccessMessages.DeleteUserSuccessful);
@@ -162,18 +122,24 @@ public partial class UserServices : BaseServices, IUserServices
 
 		_logger.LogWarning(Resources.Resource.DeleteSuccessful, parameters: new List<object>
 		{
-			userId.Value
+			userId
 		});
 
 		return result;
 	}
 
 
+	/// <summary>
+	/// Generate a new access token by refresh token
+	/// </summary>
+	/// <param name="refreshToken"></param>
+	/// <param name="ipAddress"></param>
+	/// <returns>Success or Failed Result</returns>
 	public async Task<Result<LoginResponseViewModel>>
 		RefreshTokenAsync(string refreshToken, string? ipAddress)
 	{
 		var result =
-			 RefreshTokenValidation(refreshToken, ipAddress);
+			 new Result<LoginResponseViewModel>();
 
 		if (result.IsFailed)
 			return result;
@@ -181,16 +147,16 @@ public partial class UserServices : BaseServices, IUserServices
 		if (!Guid.TryParse(refreshToken, out var inputRefreshToken))
 		{
 			string errorMessage = string.Format
-				(Resources.Messages.ErrorMessages.InvalidJwtToken);
+				(Resources.Messages.ErrorMessages.InvalidRefreshToken);
 
 			result.AddErrorMessage(errorMessage);
+
 			return result;
 		}
 
 		var userLogin =
 		  await _userRepository.GetUserLoginsAsync
 			(refreshToken: inputRefreshToken, includeUser: true);
-
 
 		if (userLogin == null || userLogin.IsExpired)
 		{
@@ -228,20 +194,18 @@ public partial class UserServices : BaseServices, IUserServices
 
 		await _userRepository.SaveChangesAsync();
 
-		var claims = GenerateClaims(new UserClaims
-		{
-			Id = userLogin.User.Id.ToString(),
-			RoleName = userLogin.User?.UserRole?.Title!,
-			RoleId = userLogin.User?.RoleId?.ToString()!,
-			SecurityStamp = userLogin.User?.SecurityStamp.ToString()!,
-		});
+		var claims =
+			GenerateClaims(new UserClaims
+			{
+				Id = userLogin.UserId.ToString() ?? string.Empty
+			});
 
 		var expiredTime =
 			DateTime.UtcNow.AddMinutes(_applicationSettings.JwtSettings?.TokenExpiresTime ?? 15);
 
 		string jwtToken =
 			_tokenServices.GenerateJwtToken
-				(securityKey: _applicationSettings.JwtSettings?.SecretKeyForToken ?? string.Empty,
+				(securityKey: _applicationSettings.JwtSettings?.SecretKeyForToken,
 				claimsIdentity: claims,
 				dateTime: expiredTime);
 
@@ -249,42 +213,42 @@ public partial class UserServices : BaseServices, IUserServices
 			new LoginResponseViewModel()
 			{
 				Token = jwtToken,
-				Username = userLogin!.User?.Username,
+				Username = userLogin!.User?.UserName,
 				RefreshToken = newRefreshToken.RefreshToken,
 			};
 
 		result.Value = response;
-
-		await AddUserExistToCache(userId: userLogin!.User?.Id);
 
 		string successMessage = string.Format
 			(Resources.Messages.SuccessMessages.RefreshTokenSuccessfull);
 
 		result.AddSuccessMessage(successMessage);
 
-		_logger.LogWarning(Resources.Resource.UserRefreshTokenSuccessfulInformation, parameters: new List<object?>
+		_logger.LogInformation(Resources.Resource.UserRefreshTokenSuccessfulInformation, parameters: new List<object?>
 		{
-			userLogin.User?.Username,
+			userLogin.User?.UserName,
 		});
 
 		return result;
 	}
 
 
-	public async Task<Result> LogoutAsync(string token)
+	/// <summary>
+	/// Remove user refresh token in database
+	/// </summary>
+	/// <param name="refreshToken"></param>
+	/// <returns>Success or Failed Result</returns>
+	public async Task<Result> LogoutAsync(string refreshToken)
 	{
-		var result =
-			 LogoutValidation(token);
+		var result = new Result();
 
-		if (result.IsFailed)
-			return result;
-
-		if (!Guid.TryParse(token, out var inputRefreshToken))
+		if (!Guid.TryParse(refreshToken, out var inputRefreshToken))
 		{
 			string errorMessage = string.Format
 				(Resources.Messages.ErrorMessages.InvalidRefreshToken);
 
 			result.AddErrorMessage(errorMessage);
+
 			return result;
 		}
 
@@ -298,6 +262,7 @@ public partial class UserServices : BaseServices, IUserServices
 				(Resources.Messages.ErrorMessages.UserNotFound);
 
 			result.AddErrorMessage(errorMessage);
+
 			return result;
 		}
 
@@ -314,43 +279,16 @@ public partial class UserServices : BaseServices, IUserServices
 	}
 
 
-	public async Task<Result>
-		RegisterAsync(RegisterRequestViewModel registerRequestViewModel)
-	{
-		var result =
-			await RegisterValidation(registerRequestViewModel: registerRequestViewModel);
-
-		if (result.IsFailed == true)
-			return result;
-
-		var user =
-			_mapper.Map<User>(source: registerRequestViewModel);
-
-		user.HashedPassword =
-			Security.HashDataBySHA1(registerRequestViewModel.Password);
-
-		user.RoleId = Constants.Role.UserRoleId;
-
-		user.SecurityStamp = Guid.NewGuid();
-
-		await _userRepository.AddAsync(entity: user);
-
-		await _userRepository.SaveChangesAsync();
-
-		string successMessage = string.Format
-			(Resources.Messages.SuccessMessages.RegisterSuccessful);
-
-		result.AddSuccessMessage(successMessage);
-
-		return result;
-	}
-
-
+	/// <summary>
+	/// Update a user information in database by admin
+	/// </summary>
+	/// <param name="requestViewModel"></param>
+	/// <param name="adminId"></param>
+	/// <returns>Success or Failed Result</returns>
 	public async Task<Result> UpdateUserByAdminAsync
 		(UpdateUserByAdminRequestViewModel requestViewModel, int? adminId)
 	{
-		var result =
-			UpdateUserByAdminValidation(viewModel: requestViewModel);
+		var result = new Result();
 
 		if (result.IsFailed)
 		{
@@ -381,7 +319,7 @@ public partial class UserServices : BaseServices, IUserServices
 		}
 
 		var user =
-			await _userRepository.GetUserById(userId: requestViewModel.UserId, isTracking: false);
+			await _userRepository.GetUserById(userId: requestViewModel.UserId!.Value, isTracking: false);
 
 		if (user == null)
 		{
@@ -395,32 +333,32 @@ public partial class UserServices : BaseServices, IUserServices
 
 		if (user.Id != adminId)
 		{
-			if (user.RoleId == adminRoleId)
-			{
-				string errorMessage = string.Format
-					(Resources.Messages.ErrorMessages.AccessDeniedForUpdateThisUser);
+			//if (user.RoleId == adminRoleId)
+			//{
+			//	string errorMessage = string.Format
+			//		(Resources.Messages.ErrorMessages.AccessDeniedForUpdateThisUser);
 
-				result.AddErrorMessage(errorMessage);
+			//	result.AddErrorMessage(errorMessage);
 
-				return result;
-			}
+			//	return result;
+			//}
 		}
 
-		if (adminRoleId == (int) UserRoleEnum.Admin)
+		if (adminRoleId == (int)UserRoleEnum.Admin)
 		{
-			if (user.RoleId == (int) UserRoleEnum.SystemAdministrator)
-			{
-				string errorMessage = string.Format
-					(Resources.Messages.ErrorMessages.AccessDeniedForUpdateThisUser);
+			//if (user.RoleId == (int) UserRoleEnum.SystemAdministrator)
+			//{
+			//	string errorMessage = string.Format
+			//		(Resources.Messages.ErrorMessages.AccessDeniedForUpdateThisUser);
 
-				result.AddErrorMessage(errorMessage);
+			//	result.AddErrorMessage(errorMessage);
 
-				return result;
-			}
+			//	return result;
+			//}
 		}
 
 
-		if (user.Username != requestViewModel.Username)
+		if (user.UserName != requestViewModel.Username)
 		{
 			var isPhoneNumberExist =
 				await _userRepository.CheckUsernameExist(username: requestViewModel.Username);
@@ -455,8 +393,8 @@ public partial class UserServices : BaseServices, IUserServices
 		var updatedUser =
 			_mapper.Map<User>(source: requestViewModel);
 
-		updatedUser.Id = requestViewModel.UserId;
-		updatedUser.SecurityStamp = Guid.NewGuid();
+		updatedUser.Id = requestViewModel.UserId!.Value;
+		updatedUser.SecurityStamp = Guid.NewGuid().ToString();
 
 		_userRepository.UpdateUserByAdmin(updatedUser);
 
@@ -478,22 +416,38 @@ public partial class UserServices : BaseServices, IUserServices
 	}
 
 
+	/// <summary>
+	/// Login a user by username and password
+	/// </summary>
+	/// <param name="loginRequestViewModel"></param>
+	/// <param name="ipAddress"></param>
+	/// <returns>Success or Failed Result</returns>
 	public async Task<Result<LoginResponseViewModel>>
 		LoginAsync(LoginRequestViewModel loginRequestViewModel, string? ipAddress)
 	{
 		var result =
-			LoginValidation(loginRequestViewModel: loginRequestViewModel);
+			new Result<LoginResponseViewModel>();
 
 		if (result.IsFailed == true)
 			return result;
-		
-		var hashedPassword =
-			Security.GetSha256(loginRequestViewModel.Password);
 
 		var foundedUser =
-			await _userRepository.LoginAsync(username: loginRequestViewModel.Username, hashedPassword: hashedPassword);
+			await _userManager.FindByNameAsync(loginRequestViewModel.Username!);
 
 		if (foundedUser == null)
+		{
+			string errorMessage = string.Format
+				(Resources.Messages.ErrorMessages.InvalidUserAndOrPass);
+
+			result.AddErrorMessage(errorMessage);
+
+			return result;
+		}
+
+		var isPasswordValid =
+			await _userManager.CheckPasswordAsync(foundedUser, loginRequestViewModel.Password!);
+
+		if (!isPasswordValid)
 		{
 			string errorMessage = string.Format
 				(Resources.Messages.ErrorMessages.InvalidUserAndOrPass);
@@ -527,39 +481,34 @@ public partial class UserServices : BaseServices, IUserServices
 		var claims = GenerateClaims(new UserClaims
 		{
 			Id = foundedUser.Id.ToString(),
-			RoleName = foundedUser.RoleName,
-			RoleId = foundedUser.RoleId.ToString(),
-			SecurityStamp = foundedUser.SecurityStamp.ToString(),
 		});
 
 		string token =
 			_tokenServices.GenerateJwtToken
-				(securityKey: _applicationSettings.JwtSettings?.SecretKeyForToken ?? string.Empty,
+				(securityKey: _applicationSettings.JwtSettings?.SecretKeyForToken,
 				claimsIdentity: claims,
 				dateTime: expiredTime);
-
-		await AddUserExistToCache(userId: foundedUser.Id);
 
 		string successMessage = string.Format
 			(Resources.Messages.SuccessMessages.LoginSuccessful);
 
 		result.AddSuccessMessage(successMessage);
 
-		LoginResponseViewModel response =
+		var response =
 			new LoginResponseViewModel()
 			{
 				Token = token,
-				Username = foundedUser.Username,
+				Username = foundedUser.UserName,
 				RefreshToken = refreshToken.RefreshToken,
 			};
 
 		result.Value = response;
 
-		_logger.LogWarning(Resources.Resource.UserLoginSuccessfulInformation, parameters: new List<object>
+		_logger.LogInformation(Resources.Resource.UserLoginSuccessfulInformation, parameters: new List<object>
 		{
 			new
 			{
-				Username = loginRequestViewModel.Username,
+				UserName = loginRequestViewModel.Username,
 			}
 		});
 
@@ -567,31 +516,181 @@ public partial class UserServices : BaseServices, IUserServices
 	}
 
 
-	public async Task<Result> ChangeUserRoleAsync
-		(ChangeUserRoleRequestViewModel requestViewModel, int? adminId)
+	/// <summary>
+	/// Login a user by OAuth standard Authentication (for use in swagger ui)
+	/// </summary>
+	/// <param name="requestViewModel"></param>
+	/// <param name="ipAddress"></param>
+	/// <returns>Success or Failed Result</returns>
+	public async Task<Result<LoginByOAuthResponseViewModel>> LoginByOAuthAsync
+		(LoginByOAuthRequestViewModel requestViewModel, string? ipAddress)
 	{
 		var result =
-			ChangeUserRoleValidation(requestViewModel);
+			new Result<LoginByOAuthResponseViewModel>();
 
-		if (result.IsFailed)
-			return result;
-
-		if (!adminId.HasValue)
+		if (!requestViewModel.Grant_Type?.Equals("password", StringComparison.OrdinalIgnoreCase) == true)
 		{
-			string errorMessage = string.Format
-				(Resources.Messages.ErrorMessages.MostNotBeNull, nameof(adminId));
+			string errorMessage = "OAuth flow is not password.";
 
 			result.AddErrorMessage(errorMessage);
 
 			return result;
 		}
 
-		var adminRoleId =
-			await _userRepository.GetUserRoleAsync(adminId.Value);
+		var foundedUser =
+			await _userManager.FindByNameAsync(requestViewModel.Username!);
 
-		if (!adminRoleId.HasValue)
+		if (foundedUser == null)
 		{
-			var errorMessage =
+			string errorMessage = string.Format
+				(Resources.Messages.ErrorMessages.InvalidUserAndOrPass);
+
+			result.AddErrorMessage(errorMessage);
+
+			return result;
+		}
+
+		var isPasswordValid =
+			await _userManager.CheckPasswordAsync(foundedUser, requestViewModel.Password!);
+
+		if (!isPasswordValid)
+		{
+			string errorMessage = string.Format
+				(Resources.Messages.ErrorMessages.InvalidUserAndOrPass);
+
+			result.AddErrorMessage(errorMessage);
+
+			return result;
+		}
+
+		if (foundedUser.IsBanned)
+		{
+			string errorMessage = string.Format
+				(Resources.Messages.ErrorMessages.UserBanned);
+
+			result.AddErrorMessage(errorMessage);
+
+			return result;
+		}
+
+		var expiredTime =
+			DateTime.UtcNow.AddMinutes(_applicationSettings.JwtSettings?.TokenExpiresTime ?? 15);
+
+		var refreshToken = GenerateRefreshToken(ipAddress);
+
+		refreshToken.UserId = foundedUser.Id;
+
+		await _userRepository.AddUserLoginAsync(refreshToken);
+
+		await _userRepository.SaveChangesAsync();
+
+		var claims = GenerateClaims(new UserClaims
+		{
+			Id = foundedUser.Id.ToString(),
+		});
+
+		string token =
+			_tokenServices.GenerateJwtToken
+				(securityKey: _applicationSettings.JwtSettings?.SecretKeyForToken,
+				claimsIdentity: claims,
+				dateTime: expiredTime);
+
+		string successMessage = string.Format
+			(Resources.Messages.SuccessMessages.LoginSuccessful);
+
+		result.AddSuccessMessage(successMessage);
+
+		var response =
+			new LoginByOAuthResponseViewModel()
+			{
+				access_token = token,
+				username = foundedUser.UserName,
+				refresh_token = refreshToken.RefreshToken.ToString(),
+				token_type = "Bearer",
+			};
+
+		result.Value = response;
+
+		_logger.LogInformation(Resources.Resource.UserLoginSuccessfulInformation, parameters: new List<object>
+		{
+			new
+			{
+				UserName = requestViewModel.Username,
+			}
+		});
+
+		return result;
+	}
+
+
+	/// <summary>
+	/// Create a new user in database
+	/// </summary>
+	/// <param name="registerRequestViewModel"></param>
+	/// <returns>Success or Failed Result</returns>
+	public async Task<Result>
+		RegisterAsync(RegisterRequestViewModel registerRequestViewModel)
+	{
+		var result = new Result();
+
+		var registerUser =
+			new User(registerRequestViewModel.Username!)
+			{
+				Email = registerRequestViewModel.Email,
+			};
+
+		var identityUserResult =
+			await _userManager.CreateAsync(registerUser, registerRequestViewModel.Password!);
+
+		if (!identityUserResult.Succeeded)
+		{
+			foreach (var error in identityUserResult.Errors)
+			{
+				result.AddErrorMessage(error.Description);
+			}
+
+			return result;
+		}
+
+		var identityRoleResult =
+			await _userManager.AddToRoleAsync(registerUser, Constants.Role.User);
+
+		if (!identityRoleResult.Succeeded)
+		{
+			foreach (var error in identityUserResult.Errors)
+			{
+				result.AddErrorMessage(error.Description);
+			}
+
+			return result;
+		}
+
+		string successMessage = string.Format
+			(Resources.Messages.SuccessMessages.RegisterSuccessful);
+
+		result.AddSuccessMessage(successMessage);
+
+		return result;
+	}
+
+
+	/// <summary>
+	/// Change user role by admin
+	/// </summary>
+	/// <param name="requestViewModel"></param>
+	/// <param name="adminId"></param>
+	/// <returns>Success or Failed Result</returns>
+	public async Task<Result> ChangeUserRoleAsync
+		(ChangeUserRoleRequestViewModel requestViewModel, int adminId)
+	{
+		var result = new Result();
+
+		var adminUser =
+			await _userManager.FindByIdAsync(adminId.ToString());
+
+		if (adminUser == null)
+		{
+			string errorMessage = 
 				string.Format(nameof(HttpStatusCode.Unauthorized));
 
 			result.AddErrorMessage(errorMessage);
@@ -599,8 +698,11 @@ public partial class UserServices : BaseServices, IUserServices
 			return result;
 		}
 
+		var adminRoles =
+			await _userManager.GetRolesAsync(adminUser);
+
 		var isRoleExist =
-			await _userRepository.CheckRoleExist(requestViewModel.RoleId);
+			await _roleManager.RoleExistsAsync(requestViewModel.RoleName);
 
 		if (!isRoleExist)
 		{
@@ -613,7 +715,7 @@ public partial class UserServices : BaseServices, IUserServices
 		}
 
 		var foundedUser =
-			await _userRepository.GetUserById(userId: requestViewModel.UserId, isTracking: true);
+			await _userManager.FindByIdAsync(userId: requestViewModel.UserId!.Value.ToString());
 
 		if (foundedUser == null)
 		{
@@ -621,23 +723,38 @@ public partial class UserServices : BaseServices, IUserServices
 				(Resources.Messages.ErrorMessages.UserNotFound);
 
 			result.AddErrorMessage(errorMessage);
+
 			return result;
 		}
 
-		if (foundedUser.RoleId == adminRoleId)
+		var userRoles =
+			await _userManager.GetRolesAsync(foundedUser);
+
+		if (foundedUser.Id == adminId)
 		{
 			string errorMessage = string.Format
 				(Resources.Messages.ErrorMessages.AccessDeniedForChangeRole);
 
 			result.AddErrorMessage(errorMessage);
+
 			return result;
 		}
 
-		if (adminRoleId == (int) UserRoleEnum.Admin)
+		if (adminRoles[0] == userRoles[0])
 		{
-			if (foundedUser.RoleId == (int)UserRoleEnum.SystemAdministrator)
+			string errorMessage = string.Format
+				(Resources.Messages.ErrorMessages.AccessDeniedForChangeRole);
+
+			result.AddErrorMessage(errorMessage);
+
+			return result;
+		}
+
+		if (adminRoles[0] == Constants.Role.Admin)
+		{
+			if (userRoles[0] == Constants.Role.SystemAdmin)
 			{
-				string errorMessage = string.Format
+				var errorMessage = string.Format
 					(Resources.Messages.ErrorMessages.AccessDeniedForChangeRole);
 
 				result.AddErrorMessage(errorMessage);
@@ -645,24 +762,28 @@ public partial class UserServices : BaseServices, IUserServices
 				return result;
 			}
 
-			if (requestViewModel.RoleId == (int)UserRoleEnum.SystemAdministrator ||
-				requestViewModel.RoleId == (int)UserRoleEnum.Admin)
+			if (requestViewModel.RoleName == Constants.Role.SystemAdmin ||
+				requestViewModel.RoleName == Constants.Role.Admin)
 			{
-				string errorMessage = string.Format
+				var errorMessage = string.Format
 					(Resources.Messages.ErrorMessages.AccessDeniedForChangeThisRole);
 
 				result.AddErrorMessage(errorMessage);
+
 				return result;
 			}
-
 		}
 
-		foundedUser.RoleId = requestViewModel.RoleId;
-		foundedUser.SecurityStamp = Guid.NewGuid();
+		foreach (var role in userRoles)
+		{
+			await _userManager.RemoveFromRoleAsync(foundedUser, role);
+		}
 
-		await _userRepository.SaveChangesAsync();
+		await _userManager.AddToRoleAsync(foundedUser, requestViewModel.RoleName);
 
-		await _cache.RemoveByPrefixAsync($"userId-{foundedUser.Id}");
+		await _userManager.UpdateSecurityStampAsync(foundedUser);
+
+		//await _cache.RemoveByPrefixAsync($"userId-{foundedUser.Id}");
 
 		string successMessage = string.Format
 			(Resources.Messages.SuccessMessages.UpdateSuccessful);
@@ -676,98 +797,30 @@ public partial class UserServices : BaseServices, IUserServices
 
 		return result;
 	}
+	#endregion /Public Methods
 
-
-	public async Task<Result<LoginByOAuthResponseViewModel>> LoginByOAuthAsync
-		(LoginByOAuthRequestViewModel requestViewModel, string? ipAddress)
+	#region Private Methods
+	/// <summary>
+	/// Generate new refresh token
+	/// </summary>
+	/// <param name="ipAddress"></param>
+	/// <returns>Success or Failed Result</returns>
+	private UserLogin GenerateRefreshToken(string? ipAddress)
 	{
-		var result =
-			LoginByOAuthValidation(requestViewModel: requestViewModel);
-
-		if (result.IsFailed == true)
-			return result;
-
-		var hashedPassword =
-			Security.HashDataBySHA1(requestViewModel.Password);
-
-		var foundedUser =
-			await _userRepository.LoginAsync(username: requestViewModel.Username, hashedPassword: hashedPassword);
-
-		if (foundedUser == null)
+		return new UserLogin(refreshToken: Guid.NewGuid())
 		{
-			string errorMessage = string.Format
-				(Resources.Messages.ErrorMessages.InvalidUserAndOrPass);
-
-			result.AddErrorMessage(errorMessage);
-
-			return result;
-		}
-
-		if (foundedUser.IsBanned)
-		{
-			string errorMessage = string.Format
-				(Resources.Messages.ErrorMessages.UserBanned);
-
-			result.AddErrorMessage(errorMessage);
-
-			return result;
-		}
-
-		var expiredTime =
-			DateTime.UtcNow.AddMinutes(_applicationSettings.JwtSettings?.TokenExpiresTime ?? 15);
-
-		var refreshToken = GenerateRefreshToken(ipAddress);
-
-		refreshToken.UserId = foundedUser.Id;
-
-		await _userRepository.AddUserLoginAsync(refreshToken);
-
-		await _userRepository.SaveChangesAsync();
-
-		var claims = GenerateClaims(new UserClaims
-		{
-			Id = foundedUser.Id.ToString(),
-			RoleName = foundedUser.RoleName,
-			RoleId = foundedUser.RoleId.ToString(),
-			SecurityStamp = foundedUser.SecurityStamp.ToString(),
-		});
-
-		string token =
-			_tokenServices.GenerateJwtToken
-				(securityKey: _applicationSettings.JwtSettings?.SecretKeyForToken ?? string.Empty,
-				claimsIdentity: claims,
-				dateTime: expiredTime);
-
-		await AddUserExistToCache(userId: foundedUser.Id);
-
-		string successMessage = string.Format
-			(Resources.Messages.SuccessMessages.LoginSuccessful);
-
-		result.AddSuccessMessage(successMessage);
-
-		var response =
-			new LoginByOAuthResponseViewModel()
-			{
-				access_token = token,
-				username = foundedUser.Username,
-				refresh_token = refreshToken.RefreshToken.ToString(),
-				token_type = "Bearer",
-			};
-
-		result.Value = response;
-
-		_logger.LogWarning(Resources.Resource.UserLoginSuccessfulInformation, parameters: new List<object>
-		{
-			new
-			{
-				PhoneNumber = requestViewModel.Username,
-			}
-		});
-
-		return result;
+			Expires = DateTime.UtcNow.AddDays(30),
+			Created = DateTime.UtcNow,
+			CreatedByIp = ipAddress
+		};
 	}
 
 
+	/// <summary>
+	/// Generate a new user claims for authentiction
+	/// </summary>
+	/// <param name="userClaims"></param>
+	/// <returns>Success or Failed Result</returns>
 	private ClaimsIdentity GenerateClaims(UserClaims userClaims)
 	{
 		var claims =
@@ -775,18 +828,9 @@ public partial class UserServices : BaseServices, IUserServices
 			{
 				new Claim
 					(type: ClaimTypes.NameIdentifier, value: userClaims.Id),
-
-				new Claim
-					(type: nameof(userClaims.RoleId), value: userClaims.RoleId),
-
-				new Claim
-					(type: ClaimTypes.Role, value: userClaims.RoleName),
-
-				new Claim
-					(type: nameof(userClaims.SecurityStamp), value: userClaims.SecurityStamp),
 			});
 
 		return claims;
 	}
-	#endregion /Methods
+	#endregion /Private Methods
 }

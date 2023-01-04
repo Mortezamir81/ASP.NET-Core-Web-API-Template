@@ -1,13 +1,9 @@
 ﻿namespace Domain.UserManagment;
 
-public class Role
+public class Role : IdentityRole<int>
 {
-	public Role(string title)
+	public Role(string name)
 	{
-		Title = title;
+		Name = name;
 	}
-
-	public int Id { get; set; }
-	public long? Price { get; set; }
-	public string Title { get; set; }
 }

@@ -24,6 +24,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Domain\Domain.csproj" />
     <ProjectReference Include="..\Resources\Resources.csproj" />
+    <ProjectReference Include="..\Softmax Libraries\Softmax.Utilities.Validation\Softmax.Utilities.Validation.csproj" />
   </ItemGroup>
 
 </Project>

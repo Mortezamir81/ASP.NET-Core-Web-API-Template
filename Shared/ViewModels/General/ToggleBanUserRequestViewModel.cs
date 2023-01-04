@@ -1,14 +1,7 @@
 ﻿namespace ViewModels.General;
 
-public class ChangeUserRoleRequestViewModel
+public class ToggleBanUserRequestViewModel
 {
-	[Required
-		(AllowEmptyStrings = false,
-		ErrorMessageResourceType = typeof(Resources.Messages.ErrorMessages),
-		ErrorMessageResourceName = nameof(Resources.Messages.ErrorMessages.MostNotBeNull))]
-
-	public required string RoleName { get; set; }
-
 	[Required
 		(AllowEmptyStrings = false,
 		ErrorMessageResourceType = typeof(Resources.Messages.ErrorMessages),

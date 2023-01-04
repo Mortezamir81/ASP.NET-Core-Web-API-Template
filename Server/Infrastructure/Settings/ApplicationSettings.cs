@@ -9,4 +9,6 @@ public class ApplicationSettings
     }
 
     public required JwtSettings JwtSettings { get; set; }
+
+	public required IdentitySettings IdentitySettings { get; set; }
 }

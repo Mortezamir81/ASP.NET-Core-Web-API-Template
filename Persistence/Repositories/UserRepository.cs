@@ -1,12 +1,23 @@
-﻿using Shared.Enums;
+﻿namespace Persistence.Repositories;
 
-namespace Persistence.Repositories;
-
-public class UserRepository : RepositoryBase<User>, IUserRepository
+public class UserRepository : IUserRepository
 {
+	#region Properties
+	private DatabaseContext _databaseContext { get; }
+
+	private DbSet<User> _entities { get; }
+
+	private  IQueryable<User> _table => _entities;
+
+	private IQueryable<User> _tableNoTracking => _entities.AsNoTracking();
+	#endregion /Properties
+
 	#region Constractor
-	public UserRepository(DatabaseContext dbContext) : base(dbContext)
+	public UserRepository(DatabaseContext dbContext) : base()
 	{
+		_databaseContext = dbContext;
+
+		_entities = _databaseContext.Set<User>();
 	}
 	#endregion /Constractor
 
@@ -17,10 +28,10 @@ public class UserRepository : RepositoryBase<User>, IUserRepository
 
 		Attach(user);
 
-		DatabaseContext.Entry(user).Property(x => x.FullName).IsModified = true;
-		DatabaseContext.Entry(user).Property(x => x.Username).IsModified = true;
-		DatabaseContext.Entry(user).Property(x => x.Email).IsModified = true;
-		DatabaseContext.Entry(user).Property(x => x.SecurityStamp).IsModified = true;
+		_databaseContext.Entry(user).Property(x => x.FullName).IsModified = true;
+		_databaseContext.Entry(user).Property(x => x.UserName).IsModified = true;
+		_databaseContext.Entry(user).Property(x => x.Email).IsModified = true;
+		_databaseContext.Entry(user).Property(x => x.SecurityStamp).IsModified = true;
 	}
 
 
@@ -28,14 +39,14 @@ public class UserRepository : RepositoryBase<User>, IUserRepository
 	{
 		Assert.NotNull(obj: userLogin, nameof(userLogin));
 
-		DatabaseContext.Remove(userLogin!);
+		_databaseContext.Remove(userLogin!);
 	}
 
 
 	public async Task<bool> CheckRoleExist(int roleId)
 	{
 		var isRoleExist =
-			await DatabaseContext.Roles!
+			await _databaseContext.Roles!
 			.Select(current => current.Id)
 			.Where(current => current == roleId)
 			.AnyAsync();
@@ -48,7 +59,7 @@ public class UserRepository : RepositoryBase<User>, IUserRepository
 
 	{
 		var result =
-			await Entities!
+			await _entities!
 				.AsNoTracking()
 				.Select(current => current.Email)
 				.Where(current => current == email)
@@ -59,30 +70,18 @@ public class UserRepository : RepositoryBase<User>, IUserRepository
 	}
 
 
-	public async Task<int> GetRoleIdInDatabaseAsync(int roleId)
-	{
-		return
-			await DatabaseContext.Roles!
-				.AsNoTracking()
-				.Select(current => current.Id)
-				.Where(current => current == roleId)
-				.FirstOrDefaultAsync()
-				;
-	}
-
-
 	public async Task AddUserLoginAsync(UserLogin userLogin)
 	{
-		await DatabaseContext.UserLogins!.AddAsync(userLogin);
+		await _databaseContext.UserLogins!.AddAsync(userLogin);
 	}
 
 
 	public async Task<bool> CheckUsernameExist(string? username)
 	{
 		var result =
-			await DatabaseContext.Users!
+			await _databaseContext.Users!
 				.AsNoTracking()
-				.Select(current => current.Username)
+				.Select(current => current.UserName)
 				.Where(current => current == username)
 				.AnyAsync()
 				;
@@ -91,25 +90,14 @@ public class UserRepository : RepositoryBase<User>, IUserRepository
 	}
 
 
-	public async Task<User?> GetUserByPhoneNumberAsync(string phoneNumber)
-	{
-		return
-			await DatabaseContext.Users!
-				.AsNoTracking()
-				.Where(current => current.Username.ToLower() == phoneNumber.ToLower())
-				.FirstOrDefaultAsync()
-				;
-	}
-
-
-	public async Task<User?> GetUserById(long userId, bool isTracking)
+	public async Task<User?> GetUserById(int userId, bool isTracking)
 	{
 		User? user = null;
 
 		if (isTracking)
 		{
 			user =
-				await DatabaseContext
+				await _databaseContext
 					.Users!
 					.Where(current => current.Id == userId)
 					.FirstOrDefaultAsync()
@@ -118,7 +106,7 @@ public class UserRepository : RepositoryBase<User>, IUserRepository
 		else
 		{
 			user =
-				await DatabaseContext
+				await _databaseContext
 					.Users!
 					.AsNoTracking()
 					.Where(current => current.Id == userId)
@@ -137,7 +125,7 @@ public class UserRepository : RepositoryBase<User>, IUserRepository
 		if (includeUser)
 		{
 			userLogin =
-				await DatabaseContext.UserLogins!
+				await _databaseContext.UserLogins!
 					.Include(current => current.User)
 					.Where(current => current.RefreshToken == refreshToken)
 					.FirstOrDefaultAsync();
@@ -145,7 +133,7 @@ public class UserRepository : RepositoryBase<User>, IUserRepository
 		else
 		{
 			userLogin =
-				await DatabaseContext.UserLogins!
+				await _databaseContext.UserLogins!
 					.Where(current => current.RefreshToken == refreshToken)
 					.FirstOrDefaultAsync();
 		}
@@ -160,36 +148,73 @@ public class UserRepository : RepositoryBase<User>, IUserRepository
 
 		Assert.NotEmpty(obj: username, nameof(hashedPassword));
 
-		var result =
-			await DatabaseContext.Users!
-				.AsNoTracking()
-				.Where(current => current.Username == username)
-				.Where(current => current.HashedPassword == hashedPassword)
-				.Select(current => new LoginViewModel(current.Username, current.RoleId!.Value, current.UserRole!.Title)
-				{
-					Id = current.Id,
-					SecurityStamp = current.SecurityStamp!.Value,
-					IsBanned = current.IsBanned,
-				})
-				.FirstOrDefaultAsync()
-				;
+		//var result =
+		//	await _databaseContext.Users!
+		//		.AsNoTracking()
+		//		.Where(current => current.UserName == username)
+		//		.Where(current => current.PasswordHash == hashedPassword)
+		//		.Select(current => new LoginViewModel(current.UserName, current.ro!.Value, current.UserRole!.Name)
+		//		{
+		//			Id = current.Id,
+		//			SecurityStamp = current.SecurityStamp!,
+		//			IsBanned = current.IsBanned,
+		//		})
+		//		.FirstOrDefaultAsync()
+		//		;
 
-		return result;
+		return null;
 	}
 
 
 	public async Task<int?> GetUserRoleAsync(int userId)
 	{
-		var roleId =
-			await Entities
-			.Where(current => current.Id == userId)
-			.Select(current => current.RoleId)
-			.FirstOrDefaultAsync();
+		//var roleId =
+		//	await _entities
+		//	.Where(current => current.Id == userId)
+		//	.Select(current => current.RoleId)
+		//	.FirstOrDefaultAsync();
 
-		if (!roleId.HasValue || roleId == 0)
-			return null;
+		//if (!roleId.HasValue || roleId == 0)
+		//	return null;
 
-		return roleId;
+		//return roleId;
+
+		return null;
+	}
+
+
+	public async Task AddAsync
+		(User entity, CancellationToken cancellationToken = default)
+	{
+		Assert.NotNull(obj: entity, name: nameof(entity));
+
+		await _entities.AddAsync(entity, cancellationToken);
+	}
+
+	public async Task<int> SaveChangesAsync()
+	{
+		return await _databaseContext.SaveChangesAsync();
 	}
 	#endregion /Methods
+
+	#region Attach & Detach
+	private void Detach(User entity)
+	{
+		Assert.NotNull(obj: entity, name: nameof(entity));
+
+		var entry = _databaseContext.Entry(entity);
+
+		if (entry != null)
+			entry.State = EntityState.Detached;
+	}
+
+
+	private void Attach(User entity)
+	{
+		Assert.NotNull(obj: entity, name: nameof(entity));
+
+		if (_databaseContext.Entry(entity).State == EntityState.Detached)
+			_entities.Attach(entity);
+	}
+	#endregion /Attach&Detach
 }

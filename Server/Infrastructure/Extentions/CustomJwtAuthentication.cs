@@ -6,105 +6,42 @@ public static class CustomJwtAuthentication
 	{
 		Assert.NotNull(obj: services, name: nameof(services));
 
-		services.AddAuthentication(options =>
-		{
-			options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-			options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-			options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-		})
-		.AddJwtBearer(options =>
-		{
-			if (string.IsNullOrWhiteSpace(jwtSettings?.SecretKeyForToken))
-				throw new ArgumentNullException(paramName: nameof(jwtSettings.SecretKeyForToken));
-
-			if (string.IsNullOrWhiteSpace(jwtSettings?.SecretKeyForEncryptionToken))
-				throw new ArgumentNullException(paramName: nameof(jwtSettings.SecretKeyForEncryptionToken));
-
-			var secretkey =
-				Encoding.UTF8.GetBytes(jwtSettings.SecretKeyForToken);
-
-			var encryptionkey =
-				Encoding.UTF8.GetBytes(jwtSettings.SecretKeyForEncryptionToken);
-
-			var validationParameters = new TokenValidationParameters
+		services
+			.AddAuthentication()
+			.AddJwtBearer(options =>
 			{
-				ClockSkew = TimeSpan.Zero,
-				RequireSignedTokens = true,
+				if (string.IsNullOrWhiteSpace(jwtSettings?.SecretKeyForToken))
+					throw new ArgumentNullException(paramName: nameof(jwtSettings.SecretKeyForToken));
 
-				ValidateIssuerSigningKey = true,
-				IssuerSigningKey = new SymmetricSecurityKey(secretkey),
+				if (string.IsNullOrWhiteSpace(jwtSettings?.SecretKeyForEncryptionToken))
+					throw new ArgumentNullException(paramName: nameof(jwtSettings.SecretKeyForEncryptionToken));
 
-				RequireExpirationTime = true,
-				ValidateLifetime = true,
+				var secretkey =
+					Encoding.UTF8.GetBytes(jwtSettings.SecretKeyForToken);
 
-				ValidateIssuer = false,
-				ValidateAudience = false,
+				var encryptionkey =
+					Encoding.UTF8.GetBytes(jwtSettings.SecretKeyForEncryptionToken);
 
-				TokenDecryptionKey = new SymmetricSecurityKey(encryptionkey)
-			};
-
-			options.SaveToken = true;
-			options.TokenValidationParameters = validationParameters;
-			options.Events = new JwtBearerEvents
-			{
-				OnTokenValidated = async context =>
+				var validationParameters = new TokenValidationParameters
 				{
-					var cache =
-						context.HttpContext.RequestServices.GetService<IEasyCachingProvider>();
+					ClockSkew = TimeSpan.Zero,
+					RequireSignedTokens = true,
 
-					var databaseContext =
-						context.HttpContext.RequestServices.GetService<DatabaseContext>();
+					ValidateIssuerSigningKey = true,
+					IssuerSigningKey = new SymmetricSecurityKey(secretkey),
 
-					if (cache == null || databaseContext == null)
-					{
-						context.Fail(nameof(HttpStatusCode.Unauthorized));
-						return;
-					}
+					RequireExpirationTime = true,
+					ValidateLifetime = true,
 
-					var userId =
-						context.Principal?.Claims.FirstOrDefault
-							(current => current.Type == ClaimTypes.NameIdentifier)?.Value;
+					ValidateIssuer = false,
+					ValidateAudience = false,
 
+					TokenDecryptionKey = new SymmetricSecurityKey(encryptionkey),
+				};
 
-					var securityStamp =
-						context.Principal?.Claims.FirstOrDefault
-							(current => current.Type == nameof(User.SecurityStamp))?.Value;
-
-					if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(securityStamp))
-					{
-						context.Fail(nameof(HttpStatusCode.Unauthorized));
-						return;
-					}
-
-					var userInCache =
-						await cache.GetAsync<bool>($"userId-{userId}-exist");
-
-					if (!userInCache.HasValue)
-					{
-						bool isExistSecurityStamp =
-							await databaseContext.Users!
-							.Where(current => current.Id.ToString() == userId)
-							.Where(current => current.SecurityStamp.ToString() == securityStamp)
-							.AnyAsync();
-
-						if (isExistSecurityStamp == false)
-						{
-							context.Fail(nameof(HttpStatusCode.Unauthorized));
-
-							return;
-						}
-					}
-
-					await Task.CompletedTask;
-				},
-				OnChallenge = async context =>
-				{
-					context.HandleResponse();
-
-					await CreateUnAuthorizeResult(context.Response);
-				}
-			};
-		});
+				options.SaveToken = true;
+				options.TokenValidationParameters = validationParameters;
+			});
 	}
 
 

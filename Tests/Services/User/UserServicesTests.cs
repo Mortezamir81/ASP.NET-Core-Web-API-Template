@@ -1,22 +1,27 @@
 ﻿namespace Tests.Services.User;
 
-public class UserServicesTests : IClassFixture<DatabaseFixture>
+public class UserServicesTests : IClassFixture<RegistrationServices>
 {
 	#region Fields
 	private MockRepository _mockRepository;
-
 	private Mock<IMapper> _mockMapper;
 	private Mock<IEasyCachingProvider> _mockEasyCachingProvider;
-	private ITokenServices _tokenServices;
-	private Mock<ILogger<UserServices>> _mockLogger;
-	private Mock<IOptions<ApplicationSettings>> _mockOptions;
+	private Mock<Dtat.Logging.ILogger<UserServices>> _mockLogger;
 
+	private IOptions<ApplicationSettings> _options;
 	private IUserRepository _userRepository { get; set; }
+	private ITokenServices _tokenServices;
+
+	private UserManager<Domain.UserManagment.User> _userManager;
+	private RoleManager<Role> _roleManager;
 	#endregion /Fields
 
 	#region Constractor
-	public UserServicesTests(DatabaseFixture databaseFixture)
+	public UserServicesTests(RegistrationServices registrationServices)
 	{
+		var databaseContext =
+			registrationServices.ServiceProvider.GetRequiredService<DatabaseContext>();
+
 		_mockRepository = new MockRepository(MockBehavior.Loose);
 
 		_mockMapper =
@@ -26,86 +31,25 @@ public class UserServicesTests : IClassFixture<DatabaseFixture>
 			_mockRepository.Create<IEasyCachingProvider>();
 
 		_mockLogger =
-			_mockRepository.Create<ILogger<UserServices>>();
-
-		_mockOptions =
-			_mockRepository.Create<IOptions<ApplicationSettings>>();
+			_mockRepository.Create<Dtat.Logging.ILogger<UserServices>>();
 
 		_userRepository =
-			new UserRepository(databaseFixture.CreateContext());
+			new UserRepository(databaseContext);
 
-		_tokenServices =
-			new TokenServices(new Mock<ILogger<TokenServices>>().Object, _mockEasyCachingProvider.Object);
+		_tokenServices = new TokenServices();
+
+		_options =
+			registrationServices.ServiceProvider.GetRequiredService<IOptions<ApplicationSettings>>();
+
+		_userManager =
+			registrationServices.ServiceProvider.GetRequiredService<UserManager<Domain.UserManagment.User>>();
+
+		_roleManager =
+			registrationServices.ServiceProvider.GetRequiredService<RoleManager<Domain.UserManagment.Role>>();
 	}
 	#endregion /Constractor
 
 	#region LoginTests
-	[Fact]
-	public async Task LoginAsync_PassingNullViewModel_MostNotBeNullError()
-	{
-		// Arrange
-		var userServices = CreateUserServices();
-
-		LoginRequestViewModel loginRequestViewModel = null;
-
-		string? ipAddress = null;
-
-		var exceptedErrorMessage =
-			string.Format(Resources.Messages.ErrorMessages.MostNotBeNull, nameof(loginRequestViewModel));
-
-		// Act
-		var result =
-			await userServices.LoginAsync(loginRequestViewModel, ipAddress);
-
-		// Assert
-		Assert.NotNull(result);
-		Assert.False(result.IsSuccess);
-		Assert.Equal(expected: exceptedErrorMessage, result.Errors[0]);
-	}
-
-
-	[Theory]
-	[InlineData(null, null)]
-	[InlineData("", "")]
-	[InlineData("    ", "    ")]
-	public async Task LoginAsync_PassingNullOrEmptyUsernameAndPass_MostNotBeNullError(string username, string password)
-	{
-		// Arrange
-		var userServices = CreateUserServices();
-
-		var loginRequestViewModel =
-			new LoginRequestViewModel
-			{
-				Username = username,
-				Password = password
-			};
-
-		string? ipAddress = null;
-
-		var exceptedUsernameErrorMessage =
-			string.Format(Resources.Messages.ErrorMessages.MostNotBeNull, nameof(loginRequestViewModel.Username));
-
-		var exceptedPasswordErrorMessage =
-			string.Format(Resources.Messages.ErrorMessages.MostNotBeNull, nameof(loginRequestViewModel.Password));
-
-		// Act
-		var result =
-			await userServices.LoginAsync(loginRequestViewModel, ipAddress);
-
-		var isUsernameErrorExist =
-			result.Errors.Any(current => current == exceptedUsernameErrorMessage);
-
-		var isPasswordErrorExist =
-			result.Errors.Any(current => current == exceptedPasswordErrorMessage);
-
-		// Assert
-		Assert.NotNull(result);
-		Assert.False(result.IsSuccess);
-		Assert.True(isUsernameErrorExist);
-		Assert.True(isPasswordErrorExist);
-	}
-
-
 	[Fact]
 	public async Task LoginAsync_PassingNotFoundUsername_UserNotFoundError()
 	{
@@ -205,28 +149,428 @@ public class UserServicesTests : IClassFixture<DatabaseFixture>
 	}
 	#endregion /LoginTests
 
+	#region RegisterTests
+	[Fact]
+	public async Task RegisterAsync_PassingPasswordLessThan8Char_IdentityPasswordError()
+	{
+		// Arrange
+		var userServices = CreateUserServices();
+
+		var registerRequestViewModel =
+			new RegisterRequestViewModel
+			{
+				Username = Guid.NewGuid().ToString(),
+				Email = $"{Guid.NewGuid().ToString()[0..10]}@gmail.com",
+				Password = "1234567"
+			};
+
+		var exceptedErrorMessage =
+			new IdentityErrorDescriber()
+			.PasswordTooShort(_options.Value.IdentitySettings.PasswordRequiredLength)
+			.Description;
+
+		// Act
+		var result =
+			await userServices.RegisterAsync(registerRequestViewModel);
+
+		var isErrorExist =
+			result.Errors.Any(current => current == exceptedErrorMessage);
+
+		// Assert
+		Assert.NotNull(result);
+		Assert.False(result.IsSuccess);
+		Assert.True(isErrorExist);
+	}
+
+
+	[Fact]
+	public async Task RegisterAsync_PassingExistingUsername_IdentityUsernameExistError()
+	{
+		// Arrange
+		var userServices = CreateUserServices();
+
+		var registerRequestViewModel =
+			new RegisterRequestViewModel
+			{
+				Username = Consts.UserUsername,
+				Email = $"{Guid.NewGuid().ToString()[0..10]}@gmail.com",
+				Password = Consts.UsersPassword
+			};
+
+		var exceptedErrorMessage =
+			new IdentityErrorDescriber()
+			.DuplicateUserName(registerRequestViewModel.Username)
+			.Description;
+
+		// Act
+		var result =
+			await userServices.RegisterAsync(registerRequestViewModel);
+
+		var isErrorExist =
+			result.Errors.Any(current => current == exceptedErrorMessage);
+
+		// Assert
+		Assert.NotNull(result);
+		Assert.False(result.IsSuccess);
+		Assert.True(isErrorExist);
+	}
+
+
+	[Fact]
+	public async Task RegisterAsync_PassingInvalidEmail_IdentityInvalidEmailError()
+	{
+		// Arrange
+		var userServices = CreateUserServices();
+
+		var registerRequestViewModel =
+			new RegisterRequestViewModel
+			{
+				Username = Guid.NewGuid().ToString(),
+				Email = Guid.NewGuid().ToString(),
+				Password = Consts.UsersPassword
+			};
+
+		var exceptedErrorMessage =
+			new IdentityErrorDescriber()
+			.InvalidEmail(registerRequestViewModel.Email)
+			.Description;
+
+		// Act
+		var result =
+			await userServices.RegisterAsync(registerRequestViewModel);
+
+		var isErrorExist =
+			result.Errors.Any(current => current == exceptedErrorMessage);
+
+		// Assert
+		Assert.NotNull(result);
+		Assert.False(result.IsSuccess);
+		Assert.True(isErrorExist);
+	}
+
+
+	[Fact]
+	public async Task RegisterAsync_PassingExistingEmail_IdentityEmailExistError()
+	{
+		// Arrange
+		var userServices = CreateUserServices();
+
+		var registerRequestViewModel =
+			new RegisterRequestViewModel
+			{
+				Username = Guid.NewGuid().ToString(),
+				Email = Consts.AdminEmail,
+				Password = Consts.UsersPassword
+			};
+
+		var exceptedErrorMessage =
+			new IdentityErrorDescriber()
+			.DuplicateEmail(registerRequestViewModel.Email)
+			.Description;
+
+		// Act
+		var result =
+			await userServices.RegisterAsync(registerRequestViewModel);
+
+		var isErrorExist =
+			result.Errors.Any(current => current == exceptedErrorMessage);
+
+		// Assert
+		Assert.NotNull(result);
+		Assert.False(result.IsSuccess);
+		Assert.True(isErrorExist);
+	}
+
+
+	[Fact]
+	public async Task RegisterAsync_PassingValidInformation_IdentitySuccess()
+	{
+		// Arrange
+		var userServices = CreateUserServices();
+
+		var registerRequestViewModel =
+			new RegisterRequestViewModel
+			{
+				Username = Guid.NewGuid().ToString(),
+				Email = $"{Guid.NewGuid().ToString().Replace("-", "").AsSpan().Slice(0, 10)}@gmail.com",
+				Password = Consts.UsersPassword
+			};
+
+		var exceptedSuccessMessage =
+			Resources.Messages.SuccessMessages.RegisterSuccessful;
+
+		// Act
+		var result =
+			await userServices.RegisterAsync(registerRequestViewModel);
+
+		var isSuccessExist =
+			result.Successes.Any(current => current == exceptedSuccessMessage);
+
+		// Assert
+		Assert.NotNull(result);
+		Assert.True(result.IsSuccess);
+		Assert.True(isSuccessExist);
+	}
+	#endregion /RegisterTests
+
+	#region RefreshTokenTests
+	[Fact]
+	public async Task RefreshTokenAsync_PassingInvalidRefreshToken_InvalidRefreshTokenError()
+	{
+		// Arrange
+		var userServices = CreateUserServices();
+
+		var exceptedErrorMessage =
+			Resources.Messages.ErrorMessages.InvalidRefreshToken;
+
+		// Act
+		var result =
+			await userServices.RefreshTokenAsync("12345", "123");
+
+		var isErrorExist =
+			result.Errors.Any(current => current == exceptedErrorMessage);
+
+		// Assert
+		Assert.NotNull(result);
+		Assert.False(result.IsSuccess);
+		Assert.True(isErrorExist);
+	}
+
+
+	[Fact]
+	public async Task RefreshTokenAsync_PassingValidRefreshToken_RefreshTokenSuccessful()
+	{
+		// Arrange
+		var userServices = CreateUserServices();
+
+		var exceptedSuccessMessage =
+			Resources.Messages.SuccessMessages.RefreshTokenSuccessfull;
+
+		var loginRequestViewModel =
+			new LoginRequestViewModel
+			{
+				Username = Consts.AdminUsername,
+				Password = Consts.UsersPassword
+			};
+
+		var userLogined =
+			await userServices.LoginAsync(loginRequestViewModel, null);
+
+		// Act
+		var result =
+			await userServices.RefreshTokenAsync(userLogined.Value.RefreshToken.ToString(), null);
+
+		var isSuccessExist =
+			result.Successes.Any(current => current == exceptedSuccessMessage);
+
+		// Assert
+		Assert.NotNull(result);
+		Assert.NotNull(result.Value);
+		Assert.NotNull(result.Value.Token);
+		Assert.NotNull(result.Value.Username);
+		Assert.True(result.IsSuccess);
+		Assert.True(isSuccessExist);
+	}
+	#endregion /RefreshTokenTests
+
+	#region ToggleBanUserTests
+	[Fact]
+	public async Task ToggleBanUserAsync_PassingInvalidUserId_UserNotFoundError()
+	{
+		// Arrange
+		var userServices = CreateUserServices();
+
+		var exceptedErrorMessage =
+			Resources.Messages.ErrorMessages.UserNotFound;
+
+		// Act
+		var result =
+			await userServices.ToggleBanUser(int.MaxValue);
+
+		var isErrorExist =
+			result.Errors.Any(current => current == exceptedErrorMessage);
+
+		// Assert
+		Assert.NotNull(result);
+		Assert.False(result.IsSuccess);
+		Assert.True(isErrorExist);
+	}
+
+
+	[Fact]
+	public async Task ToggleBanUserAsync_PassingValidUserId_SuccessMessage()
+	{
+		// Arrange
+		var userServices = CreateUserServices();
+
+		var exceptedSuccessfullyBanedMessage =
+			Resources.Messages.SuccessMessages.UserBannedSuccessful;
+
+		var exceptedSuccessfullyUnBanedMessage =
+			Resources.Messages.SuccessMessages.UserUnbannedSuccessful;
+
+		// Act
+		var resultBanUser =
+			await userServices.ToggleBanUser(Consts.UserId);
+
+		var isSuccessBanExist =
+			resultBanUser.Successes.Any(current => current == exceptedSuccessfullyBanedMessage);
+
+
+		var resultUnBanUser =
+			await userServices.ToggleBanUser(Consts.UserId);
+
+		var isSuccessUnBanExist =
+			resultUnBanUser.Successes.Any(current => current == exceptedSuccessfullyUnBanedMessage);
+
+		// Assert
+		Assert.NotNull(resultBanUser);
+		Assert.True(resultBanUser.IsSuccess);
+		Assert.True(resultUnBanUser.IsSuccess);
+		Assert.True(isSuccessBanExist);
+		Assert.True(isSuccessUnBanExist);
+	}
+	#endregion /ToggleBanUserTests
+
+	#region UserSoftDeleteTests
+	[Fact]
+	public async Task UserSoftDeleteAsync_PassingInvalidUserId_UserNotFoundError()
+	{
+		// Arrange
+		var userServices = CreateUserServices();
+
+		var exceptedErrorMessage =
+			Resources.Messages.ErrorMessages.UserNotFound;
+
+		// Act
+		var result =
+			await userServices.UserSoftDeleteAsync(int.MaxValue);
+
+		var isErrorExist =
+			result.Errors.Any(current => current == exceptedErrorMessage);
+
+		// Assert
+		Assert.NotNull(result);
+		Assert.False(result.IsSuccess);
+		Assert.True(isErrorExist);
+	}
+
+
+	[Fact]
+	public async Task UserSoftDeleteAsync_PassingValidUserId_SuccessMessage()
+	{
+		// Arrange
+		var userServices = CreateUserServices();
+
+		var exceptedSuccessMessage =
+			Resources.Messages.SuccessMessages.DeleteUserSuccessful;
+
+		// Act
+		var result =
+			await userServices.UserSoftDeleteAsync(Consts.UserForDeleteId);
+
+		var isSuccessExist =
+			result.Successes.Any(current => current == exceptedSuccessMessage);
+
+		// Assert
+		Assert.NotNull(result);
+		Assert.True(result.IsSuccess);
+		Assert.True(isSuccessExist);
+	}
+	#endregion /UserSoftDeleteTests
+
+	#region LogoutTests
+	[Fact]
+	public async Task LogoutAsync_PassingInvalidRefreshToken_InvalidJWTError()
+	{
+		// Arrange
+		var userServices = CreateUserServices();
+
+		var exceptedErrorMessage =
+			Resources.Messages.ErrorMessages.InvalidRefreshToken;
+
+		// Act
+		var result =
+			await userServices.LogoutAsync("12345");
+
+		var isErrorExist =
+			result.Errors.Any(current => current == exceptedErrorMessage);
+
+		// Assert
+		Assert.NotNull(result);
+		Assert.False(result.IsSuccess);
+		Assert.True(isErrorExist);
+	}
+
+
+	[Fact]
+	public async Task LogoutAsync_PassingNotFoundRefreshToken_UserNotFoundMessage()
+	{
+		// Arrange
+		var userServices = CreateUserServices();
+
+		var exceptedErrorMessage =
+			Resources.Messages.ErrorMessages.UserNotFound;
+
+		// Act
+		var result =
+			await userServices.LogoutAsync(Guid.NewGuid().ToString());
+
+		var isErrorExist =
+			result.Errors.Any(current => current == exceptedErrorMessage);
+
+		// Assert
+		Assert.NotNull(result);
+		Assert.False(result.IsSuccess);
+		Assert.True(isErrorExist);
+	}
+
+
+	[Fact]
+	public async Task LogoutAsync_PassingValidRefreshToken_LogoutSuccessfulMessage()
+	{
+		// Arrange
+		var userServices = CreateUserServices();
+
+		var loginRequestViewModel =
+			new LoginRequestViewModel
+			{
+				Username = Consts.UserUsername,
+				Password = Consts.UsersPassword
+			};
+
+		var userLogin =
+			await userServices.LoginAsync(loginRequestViewModel, null);
+
+		var exceptedSuccessMessage =
+			Resources.Messages.SuccessMessages.RefreshTokenRevoked;
+
+		// Act
+		var result =
+			await userServices.LogoutAsync(userLogin.Value.RefreshToken.ToString());
+
+		var isSuccessExist =
+			result.Successes.Any(current => current == exceptedSuccessMessage);
+
+		// Assert
+		Assert.NotNull(result);
+		Assert.True(result.IsSuccess);
+		Assert.True(isSuccessExist);
+	}
+	#endregion /LogoutTests
+
 	#region OtherMethods
 	private UserServices CreateUserServices()
 	{
-		_mockOptions
-			.SetupGet(current => current.Value)
-			.Returns(new ApplicationSettings
-			{
-				JwtSettings = new JwtSettings
-				{
-					SecretKeyForEncryptionToken = Guid.NewGuid().ToString(),
-					SecretKeyForToken = Guid.NewGuid().ToString(),
-					TokenExpiresTime = 60
-				}
-			});
-
 		return new UserServices
 			(_mockMapper.Object,
 			_mockEasyCachingProvider.Object,
 			_tokenServices,
 			_mockLogger.Object,
 			_userRepository,
-			_mockOptions.Object);
+			options: _options,
+			userManager: _userManager,
+			roleManager: _roleManager);
 	}
 	#endregion /OtherMethods
 }

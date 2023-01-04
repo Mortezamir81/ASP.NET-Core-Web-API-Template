@@ -2,13 +2,22 @@
 
 public class LoginByOAuthRequestViewModel
 {
-	[Required]
+	[Required
+		(AllowEmptyStrings = false,
+		ErrorMessageResourceType = typeof(Resources.Messages.ErrorMessages),
+		ErrorMessageResourceName = nameof(Resources.Messages.ErrorMessages.MostNotBeNull))]
 	public string? Grant_Type { get; set; }
 
-	[Required]
+	[Required
+		(AllowEmptyStrings = false,
+		ErrorMessageResourceType = typeof(Resources.Messages.ErrorMessages),
+		ErrorMessageResourceName = nameof(Resources.Messages.ErrorMessages.MostNotBeNull))]
 	public string? Username { get; set; }
 
-	[Required]
+	[Required
+		(AllowEmptyStrings = false,
+		ErrorMessageResourceType = typeof(Resources.Messages.ErrorMessages),
+		ErrorMessageResourceName = nameof(Resources.Messages.ErrorMessages.MostNotBeNull))]
 	public string? Password { get; set; }
 
 	public string? Refresh_Token { get; set; }
