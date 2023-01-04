@@ -95,28 +95,16 @@ public class UsersController : BaseController
 	/// <summary>
 	/// Change user role by userId and roleId
 	/// </summary>
-	[Authorize(Roles = $"{Constants.Role.SystemAdmin},{Constants.Role.Admin}")]
+	[Authorize(Roles = $"{Constants.Role.SystemAdmin}")]
 	[LogInputParameter(InputLogLevel.Warning)]
 	[HttpPut("ChangeUserRole")]
 	public async Task<ActionResult<Result>>
 		ChangeUserRoleAsync([FromBody] ChangeUserRoleRequestViewModel requestViewModel)
 	{
-		var result = new Result();
-
-		var userRequestedId = GetUserId();
-
-		if (!userRequestedId.HasValue)
-		{
-			var errorMessage =
-				string.Format(nameof(HttpStatusCode.Unauthorized));
-
-			result.AddErrorMessage(errorMessage);
-
-			return result;
-		}
+		var adminId = GetRequierdUserId();
 
 		var serviceResult =
-			await _userServices.ChangeUserRoleAsync(requestViewModel, adminId: userRequestedId.Value);
+			await _userServices.ChangeUserRoleAsync(requestViewModel, adminId: adminId);
 
 		return serviceResult.ApiResult();
 	}
@@ -147,10 +135,10 @@ public class UsersController : BaseController
 	public async Task<ActionResult>
 		UpdateUserByAdminAsync(UpdateUserByAdminRequestViewModel requestViewModel)
 	{
-		var userRequestedId = GetUserId();
+		var adminId = GetRequierdUserId();
 
 		var serviceResult =
-			await _userServices.UpdateUserByAdminAsync(viewModel: requestViewModel, adminId: userRequestedId);
+			await _userServices.UpdateUserByAdminAsync(viewModel: requestViewModel, adminId: adminId);
 
 		return serviceResult.ApiResult();
 	}

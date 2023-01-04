@@ -22,19 +22,6 @@ public class UserRepository : IUserRepository
 	#endregion /Constractor
 
 	#region Methods
-	public void UpdateUserByAdmin(User user)
-	{
-		Assert.NotNull(obj: user, nameof(user));
-
-		Attach(user);
-
-		_databaseContext.Entry(user).Property(x => x.FullName).IsModified = true;
-		_databaseContext.Entry(user).Property(x => x.UserName).IsModified = true;
-		_databaseContext.Entry(user).Property(x => x.Email).IsModified = true;
-		_databaseContext.Entry(user).Property(x => x.SecurityStamp).IsModified = true;
-	}
-
-
 	public void DeleteUserLogin(UserLogin? userLogin)
 	{
 		Assert.NotNull(obj: userLogin, nameof(userLogin));
@@ -61,7 +48,7 @@ public class UserRepository : IUserRepository
 		var result =
 			await _entities!
 				.AsNoTracking()
-				.Select(current => current.Email)
+				.Select(current => current.NormalizedEmail)
 				.Where(current => current == email)
 				.AnyAsync()
 				;
@@ -81,7 +68,7 @@ public class UserRepository : IUserRepository
 		var result =
 			await _databaseContext.Users!
 				.AsNoTracking()
-				.Select(current => current.UserName)
+				.Select(current => current.NormalizedUserName)
 				.Where(current => current == username)
 				.AnyAsync()
 				;

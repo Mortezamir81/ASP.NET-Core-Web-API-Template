@@ -108,6 +108,16 @@ public partial class UserServices : BaseServices, IUserServices
 			return result;
 		}
 
+		if (foundedUser.IsSystemic)
+		{
+			string errorMessage = string.Format
+				(Resources.Messages.ErrorMessages.AccessDenied);
+
+			result.AddErrorMessage(errorMessage);
+
+			return result;
+		}
+
 		foundedUser.IsDeleted = true;
 		await _userManager.UpdateSecurityStampAsync(foundedUser);
 
@@ -286,29 +296,27 @@ public partial class UserServices : BaseServices, IUserServices
 	/// <param name="adminId"></param>
 	/// <returns>Success or Failed Result</returns>
 	public async Task<Result> UpdateUserByAdminAsync
-		(UpdateUserByAdminRequestViewModel requestViewModel, int? adminId)
+		(UpdateUserByAdminRequestViewModel requestViewModel, int adminId)
 	{
 		var result = new Result();
 
-		if (result.IsFailed)
-		{
-			return result;
-		}
+		var adminUser =
+			await _userManager.FindByIdAsync(adminId.ToString());
 
-		if (!adminId.HasValue)
+		if (adminUser == null)
 		{
-			string errorMessage = string.Format
-				(Resources.Messages.ErrorMessages.MostNotBeNull, nameof(adminId));
+			var errorMessage =
+				string.Format(nameof(HttpStatusCode.Unauthorized));
 
 			result.AddErrorMessage(errorMessage);
 
 			return result;
 		}
 
-		var adminRoleId =
-			await _userRepository.GetUserRoleAsync(adminId.Value);
+		var adminRoles =
+			await _userManager.GetRolesAsync(adminUser);
 
-		if (!adminRoleId.HasValue)
+		if (adminRoles == null || adminRoles.Count == 0)
 		{
 			var errorMessage =
 				string.Format(nameof(HttpStatusCode.Unauthorized));
@@ -319,7 +327,7 @@ public partial class UserServices : BaseServices, IUserServices
 		}
 
 		var user =
-			await _userRepository.GetUserById(userId: requestViewModel.UserId!.Value, isTracking: false);
+			await _userManager.FindByIdAsync(requestViewModel.UserId.ToString()!);
 
 		if (user == null)
 		{
@@ -331,42 +339,42 @@ public partial class UserServices : BaseServices, IUserServices
 			return result;
 		}
 
+		var userRoles =
+			await _userManager.GetRolesAsync(user);
+
 		if (user.Id != adminId)
 		{
-			//if (user.RoleId == adminRoleId)
-			//{
-			//	string errorMessage = string.Format
-			//		(Resources.Messages.ErrorMessages.AccessDeniedForUpdateThisUser);
+			if (!adminUser.IsSystemic && userRoles[0] == adminRoles[0])
+			{
+				string errorMessage = string.Format
+					(Resources.Messages.ErrorMessages.AccessDeniedForUpdateThisUser);
 
-			//	result.AddErrorMessage(errorMessage);
+				result.AddErrorMessage(errorMessage);
 
-			//	return result;
-			//}
+				return result;
+			}
+
+			if (adminRoles[0] == Constants.Role.Admin && userRoles[0] == Constants.Role.SystemAdmin)
+			{
+				string errorMessage = string.Format
+					(Resources.Messages.ErrorMessages.AccessDeniedForUpdateThisUser);
+
+				result.AddErrorMessage(errorMessage);
+
+				return result;
+			}
 		}
-
-		if (adminRoleId == (int)UserRoleEnum.Admin)
-		{
-			//if (user.RoleId == (int) UserRoleEnum.SystemAdministrator)
-			//{
-			//	string errorMessage = string.Format
-			//		(Resources.Messages.ErrorMessages.AccessDeniedForUpdateThisUser);
-
-			//	result.AddErrorMessage(errorMessage);
-
-			//	return result;
-			//}
-		}
-
 
 		if (user.UserName != requestViewModel.Username)
 		{
-			var isPhoneNumberExist =
-				await _userRepository.CheckUsernameExist(username: requestViewModel.Username);
+			var isUsernameExist =
+				await _userRepository.CheckUsernameExist
+					(username: _userManager.NormalizeName(requestViewModel.Username));
 
-			if (isPhoneNumberExist)
+			if (isUsernameExist)
 			{
 				string errorMessage = string.Format
-					(Resources.Messages.ErrorMessages.PhoneNumberExist);
+					(Resources.Messages.ErrorMessages.UsernameExist);
 
 				result.AddErrorMessage(errorMessage);
 
@@ -377,7 +385,8 @@ public partial class UserServices : BaseServices, IUserServices
 		if (user.Email != requestViewModel.Email)
 		{
 			var isEmailExist =
-				await _userRepository.CheckEmailExist(email: requestViewModel.Email);
+				await _userRepository.CheckEmailExist
+					(email: _userManager.NormalizeEmail(requestViewModel.Email));
 
 			if (isEmailExist)
 			{
@@ -390,17 +399,15 @@ public partial class UserServices : BaseServices, IUserServices
 			}
 		}
 
-		var updatedUser =
-			_mapper.Map<User>(source: requestViewModel);
-
-		updatedUser.Id = requestViewModel.UserId!.Value;
-		updatedUser.SecurityStamp = Guid.NewGuid().ToString();
-
-		_userRepository.UpdateUserByAdmin(updatedUser);
+		user.Email = requestViewModel.Email;
+		user.UserName = requestViewModel.Username;
+		user.FullName = requestViewModel.FullName;
 
 		await _userRepository.SaveChangesAsync();
 
-		await _cache.RemoveByPrefixAsync($"userId-{updatedUser.Id}");
+		await _userManager.UpdateSecurityStampAsync(user);
+
+		//await _cache.RemoveByPrefixAsync($"userId-{user.Id}");
 
 		string successMessage = string.Format
 			(Resources.Messages.SuccessMessages.UpdateSuccessful);
@@ -690,8 +697,21 @@ public partial class UserServices : BaseServices, IUserServices
 
 		if (adminUser == null)
 		{
-			string errorMessage = 
+			var errorMessage =
 				string.Format(nameof(HttpStatusCode.Unauthorized));
+
+			result.AddErrorMessage(errorMessage);
+
+			return result;
+		}
+
+		var isRoleExist =
+			await _roleManager.RoleExistsAsync(requestViewModel.RoleName);
+
+		if (!isRoleExist)
+		{
+			var errorMessage = string.Format
+				(Resources.Messages.ErrorMessages.RoleNotFound);
 
 			result.AddErrorMessage(errorMessage);
 
@@ -701,21 +721,9 @@ public partial class UserServices : BaseServices, IUserServices
 		var adminRoles =
 			await _userManager.GetRolesAsync(adminUser);
 
-		var isRoleExist =
-			await _roleManager.RoleExistsAsync(requestViewModel.RoleName);
-
-		if (!isRoleExist)
-		{
-			string errorMessage = string.Format
-				(Resources.Messages.ErrorMessages.RoleNotFound);
-
-			result.AddErrorMessage(errorMessage);
-
-			return result;
-		}
-
 		var foundedUser =
-			await _userManager.FindByIdAsync(userId: requestViewModel.UserId!.Value.ToString());
+			await _userManager.FindByIdAsync
+				(userId: requestViewModel.UserId!.Value.ToString());
 
 		if (foundedUser == null)
 		{
@@ -730,9 +738,19 @@ public partial class UserServices : BaseServices, IUserServices
 		var userRoles =
 			await _userManager.GetRolesAsync(foundedUser);
 
+		if (adminRoles.Count == 0 || userRoles.Count == 0)
+		{
+			var errorMessage = string.Format
+				(Resources.Messages.ErrorMessages.AccessDeniedForChangeRole);
+
+			result.AddErrorMessage(errorMessage);
+
+			return result;
+		}
+
 		if (foundedUser.Id == adminId)
 		{
-			string errorMessage = string.Format
+			var errorMessage = string.Format
 				(Resources.Messages.ErrorMessages.AccessDeniedForChangeRole);
 
 			result.AddErrorMessage(errorMessage);
@@ -740,38 +758,14 @@ public partial class UserServices : BaseServices, IUserServices
 			return result;
 		}
 
-		if (adminRoles[0] == userRoles[0])
+		if (foundedUser.IsSystemic)
 		{
-			string errorMessage = string.Format
+			var errorMessage = string.Format
 				(Resources.Messages.ErrorMessages.AccessDeniedForChangeRole);
 
 			result.AddErrorMessage(errorMessage);
 
 			return result;
-		}
-
-		if (adminRoles[0] == Constants.Role.Admin)
-		{
-			if (userRoles[0] == Constants.Role.SystemAdmin)
-			{
-				var errorMessage = string.Format
-					(Resources.Messages.ErrorMessages.AccessDeniedForChangeRole);
-
-				result.AddErrorMessage(errorMessage);
-
-				return result;
-			}
-
-			if (requestViewModel.RoleName == Constants.Role.SystemAdmin ||
-				requestViewModel.RoleName == Constants.Role.Admin)
-			{
-				var errorMessage = string.Format
-					(Resources.Messages.ErrorMessages.AccessDeniedForChangeThisRole);
-
-				result.AddErrorMessage(errorMessage);
-
-				return result;
-			}
 		}
 
 		foreach (var role in userRoles)
@@ -779,7 +773,18 @@ public partial class UserServices : BaseServices, IUserServices
 			await _userManager.RemoveFromRoleAsync(foundedUser, role);
 		}
 
-		await _userManager.AddToRoleAsync(foundedUser, requestViewModel.RoleName);
+		var addToRoleResult =
+			await _userManager.AddToRoleAsync(foundedUser, requestViewModel.RoleName);
+
+		if (!addToRoleResult.Succeeded)
+		{
+			foreach (var error in addToRoleResult.Errors)
+			{
+				result.AddErrorMessage(error.Description);
+			}
+
+			return result;
+		}
 
 		await _userManager.UpdateSecurityStampAsync(foundedUser);
 

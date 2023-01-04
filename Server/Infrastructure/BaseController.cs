@@ -26,4 +26,22 @@ public class BaseController : ControllerBase
 
 		return userId;
 	}
+
+
+	[NonAction]
+	protected int GetRequierdUserId()
+	{
+		if (User?.Identity?.IsAuthenticated == false)
+			throw new Exception("The user is not authenticated!");
+
+		var stringUserId =
+			User?.Claims.FirstOrDefault(current => current.Type == ClaimTypes.NameIdentifier)?.Value;
+
+		if (stringUserId == null)
+			throw new Exception("The user is not authenticated!");
+
+		var userId = int.Parse(stringUserId);
+
+		return userId;
+	}
 }

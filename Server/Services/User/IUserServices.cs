@@ -16,7 +16,7 @@ public interface IUserServices
 
 
 	Task<Result>UpdateUserByAdminAsync
-			(UpdateUserByAdminRequestViewModel viewModel, int? adminId);
+			(UpdateUserByAdminRequestViewModel viewModel, int adminId);
 
 
 	Task<Result<LoginResponseViewModel>>

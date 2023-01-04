@@ -2,9 +2,6 @@
 
 public interface IUserRepository
 {
-	void UpdateUserByAdmin(User user);
-
-
 	Task<bool> CheckRoleExist(int roleId);
 
 

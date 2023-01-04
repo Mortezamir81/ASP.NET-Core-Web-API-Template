@@ -26,7 +26,7 @@ public class RegistrationServices : IDisposable
 
 		Services.AddCustomIdentity(identitySettings);
 
-		Services.AddCustomDbContext(connectionString: Consts.ConnectionString);
+		Services.AddCustomDbContext(connectionString: Consts.General.ConnectionString);
 
 		Services.AddLogging(config => config.AddConsole());
 
@@ -68,59 +68,98 @@ public class RegistrationServices : IDisposable
 		await roleManager!.CreateAsync(new Role(Constants.Role.User));
 
 		var systemAdminUser =
-			new User(Consts.SystemAdminUsername)
+			new User(Consts.UserServices.SystemAdminUsername)
 			{
-				Email = Consts.SystemAdminEmail,
+				Email = Consts.UserServices.SystemAdminEmail,
+				EmailConfirmed = true,
+				FullName = "some name",
+				IsSystemic = true,
+			};
+
+		var secoundSystemAdminUser =
+			new User(Consts.UserServices.SecoundSystemAdminUsername)
+			{
+				Email = Consts.UserServices.SecoundSystemAdminEmail,
 				EmailConfirmed = true,
 				FullName = "some name",
 			};
 
 		var adminUser =
-			new User(Consts.AdminUsername)
+			new User(Consts.UserServices.AdminUsername)
 			{
-				Email = Consts.AdminEmail,
+				Email = Consts.UserServices.AdminEmail,
+				EmailConfirmed = true,
+				FullName = "some name",
+			};
+
+		var secoundAdminUser =
+			new User(Consts.UserServices.SecoundAdminUsername)
+			{
+				Email = Consts.UserServices.SecoundAdminEmail,
 				EmailConfirmed = true,
 				FullName = "some name",
 			};
 
 		var user =
-			new User(Consts.UserUsername)
+			new User(Consts.UserServices.UserUsername)
 			{
-				Email = Consts.UserEmail,
+				Email = Consts.UserServices.UserEmail,
 				EmailConfirmed = true,
 				FullName = "some name",
 			};
 
-
 		var banUser =
-			new User(Consts.BanUserUsername)
+			new User(Consts.UserServices.BanUserUsername)
 			{
-				Email = Consts.BanUserEmail,
+				Email = Consts.UserServices.BanUserEmail,
 				EmailConfirmed = true,
 				FullName = "some name",
 				IsBanned = true,
 			};
 
 		var userForDelete =
-			new User(Consts.UserForDeleteUsername)
+			new User(Consts.UserServices.UserForDeleteUsername)
 			{
-				Email = Consts.UserForDeleteEmail,
+				Email = Consts.UserServices.UserForDeleteEmail,
 				EmailConfirmed = true,
 				FullName = "some name",
-				IsBanned = false,
 			};
 
-		await userManager!.CreateAsync(systemAdminUser, password: Consts.UsersPassword);
-		await userManager!.CreateAsync(adminUser, password: Consts.UsersPassword);
-		await userManager!.CreateAsync(user, password: Consts.UsersPassword);
-		await userManager!.CreateAsync(banUser, password: Consts.UsersPassword);
-		await userManager!.CreateAsync(userForDelete, password: Consts.UsersPassword);
+		var userForEditRole =
+			new User(Consts.UserServices.UserForEditRoleUsername)
+			{
+				Email = Consts.UserServices.UserForEditRoleEmail,
+				EmailConfirmed = true,
+				FullName = "some name",
+			};
+
+		var userForUpdate =
+			new User(Consts.UserServices.UserForUpdateUsername)
+			{
+				Email = Consts.UserServices.UserForUpdateEmail,
+				EmailConfirmed = true,
+				FullName = "some name",
+			};
+
+		await userManager!.CreateAsync(systemAdminUser, password: Consts.UserServices.UsersPassword);
+		await userManager!.CreateAsync(secoundSystemAdminUser, password: Consts.UserServices.UsersPassword);
+		await userManager!.CreateAsync(adminUser, password: Consts.UserServices.UsersPassword);
+		await userManager!.CreateAsync(secoundAdminUser, password: Consts.UserServices.UsersPassword);
+		await userManager!.CreateAsync(user, password: Consts.UserServices.UsersPassword);
+		await userManager!.CreateAsync(banUser, password: Consts.UserServices.UsersPassword);
+		await userManager!.CreateAsync(userForDelete, password: Consts.UserServices.UsersPassword);
+		await userManager!.CreateAsync(userForEditRole, password: Consts.UserServices.UsersPassword);
+		await userManager!.CreateAsync(userForUpdate, password: Consts.UserServices.UsersPassword);
 
 		await userManager.AddToRoleAsync(user: systemAdminUser, role: Constants.Role.SystemAdmin);
+		await userManager.AddToRoleAsync(user: secoundSystemAdminUser, role: Constants.Role.SystemAdmin);
 		await userManager.AddToRoleAsync(user: adminUser, role: Constants.Role.Admin);
+		await userManager.AddToRoleAsync(user: secoundAdminUser, role: Constants.Role.Admin);
 		await userManager.AddToRoleAsync(user: user, role: Constants.Role.User);
 		await userManager.AddToRoleAsync(user: banUser, role: Constants.Role.User);
 		await userManager.AddToRoleAsync(user: userForDelete, role: Constants.Role.User);
+		await userManager.AddToRoleAsync(user: userForEditRole, role: Constants.Role.User);
+		await userManager.AddToRoleAsync(user: userForUpdate, role: Constants.Role.User);
 	}
 	#endregion /Methods
 }

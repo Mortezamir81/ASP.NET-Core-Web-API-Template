@@ -27,6 +27,7 @@ public static class InitializeDatabase
 					PhoneNumberConfirmed = true,
 					FullName = "admin",
 					PhoneNumber = "09165059874",
+					IsSystemic = true,
 				};
 
 			await userManager!.CreateAsync(adminUser, password: "morteza@12345");

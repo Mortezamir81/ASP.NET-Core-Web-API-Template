@@ -1,4 +1,6 @@
-﻿namespace Tests.Services.User;
+﻿using System.Net;
+
+namespace Tests.Services.User;
 
 public class UserServicesTests : IClassFixture<RegistrationServices>
 {
@@ -91,8 +93,8 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 		var loginRequestViewModel =
 			new LoginRequestViewModel
 			{
-				Username = Consts.BanUserUsername,
-				Password = Consts.UsersPassword,
+				Username = Consts.UserServices.BanUserUsername,
+				Password = Consts.UserServices.UsersPassword,
 			};
 
 		string? ipAddress = null;
@@ -120,13 +122,13 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 		// Arrange
 		var userServices = CreateUserServices();
 
-		var username = Consts.UserUsername;
+		var username = Consts.UserServices.UserUsername;
 
 		var loginRequestViewModel =
 			new LoginRequestViewModel
 			{
 				Username = username,
-				Password = Consts.UsersPassword,
+				Password = Consts.UserServices.UsersPassword,
 			};
 
 		var exceptedSuccessMessage =
@@ -192,9 +194,9 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 		var registerRequestViewModel =
 			new RegisterRequestViewModel
 			{
-				Username = Consts.UserUsername,
+				Username = Consts.UserServices.UserUsername,
 				Email = $"{Guid.NewGuid().ToString()[0..10]}@gmail.com",
-				Password = Consts.UsersPassword
+				Password = Consts.UserServices.UsersPassword
 			};
 
 		var exceptedErrorMessage =
@@ -227,7 +229,7 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 			{
 				Username = Guid.NewGuid().ToString(),
 				Email = Guid.NewGuid().ToString(),
-				Password = Consts.UsersPassword
+				Password = Consts.UserServices.UsersPassword
 			};
 
 		var exceptedErrorMessage =
@@ -259,8 +261,8 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 			new RegisterRequestViewModel
 			{
 				Username = Guid.NewGuid().ToString(),
-				Email = Consts.AdminEmail,
-				Password = Consts.UsersPassword
+				Email = Consts.UserServices.AdminEmail,
+				Password = Consts.UserServices.UsersPassword
 			};
 
 		var exceptedErrorMessage =
@@ -293,7 +295,7 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 			{
 				Username = Guid.NewGuid().ToString(),
 				Email = $"{Guid.NewGuid().ToString().Replace("-", "").AsSpan().Slice(0, 10)}@gmail.com",
-				Password = Consts.UsersPassword
+				Password = Consts.UserServices.UsersPassword
 			};
 
 		var exceptedSuccessMessage =
@@ -349,8 +351,8 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 		var loginRequestViewModel =
 			new LoginRequestViewModel
 			{
-				Username = Consts.AdminUsername,
-				Password = Consts.UsersPassword
+				Username = Consts.UserServices.AdminUsername,
+				Password = Consts.UserServices.UsersPassword
 			};
 
 		var userLogined =
@@ -411,14 +413,14 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 
 		// Act
 		var resultBanUser =
-			await userServices.ToggleBanUser(Consts.UserId);
+			await userServices.ToggleBanUser(Consts.UserServices.UserId);
 
 		var isSuccessBanExist =
 			resultBanUser.Successes.Any(current => current == exceptedSuccessfullyBanedMessage);
 
 
 		var resultUnBanUser =
-			await userServices.ToggleBanUser(Consts.UserId);
+			await userServices.ToggleBanUser(Consts.UserServices.UserId);
 
 		var isSuccessUnBanExist =
 			resultUnBanUser.Successes.Any(current => current == exceptedSuccessfullyUnBanedMessage);
@@ -467,7 +469,7 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 
 		// Act
 		var result =
-			await userServices.UserSoftDeleteAsync(Consts.UserForDeleteId);
+			await userServices.UserSoftDeleteAsync(Consts.UserServices.UserForDeleteId);
 
 		var isSuccessExist =
 			result.Successes.Any(current => current == exceptedSuccessMessage);
@@ -535,8 +537,8 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 		var loginRequestViewModel =
 			new LoginRequestViewModel
 			{
-				Username = Consts.UserUsername,
-				Password = Consts.UsersPassword
+				Username = Consts.UserServices.UserUsername,
+				Password = Consts.UserServices.UsersPassword
 			};
 
 		var userLogin =
@@ -558,6 +560,354 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 		Assert.True(isSuccessExist);
 	}
 	#endregion /LogoutTests
+
+	#region ChangeUserRoleTests
+	[Fact]
+	public async Task ChangeUserRoleAsync_PassingInvalidAdminId_UnauthroizeError()
+	{
+		// Arrange
+		var userServices = CreateUserServices();
+
+		var exceptedErrorMessage =
+			string.Format(nameof(HttpStatusCode.Unauthorized));
+
+		// Act
+		var result =
+			await userServices.ChangeUserRoleAsync(null, 0);
+
+		var isErrorExist =
+			result.Errors.Any(current => current == exceptedErrorMessage);
+
+		// Assert
+		Assert.NotNull(result);
+		Assert.False(result.IsSuccess);
+		Assert.True(isErrorExist);
+	}
+
+
+	[Fact]
+	public async Task ChangeUserRoleAsync_PassingInvalidRole_RoleNotFoundError()
+	{
+		// Arrange
+		var userServices = CreateUserServices();
+
+		var requestViewModel =
+			new ChangeUserRoleRequestViewModel
+			{
+				RoleName = Guid.NewGuid().ToString(),
+				UserId = null
+			};
+
+		var exceptedErrorMessage =
+			string.Format(Resources.Messages.ErrorMessages.RoleNotFound);
+
+		// Act
+		var result =
+			await userServices.ChangeUserRoleAsync(requestViewModel, Consts.UserServices.SystemAdminId);
+
+		var isErrorExist =
+			result.Errors.Any(current => current == exceptedErrorMessage);
+
+		// Assert
+		Assert.NotNull(result);
+		Assert.False(result.IsSuccess);
+		Assert.True(isErrorExist);
+	}
+
+
+	[Fact]
+	public async Task ChangeUserRoleAsync_PassingInvalidUser_UserNotFoundError()
+	{
+		// Arrange
+		var userServices = CreateUserServices();
+
+		var requestViewModel =
+			new ChangeUserRoleRequestViewModel
+			{
+				RoleName = Constants.Role.User,
+				UserId = 0
+			};
+
+		var exceptedErrorMessage =
+			string.Format(Resources.Messages.ErrorMessages.UserNotFound);
+
+		// Act
+		var result =
+			await userServices.ChangeUserRoleAsync(requestViewModel, Consts.UserServices.SystemAdminId);
+
+		var isErrorExist =
+			result.Errors.Any(current => current == exceptedErrorMessage);
+
+		// Assert
+		Assert.NotNull(result);
+		Assert.False(result.IsSuccess);
+		Assert.True(isErrorExist);
+	}
+
+
+	[Fact]
+	public async Task ChangeUserRoleAsync_PassingAdminSelf_AccessDeniedError()
+	{
+		// Arrange
+		var userServices = CreateUserServices();
+
+		var requestViewModel =
+			new ChangeUserRoleRequestViewModel
+			{
+				RoleName = Constants.Role.User,
+				UserId = Consts.UserServices.SystemAdminId
+			};
+
+		var exceptedErrorMessage =
+			string.Format(Resources.Messages.ErrorMessages.AccessDeniedForChangeRole);
+
+		// Act
+		var result =
+			await userServices.ChangeUserRoleAsync(requestViewModel, Consts.UserServices.SystemAdminId);
+
+		var isErrorExist =
+			result.Errors.Any(current => current == exceptedErrorMessage);
+
+		// Assert
+		Assert.NotNull(result);
+		Assert.False(result.IsSuccess);
+		Assert.True(isErrorExist);
+	}
+
+
+	[Fact]
+	public async Task ChangeUserRoleAsync_PassingSystemicSystemAdmin_AccessDeniedError()
+	{
+		// Arrange
+		var userServices = CreateUserServices();
+
+		var requestViewModel =
+			new ChangeUserRoleRequestViewModel
+			{
+				RoleName = Constants.Role.User,
+				UserId = Consts.UserServices.SystemAdminId
+			};
+
+		var exceptedErrorMessage =
+			string.Format(Resources.Messages.ErrorMessages.AccessDeniedForChangeRole);
+
+		// Act
+		var result =
+			await userServices.ChangeUserRoleAsync(requestViewModel, Consts.UserServices.SecoundSystemAdminId);
+
+		var isErrorExist =
+			result.Errors.Any(current => current == exceptedErrorMessage);
+
+		// Assert
+		Assert.NotNull(result);
+		Assert.False(result.IsSuccess);
+		Assert.True(isErrorExist);
+	}
+
+
+	[Fact]
+	public async Task ChangeUserRoleAsync_PassingValidData_SuccessMessage()
+	{
+		// Arrange
+		var userServices = CreateUserServices();
+
+		var requestViewModel =
+			new ChangeUserRoleRequestViewModel
+			{
+				RoleName = Constants.Role.Admin,
+				UserId = Consts.UserServices.UserForEditRoleId
+			};
+
+		var exceptedSuccessMessage =
+			string.Format(Resources.Messages.SuccessMessages.UpdateSuccessful);
+
+		// Act
+		var result =
+			await userServices.ChangeUserRoleAsync(requestViewModel, Consts.UserServices.SystemAdminId);
+
+		var isErrorExist =
+			result.Successes.Any(current => current == exceptedSuccessMessage);
+
+		// Assert
+		Assert.NotNull(result);
+		Assert.True(result.IsSuccess);
+		Assert.True(isErrorExist);
+	}
+	#endregion /ChangeUserRoleTests
+
+	#region UpdateUserByAdminTests
+	[Fact]
+	public async Task UpdateUserByAdminAsync_PassingInvalidAdminId_UnauthorizeError()
+	{
+		// Arrange
+		var userServices = CreateUserServices();
+
+		var exceptedErrorMessage =
+			nameof(HttpStatusCode.Unauthorized);
+
+		// Act
+		var result =
+			await userServices.UpdateUserByAdminAsync(null, 0);
+
+		var isErrorExist =
+			result.Errors.Any(current => current == exceptedErrorMessage);
+
+		// Assert
+		Assert.NotNull(result);
+		Assert.False(result.IsSuccess);
+		Assert.True(isErrorExist);
+	}
+
+
+	[Fact]
+	public async Task UpdateUserByAdminAsync_PassingNotSystemicAdminAndPeerUser_AccessDeniedError()
+	{
+		// Arrange
+		var userServices = CreateUserServices();
+
+		var requestViewModel =
+			new UpdateUserByAdminRequestViewModel
+			{
+				UserId = Consts.UserServices.SecoundAdminId,
+			};
+
+		var exceptedErrorMessage =
+			Resources.Messages.ErrorMessages.AccessDeniedForUpdateThisUser;
+
+		// Act
+		var result =
+			await userServices.UpdateUserByAdminAsync(requestViewModel, Consts.UserServices.AdminId);
+
+		var isErrorExist =
+			result.Errors.Any(current => current == exceptedErrorMessage);
+
+		// Assert
+		Assert.NotNull(result);
+		Assert.False(result.IsSuccess);
+		Assert.True(isErrorExist);
+	}
+
+
+	[Fact]
+	public async Task UpdateUserByAdminAsync_PassingHigherLevelUser_AccessDeniedError()
+	{
+		// Arrange
+		var userServices = CreateUserServices();
+
+		var requestViewModel =
+			new UpdateUserByAdminRequestViewModel
+			{
+				UserId = Consts.UserServices.SystemAdminId,
+			};
+
+		var exceptedErrorMessage =
+			Resources.Messages.ErrorMessages.AccessDeniedForUpdateThisUser;
+
+		// Act
+		var result =
+			await userServices.UpdateUserByAdminAsync(requestViewModel, Consts.UserServices.AdminId);
+
+		var isErrorExist =
+			result.Errors.Any(current => current == exceptedErrorMessage);
+
+		// Assert
+		Assert.NotNull(result);
+		Assert.False(result.IsSuccess);
+		Assert.True(isErrorExist);
+	}
+
+
+	[Fact]
+	public async Task UpdateUserByAdminAsync_PassingExistUserName_UserNameExistError()
+	{
+		// Arrange
+		var userServices = CreateUserServices();
+
+		var requestViewModel =
+			new UpdateUserByAdminRequestViewModel
+			{
+				UserId = Consts.UserServices.UserId,
+				Username = Consts.UserServices.AdminUsername
+			};
+
+		var exceptedErrorMessage =
+			Resources.Messages.ErrorMessages.UsernameExist;
+
+		// Act
+		var result =
+			await userServices.UpdateUserByAdminAsync(requestViewModel, Consts.UserServices.AdminId);
+
+		var isErrorExist =
+			result.Errors.Any(current => current == exceptedErrorMessage);
+
+		// Assert
+		Assert.NotNull(result);
+		Assert.False(result.IsSuccess);
+		Assert.True(isErrorExist);
+	}
+
+
+	[Fact]
+	public async Task UpdateUserByAdminAsync_PassingExistEmail_EmailExistError()
+	{
+		// Arrange
+		var userServices = CreateUserServices();
+
+		var requestViewModel =
+			new UpdateUserByAdminRequestViewModel
+			{
+				UserId = Consts.UserServices.UserId,
+				Email = Consts.UserServices.AdminEmail,
+			};
+
+		var exceptedErrorMessage =
+			Resources.Messages.ErrorMessages.EmailExist;
+
+		// Act
+		var result =
+			await userServices.UpdateUserByAdminAsync(requestViewModel, Consts.UserServices.AdminId);
+
+		var isErrorExist =
+			result.Errors.Any(current => current == exceptedErrorMessage);
+
+		// Assert
+		Assert.NotNull(result);
+		Assert.False(result.IsSuccess);
+		Assert.True(isErrorExist);
+	}
+
+
+	[Fact]
+	public async Task UpdateUserByAdminAsync_PassingValidData_SuccessMessage()
+	{
+		// Arrange
+		var userServices = CreateUserServices();
+
+		var requestViewModel =
+			new UpdateUserByAdminRequestViewModel
+			{
+				UserId = Consts.UserServices.UserForUpdateId,
+				Email = $"{Guid.NewGuid().ToString()[0..10]}@gmail.com",
+				Username = Guid.NewGuid().ToString().Replace("-", "")[0..10],
+				FullName = Guid.NewGuid().ToString()
+			};
+
+		var exceptedSuccessMessage =
+			Resources.Messages.SuccessMessages.UpdateSuccessful;
+
+		// Act
+		var result =
+			await userServices.UpdateUserByAdminAsync(requestViewModel, Consts.UserServices.AdminId);
+
+		var isSuccessExist =
+			result.Successes.Any(current => current == exceptedSuccessMessage);
+
+		// Assert
+		Assert.NotNull(result);
+		Assert.True(result.IsSuccess);
+		Assert.True(isSuccessExist);
+	}
+	#endregion /UpdateUserByAdminTests
 
 	#region OtherMethods
 	private UserServices CreateUserServices()
