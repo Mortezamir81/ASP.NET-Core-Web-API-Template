@@ -1,0 +1,86 @@
+{
+	"editor.tokenColorCustomizations": {
+		"comments": "#1ea145",
+		"textMateRules": [
+			{
+				"scope":"entity.name.tag",
+				"settings": {
+					"foreground": "#f096ca",
+				}
+			},
+			{
+				"scope":"entity.other.attribute-name",
+				"settings": {
+					"foreground": "#80f09c",
+				}
+			},
+			{
+				"scope":"string.quoted.double",
+				"settings": {
+					"foreground": "#D69D85",
+				}
+			},
+			{
+				"scope":"entity.name.function",
+				"settings": {
+					"foreground": "#D8DC9E",
+				}
+			},
+			{
+				"scope":"entity.name.method",
+				"settings": {
+					"foreground": "#D8DC9E",
+				}
+			},
+			{
+				"scope":"entity",
+				"settings": {
+					"foreground": "#9CDCFE",
+				}
+			},
+			{
+				"scope":"entity.name.type",
+				"settings": {
+					"foreground": "#4EC9B0",
+				}
+			},
+		],
+		"variables": "#9CDCFE",
+	},
+	"workbench.colorCustomizations": {
+		"editor.background": "#23252c",
+		"sideBar.background": "#23252c",
+		"sideBarSectionHeader.background": "#383838",
+		"icon.foreground": "#6d5fc5",
+		"activityBar.background": "#282930",
+		"activityBar.foreground": "#9494ee",
+		"activityBarBadge.background": "#7f74c5",
+		"tab.activeBorder": "#8273e2",
+	},
+	"ShortcutMenuBar.beautify": true,
+	"ShortcutMenuBar.commentLine": true,
+	"ShortcutMenuBar.goToDefinition": true,
+	"ShortcutMenuBar.navigateBack": true,
+	"ShortcutMenuBar.newFile": false,
+	"ShortcutMenuBar.openFilesList": false,
+	"ShortcutMenuBar.openSettings": true,
+	"ShortcutMenuBar.outdentLines": true,
+	"ShortcutMenuBar.powershellRestartSession": false,
+	"ShortcutMenuBar.startDebugging": true,
+	"ShortcutMenuBar.toggleTerminal": true,
+	"ShortcutMenuBar.toggleRenderWhitespace": true,
+	"ShortcutMenuBar.toggleWordWrap": true,
+	"ShortcutMenuBar.undo": true,
+	"files.exclude": {
+		".gitattributes": false,
+		".gitignore": false,
+		"**/.vs": false,
+		"**/.vscode": false,
+		"**/*.csproj": false,
+		"**/*.csproj.user": false,
+		"**/*.sln": false,
+		"**/bin": false,
+		"**/obj": false,
+		"global.json": false
+	}
+}

@@ -7,7 +7,11 @@ public static class CustomJwtAuthentication
 		Assert.NotNull(obj: services, name: nameof(services));
 
 		services
-			.AddAuthentication()
+			.AddAuthentication(options =>
+			{
+				options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+				options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+			})
 			.AddJwtBearer(options =>
 			{
 				if (string.IsNullOrWhiteSpace(jwtSettings?.SecretKeyForToken))
@@ -26,7 +30,7 @@ public static class CustomJwtAuthentication
 				{
 					ClockSkew = TimeSpan.Zero,
 					RequireSignedTokens = true,
-
+					
 					ValidateIssuerSigningKey = true,
 					IssuerSigningKey = new SymmetricSecurityKey(secretkey),
 
@@ -41,13 +45,67 @@ public static class CustomJwtAuthentication
 
 				options.SaveToken = true;
 				options.TokenValidationParameters = validationParameters;
+
+				options.Events = new JwtBearerEvents
+				{
+					OnTokenValidated = async context =>
+					{
+						var cache =
+							context.HttpContext.RequestServices.GetRequiredService<IEasyCachingProvider>();
+
+						var databaseContext =
+							context.HttpContext.RequestServices.GetRequiredService<DatabaseContext>();
+
+						var userId =
+							context.Principal?.Claims.FirstOrDefault
+								(current => current.Type == ClaimTypes.NameIdentifier)?.Value;
+
+						var securityStamp =
+							context.Principal?.Claims.FirstOrDefault
+								(current => current.Type == nameof(User.SecurityStamp))?.Value;
+
+						if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(securityStamp))
+						{
+							context.Fail(nameof(HttpStatusCode.Unauthorized));
+
+							return;
+						}
+
+						var userInCache =
+							await cache.GetAsync<bool>($"userId-{userId}-loggedin");
+
+						if (!userInCache.HasValue)
+						{
+							bool isExistSecurityStamp =
+								await databaseContext.Users!
+								.Where(current => current.Id.ToString() == userId)
+								.Where(current => current.SecurityStamp == securityStamp)
+								.AnyAsync();
+
+							if (isExistSecurityStamp == false)
+							{
+								context.Fail(nameof(HttpStatusCode.Unauthorized));
+
+								return;
+							}
+						}
+
+						await Task.CompletedTask;
+					},
+					OnChallenge = async context =>
+					{
+						context.HandleResponse();
+
+						await CreateUnAuthorizeResult(context.Response);
+					}
+				};
 			});
 	}
 
 
 	public static async Task CreateUnAuthorizeResult(HttpResponse response)
 	{
-		response.StatusCode = (int)HttpStatusCode.Unauthorized;
+		response.StatusCode = (int) HttpStatusCode.Unauthorized;
 
 		var result = new Result();
 

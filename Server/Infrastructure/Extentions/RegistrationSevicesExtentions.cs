@@ -1,4 +1,6 @@
-﻿namespace Infrastructure.Extentions;
+﻿using System.Text.Json.Serialization;
+
+namespace Infrastructure.Extentions;
 
 public static class RegistrationSevicesExtentions
 {
@@ -35,11 +37,15 @@ public static class RegistrationSevicesExtentions
 	public static void AddCustomController(this IServiceCollection services)
 	{
 		services
-			.AddControllers(config =>
+			.AddControllers(options =>
 			{
-				config.Filters.Add<ValidationAttribute>();
-				config.Filters.Add<CustomExceptionHandlerAttribute>();
-				config.Filters.Add(new LogInputParameterAttribute(InputLogLevel.Debug));
+				options.Filters.Add<ValidationAttribute>();
+				options.Filters.Add<CustomExceptionHandlerAttribute>();
+				options.Filters.Add(new LogInputParameterAttribute(InputLogLevel.Debug));
+			})
+			.AddJsonOptions(options =>
+			{
+				options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
 			})
 			.ConfigureApiBehaviorOptions(options =>
 			{
@@ -93,12 +99,17 @@ public static class RegistrationSevicesExtentions
 	{
 		Assert.NotNull(obj: services, name: nameof(services));
 
+		services.Configure<SecurityStampValidatorOptions>(option =>
+		{
+			option.ValidationInterval = TimeSpan.FromSeconds(1);
+		});
+
 		services.AddIdentity<User, Role>(identityOptions =>
 		{
 			//Password Settings
 			identityOptions.Password.RequireDigit = settings!.PasswordRequireDigit;
 			identityOptions.Password.RequiredLength = settings!.PasswordRequiredLength;
-			identityOptions.Password.RequireNonAlphanumeric = settings!.PasswordRequireNonAlphanumic; //#@!
+			identityOptions.Password.RequireNonAlphanumeric = settings!.PasswordRequireNonAlphanumic;
 			identityOptions.Password.RequireUppercase = settings!.PasswordRequireUppercase;
 			identityOptions.Password.RequireLowercase = settings!.PasswordRequireLowercase;
 

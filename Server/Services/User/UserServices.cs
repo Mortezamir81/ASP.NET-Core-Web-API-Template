@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Domain.UserManagment;
+using Infrastructure.Enums;
+using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
 
 namespace Services;
 
@@ -66,7 +69,7 @@ public partial class UserServices : BaseServices, IUserServices
 
 		await _userRepository.SaveChangesAsync();
 
-		//await _cache.RemoveByPrefixAsync($"userId-{foundedUser.Id}");
+		await _cache.RemoveByPrefixAsync($"userId-{foundedUser.Id}");
 
 		string successMessage =
 			foundedUser.IsBanned == true
@@ -123,7 +126,7 @@ public partial class UserServices : BaseServices, IUserServices
 
 		await _userRepository.SaveChangesAsync();
 
-		//await _cache.RemoveByPrefixAsync($"userId-{foundedUser.Id}");
+		await _cache.RemoveByPrefixAsync($"userId-{foundedUser.Id}");
 
 		string successMessage = string.Format
 			(Resources.Messages.SuccessMessages.DeleteUserSuccessful);
@@ -204,11 +207,23 @@ public partial class UserServices : BaseServices, IUserServices
 
 		await _userRepository.SaveChangesAsync();
 
-		var claims =
-			GenerateClaims(new UserClaims
-			{
-				Id = userLogin.UserId.ToString() ?? string.Empty
-			});
+		var userRoles =
+			await _userManager.GetRolesAsync(userLogin.User);
+
+		var claims = new List<Claim>()
+		{
+			new Claim(ClaimTypes.NameIdentifier, userLogin.User.Id.ToString()!),
+			new Claim(ClaimTypes.Name, userLogin.User.UserName!),
+			new Claim(ClaimTypes.Email, userLogin.User.Email!),
+			new Claim(nameof(User.SecurityStamp), userLogin.User.SecurityStamp!),
+		};
+
+		foreach (var userRole in userRoles)
+		{
+			claims.Add(new Claim(ClaimTypes.Role, userRole));
+		}
+
+		var claimIdentity = new ClaimsIdentity(claims);
 
 		var expiredTime =
 			DateTime.UtcNow.AddMinutes(_applicationSettings.JwtSettings?.TokenExpiresTime ?? 15);
@@ -216,7 +231,7 @@ public partial class UserServices : BaseServices, IUserServices
 		string jwtToken =
 			_tokenServices.GenerateJwtToken
 				(securityKey: _applicationSettings.JwtSettings?.SecretKeyForToken,
-				claimsIdentity: claims,
+				claimsIdentity: claimIdentity,
 				dateTime: expiredTime);
 
 		var response =
@@ -233,6 +248,8 @@ public partial class UserServices : BaseServices, IUserServices
 			(Resources.Messages.SuccessMessages.RefreshTokenSuccessfull);
 
 		result.AddSuccessMessage(successMessage);
+
+		await AddUserLoggedInToCache(userLogin.User!.Id);
 
 		_logger.LogInformation(Resources.Resource.UserRefreshTokenSuccessfulInformation, parameters: new List<object?>
 		{
@@ -407,7 +424,7 @@ public partial class UserServices : BaseServices, IUserServices
 
 		await _userManager.UpdateSecurityStampAsync(user);
 
-		//await _cache.RemoveByPrefixAsync($"userId-{user.Id}");
+		await _cache.RemoveByPrefixAsync($"userId-{user.Id}");
 
 		string successMessage = string.Format
 			(Resources.Messages.SuccessMessages.UpdateSuccessful);
@@ -485,15 +502,28 @@ public partial class UserServices : BaseServices, IUserServices
 
 		await _userRepository.SaveChangesAsync();
 
-		var claims = GenerateClaims(new UserClaims
+		var userRoles =
+			await _userManager.GetRolesAsync(foundedUser);
+
+		var claims = new List<Claim>()
 		{
-			Id = foundedUser.Id.ToString(),
-		});
+			new Claim(ClaimTypes.NameIdentifier, foundedUser.Id.ToString()!),
+			new Claim(ClaimTypes.Name, foundedUser.UserName!),
+			new Claim(ClaimTypes.Email, foundedUser.Email!),
+			new Claim(nameof(User.SecurityStamp), foundedUser.SecurityStamp!),
+		};
+
+		foreach (var userRole in userRoles)
+		{
+			claims.Add(new Claim(ClaimTypes.Role, userRole));
+		}
+
+		var claimIdentity = new ClaimsIdentity(claims);
 
 		string token =
 			_tokenServices.GenerateJwtToken
 				(securityKey: _applicationSettings.JwtSettings?.SecretKeyForToken,
-				claimsIdentity: claims,
+				claimsIdentity: claimIdentity,
 				dateTime: expiredTime);
 
 		string successMessage = string.Format
@@ -510,6 +540,8 @@ public partial class UserServices : BaseServices, IUserServices
 			};
 
 		result.Value = response;
+
+		await AddUserLoggedInToCache(foundedUser.Id);
 
 		_logger.LogInformation(Resources.Resource.UserLoginSuccessfulInformation, parameters: new List<object>
 		{
@@ -591,15 +623,28 @@ public partial class UserServices : BaseServices, IUserServices
 
 		await _userRepository.SaveChangesAsync();
 
-		var claims = GenerateClaims(new UserClaims
+		var userRoles =
+			await _userManager.GetRolesAsync(foundedUser);
+
+		var claims = new List<Claim>()
 		{
-			Id = foundedUser.Id.ToString(),
-		});
+			new Claim(ClaimTypes.NameIdentifier, foundedUser.Id.ToString()!),
+			new Claim(ClaimTypes.Name, foundedUser.UserName!),
+			new Claim(ClaimTypes.Email, foundedUser.Email!),
+			new Claim(nameof(User.SecurityStamp), foundedUser.SecurityStamp!),
+		};
+
+		foreach (var userRole in userRoles)
+		{
+			claims.Add(new Claim(ClaimTypes.Role, userRole));
+		}
+
+		var claimIdentity = new ClaimsIdentity(claims);
 
 		string token =
 			_tokenServices.GenerateJwtToken
 				(securityKey: _applicationSettings.JwtSettings?.SecretKeyForToken,
-				claimsIdentity: claims,
+				claimsIdentity: claimIdentity,
 				dateTime: expiredTime);
 
 		string successMessage = string.Format
@@ -617,6 +662,8 @@ public partial class UserServices : BaseServices, IUserServices
 			};
 
 		result.Value = response;
+
+		await AddUserLoggedInToCache(foundedUser.Id);
 
 		_logger.LogInformation(Resources.Resource.UserLoginSuccessfulInformation, parameters: new List<object>
 		{
@@ -788,7 +835,7 @@ public partial class UserServices : BaseServices, IUserServices
 
 		await _userManager.UpdateSecurityStampAsync(foundedUser);
 
-		//await _cache.RemoveByPrefixAsync($"userId-{foundedUser.Id}");
+		await _cache.RemoveByPrefixAsync($"userId-{foundedUser.Id}");
 
 		string successMessage = string.Format
 			(Resources.Messages.SuccessMessages.UpdateSuccessful);
@@ -821,21 +868,10 @@ public partial class UserServices : BaseServices, IUserServices
 	}
 
 
-	/// <summary>
-	/// Generate a new user claims for authentiction
-	/// </summary>
-	/// <param name="userClaims"></param>
-	/// <returns>Success or Failed Result</returns>
-	private ClaimsIdentity GenerateClaims(UserClaims userClaims)
+	private async Task AddUserLoggedInToCache(int userId)
 	{
-		var claims =
-			new ClaimsIdentity(new[]
-			{
-				new Claim
-					(type: ClaimTypes.NameIdentifier, value: userClaims.Id),
-			});
-
-		return claims;
+		await _cache.TrySetAsync
+			($"userId-{userId}-loggedin", true, TimeSpan.FromHours(1));
 	}
 	#endregion /Private Methods
 }

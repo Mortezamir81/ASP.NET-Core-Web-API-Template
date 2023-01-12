@@ -1,4 +1,8 @@
-﻿namespace Infrastructure.Extentions;
+﻿using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+
+namespace Infrastructure.Extentions;
 
 public static class InitializeDatabase
 {
@@ -6,18 +10,25 @@ public static class InitializeDatabase
 	{
 		using (var scope = app.ApplicationServices.CreateScope())
 		{
+			var databaseContext =
+				scope.ServiceProvider.GetRequiredService<DatabaseContext>();
+
 			var userManager = 
-				scope.ServiceProvider.GetService<UserManager<User>>();
+				scope.ServiceProvider.GetRequiredService<UserManager<User>>();
 
 			var roleManager = 
-				scope.ServiceProvider.GetService<RoleManager<Role>>();
+				scope.ServiceProvider.GetRequiredService<RoleManager<Role>>();
 
-			Assert.NotNull(userManager, name: nameof(userManager));
-			Assert.NotNull(roleManager, name: nameof(roleManager));
+			var anyUserExist =
+				await databaseContext.Users
+				.AnyAsync();
 
-			await roleManager!.CreateAsync(new Role(Constants.Role.SystemAdmin));
-			await roleManager!.CreateAsync(new Role(Constants.Role.Admin));
-			await roleManager!.CreateAsync(new Role(Constants.Role.User));
+			if (anyUserExist)
+				return;
+
+			await roleManager.CreateAsync(new Role(Constants.Role.SystemAdmin));
+			await roleManager.CreateAsync(new Role(Constants.Role.Admin));
+			await roleManager.CreateAsync(new Role(Constants.Role.User));
 
 			var adminUser =
 				new User("Morteza.m")
@@ -30,7 +41,7 @@ public static class InitializeDatabase
 					IsSystemic = true,
 				};
 
-			await userManager!.CreateAsync(adminUser, password: "morteza@12345");
+			await userManager.CreateAsync(adminUser, password: "morteza@12345");
 
 			await userManager.AddToRoleAsync(user: adminUser, role: Constants.Role.SystemAdmin);
 		}

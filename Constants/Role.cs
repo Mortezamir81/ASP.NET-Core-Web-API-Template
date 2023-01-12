@@ -6,9 +6,9 @@ public static class Role : object
 	{
 	}
 
-	public const string User = "کاربر";
-	public const string Admin = "ادمین";
-	public const string SystemAdmin = "ادمین سیستم";
+	public const string User = "User";
+	public const string Admin = "Admin";
+	public const string SystemAdmin = "SystemAdmin";
 
 	public const int SystemAdminRoleId = 1;
 	public const int AdminRoleId = 2;

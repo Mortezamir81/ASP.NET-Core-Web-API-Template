@@ -51,16 +51,12 @@ var app =
 //******************************
 await app.IntializeDatabase();
 
-if (app.Environment.IsDevelopment())
-{
-	app.UseDeveloperExceptionPage();
-}
-else
-{
-	app.UseGlobalExceptionMiddleware();
-
-	app.UseSwaggerBasicAuthorization();
-}
+#if DEBUG
+app.UseDeveloperExceptionPage();
+#else
+app.UseGlobalExceptionMiddleware();
+app.UseSwaggerBasicAuthorization();
+#endif
 
 app.UseCustomSwaggerAndUI();
 
