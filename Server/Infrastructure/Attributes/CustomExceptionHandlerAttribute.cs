@@ -2,9 +2,9 @@
 
 public class CustomExceptionHandlerAttribute : ActionFilterAttribute
 {
-	private readonly ILogger<CustomExceptionHandlerAttribute> _logger;
+	private readonly ILogger _logger;
 
-	public CustomExceptionHandlerAttribute(ILogger<CustomExceptionHandlerAttribute> logger)
+	public CustomExceptionHandlerAttribute(ILogger logger)
 	{
 		_logger = logger;
 	}
@@ -17,7 +17,8 @@ public class CustomExceptionHandlerAttribute : ActionFilterAttribute
 				context.RouteData.Values["action"]?.ToString();
 
 			_logger.LogCritical
-				(exception: context.Exception, message: context.Exception.Message,
+				(exception: context.Exception,
+					message: context.Exception.Message,
 					methodName: actionName, classType: context.Controller.GetType());
 
 			var result = new Result();

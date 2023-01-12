@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using Dtat.Logging.NLog;
+using System.Text.Json.Serialization;
 
 namespace Infrastructure.Extentions;
 
@@ -17,9 +18,11 @@ public static class RegistrationSevicesExtentions
 
 	public static void AddCustomLogger(this IServiceCollection services)
 	{
+		services.AddTransient<ILogger, NLogAdapter>();
+
 		services.AddTransient
 			(serviceType: typeof(ILogger<>),
-				implementationType: typeof(Dtat.Logging.NLog.NLogAdapter<>));
+				implementationType: typeof(NLogAdapter<>));
 	}
 
 

@@ -14,7 +14,7 @@ public class LogInputParameterAttribute : ActionFilterAttribute
 		var actionArguments = filterContext.ActionArguments;
 
 		var logger =
-			filterContext.HttpContext.RequestServices.GetService<Dtat.Logging.ILogger<LogInputParameterAttribute>>();
+			filterContext.HttpContext.RequestServices.GetService<ILogger>();
 
 		if (actionArguments?.Count > 0)
 		{
@@ -36,19 +36,25 @@ public class LogInputParameterAttribute : ActionFilterAttribute
 					case InputLogLevel.Debug:
 						logger?.LogDebug
 							(message: Resources.Resource.InputPropertiesInfo,
-								methodName: actionName, parameters: parameters, classType: filterContext.Controller.GetType());
+								methodName: actionName,
+								parameters: parameters,
+								classType: filterContext.Controller.GetType());
 						break;
 
 					case InputLogLevel.Information:
 						logger?.LogInformation
 							(message: Resources.Resource.InputPropertiesInfo,
-								methodName: actionName, parameters: parameters, classType: filterContext.Controller.GetType());
+								methodName: actionName,
+								parameters: parameters,
+								classType: filterContext.Controller.GetType());
 						break;
 
 					case InputLogLevel.Warning:
 						logger?.LogWarning
 							(message: Resources.Resource.InputPropertiesInfo,
-								methodName: actionName, parameters: parameters, classType: filterContext.Controller.GetType());
+								methodName: actionName,
+								parameters: parameters,
+								classType: filterContext.Controller.GetType());
 						break;
 				}
 			}
