@@ -29,12 +29,12 @@ public class ApplySummariesOperationFilter : IOperationFilter
 			if (string.IsNullOrWhiteSpace(operation.Summary))
 				operation.Summary = $"Returns all {pluralizeName}";
 		}
-		else if (IsActionName("Post", "Create"))
+		else if (IsActionName("Post", "Create", "Add"))
 		{
 			if (string.IsNullOrWhiteSpace(operation.Summary))
 				operation.Summary = $"Create a {singularizeName}";
 
-			if (string.IsNullOrWhiteSpace(operation.Parameters[0].Description))
+			if (operation.Parameters.Count > 0 && string.IsNullOrWhiteSpace(operation.Parameters[0].Description))
 				operation.Parameters[0].Description = $"A {singularizeName} representation";
 		}
 		else if (IsActionName("Read", "Get"))
@@ -42,7 +42,7 @@ public class ApplySummariesOperationFilter : IOperationFilter
 			if (string.IsNullOrWhiteSpace(operation.Summary))
 				operation.Summary = $"Retrieve a {singularizeName} by unique id";
 
-			if (string.IsNullOrWhiteSpace(operation.Parameters[0].Description))
+			if (operation.Parameters.Count > 0 && string.IsNullOrWhiteSpace(operation.Parameters[0].Description))
 				operation.Parameters[0].Description = $"a unique id for the {singularizeName}";
 		}
 		else if (IsActionName("Put", "Edit", "Update"))
@@ -50,7 +50,7 @@ public class ApplySummariesOperationFilter : IOperationFilter
 			if (string.IsNullOrWhiteSpace(operation.Summary))
 				operation.Summary = $"Update a {singularizeName} by unique id";
 
-			if (string.IsNullOrWhiteSpace(operation.Parameters[0].Description))
+			if (operation.Parameters.Count > 0 && string.IsNullOrWhiteSpace(operation.Parameters[0].Description))
 				operation.Parameters[0].Description = $"A {singularizeName} representation";
 		}
 		else if (IsActionName("Delete", "Remove"))
@@ -58,7 +58,7 @@ public class ApplySummariesOperationFilter : IOperationFilter
 			if (string.IsNullOrWhiteSpace(operation.Summary))
 				operation.Summary = $"Delete a {singularizeName} by unique id";
 
-			if (string.IsNullOrWhiteSpace(operation.Parameters[0].Description))
+			if (operation.Parameters.Count > 0 && string.IsNullOrWhiteSpace(operation.Parameters[0].Description))
 				operation.Parameters[0].Description = $"A unique id for the {singularizeName}";
 		}
 

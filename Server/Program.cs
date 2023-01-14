@@ -36,7 +36,7 @@ builder.Services.AddCustomController();
 builder.Services.AddCustomJwtAuthentication
 	(builder.Configuration.GetSection($"{nameof(ApplicationSettings)}:{nameof(JwtSettings)}").Get<JwtSettings>());
 
-builder.Services.AddCustomSwaggerGen();
+builder.Services.AddCustomSwaggerGen(builder.Configuration);
 //******************************
 #endregion /Services
 

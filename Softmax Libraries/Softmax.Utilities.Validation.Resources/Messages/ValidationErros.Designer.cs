@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Softmax.Utilities.Validation.Messages {
+namespace Softmax.Utilities.Validation.Resources.Messages {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace Softmax.Utilities.Validation.Messages {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Softmax.Utilities.Validation.Messages.ValidationErros", typeof(ValidationErros).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Softmax.Utilities.Validation.Resources.Messages.ValidationErros", typeof(ValidationErros).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -57,6 +57,15 @@ namespace Softmax.Utilities.Validation.Messages {
             }
             set {
                 resourceCulture = value;
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The content or extention of your upload file is not allowed for ({0})!.
+        /// </summary>
+        public static string InvalidContentOrExtentionFile {
+            get {
+                return ResourceManager.GetString("InvalidContentOrExtentionFile", resourceCulture);
             }
         }
         

@@ -2,8 +2,11 @@
 
 public static class SwaggerExtentions
 {
-	public static void AddCustomSwaggerGen(this IServiceCollection services)
+	public static void AddCustomSwaggerGen(this IServiceCollection services, IConfiguration configuration)
 	{
+		var swaggerSettings = new SwaggerSettings();
+		configuration.GetSection("SwaggerSettings").Bind(swaggerSettings);
+
 		services.AddTransient<IConfigureOptions<SwaggerGenOptions>, SwaggerConfigureOptions>();
 
 		services.AddSwaggerSchemaBuilder();
@@ -48,7 +51,7 @@ public static class SwaggerExtentions
 				{
 					Password = new OpenApiOAuthFlow()
 					{
-						TokenUrl = new Uri("https://localhost:7200/api/v1/users/LoginByOAuth"),
+						TokenUrl = new Uri(swaggerSettings.AuthenticationUrl),
 					},
 				},
 				

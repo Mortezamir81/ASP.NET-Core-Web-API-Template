@@ -15,7 +15,7 @@ public class ChangeUserRoleRequestViewModel
 		ErrorMessageResourceName = nameof(Resources.Messages.ErrorMessages.MostNotBeNull))]
 
 	[MinValue(1,
-		ErrorMessageResourceType = typeof(Softmax.Utilities.Validation.Messages.ValidationErros),
-		ErrorMessageResourceName = nameof(Softmax.Utilities.Validation.Messages.ValidationErros.MinValue))]
+		ErrorMessageResourceType = typeof(ValidationErros),
+		ErrorMessageResourceName = nameof(ValidationErros.MinValue))]
 	public int? UserId { get; set; }
 }

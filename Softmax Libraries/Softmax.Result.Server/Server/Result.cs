@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Dtat.Results.Server
+﻿namespace Dtat.Results.Server
 {
 	public class Result : object
 	{
@@ -9,10 +7,10 @@ namespace Dtat.Results.Server
 			IsSuccess = true;
 			IsFailed = false;
 
-			_errors =
+			Errors =
 				new System.Collections.Generic.List<string>();
 
-			_successes =
+			Successes =
 				new System.Collections.Generic.List<string>();
 		}
 
@@ -20,27 +18,9 @@ namespace Dtat.Results.Server
 
 		public bool IsSuccess { get; set; }
 
-		[System.Text.Json.Serialization.JsonIgnore]
-		private readonly System.Collections.Generic.List<string> _errors;
+		public System.Collections.Generic.List<string> Errors {	get; }
 
-		public List<string> Errors
-		{
-			get
-			{
-				return _errors;
-			}
-		}
-
-		[System.Text.Json.Serialization.JsonIgnore]
-		private readonly System.Collections.Generic.List<string> _successes;
-
-		public List<string> Successes
-		{
-			get
-			{
-				return _successes;
-			}
-		}
+		public System.Collections.Generic.List<string> Successes { get; }
 
 		public void AddErrorMessage(string message)
 		{
@@ -52,12 +32,12 @@ namespace Dtat.Results.Server
 				return;
 			}
 
-			if (_errors.Contains(message))
+			if (Errors.Contains(message))
 			{
 				return;
 			}
 
-			_errors.Add(message);
+			Errors.Add(message);
 
 			IsFailed = true;
 			IsSuccess = false;
@@ -73,9 +53,9 @@ namespace Dtat.Results.Server
 				return;
 			}
 
-			_errors.Remove(message);
+			Errors.Remove(message);
 
-			if (_errors.Count == 0)
+			if (Errors.Count == 0)
 			{
 				IsFailed = false;
 				IsSuccess = true;
@@ -87,7 +67,7 @@ namespace Dtat.Results.Server
 			IsFailed = false;
 			IsSuccess = true;
 
-			_errors.Clear();
+			Errors.Clear();
 		}
 
 		public void AddSuccessMessage(string message)
@@ -100,13 +80,13 @@ namespace Dtat.Results.Server
 				return;
 			}
 
-			if (_successes.Contains(message))
+			if (Successes.Contains(message))
 			{
 				return;
 			}
 
 			IsSuccess = true;
-			_successes.Add(message);
+			Successes.Add(message);
 		}
 
 		public void RemoveSuccessMessage(string message)
@@ -119,12 +99,12 @@ namespace Dtat.Results.Server
 				return;
 			}
 
-			_successes.Remove(message);
+			Successes.Remove(message);
 		}
 
 		public void ClearSuccessMessages()
 		{
-			_successes.Clear();
+			Successes.Clear();
 		}
 
 		public void ClearAllMessages()
