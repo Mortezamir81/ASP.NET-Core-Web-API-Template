@@ -79,6 +79,7 @@ public class ApplySummariesOperationFilter : IOperationFilter
 			return false;
 		}
 
+
 		bool IsActionName(params string[] names)
 		{
 			foreach (var name in names)
