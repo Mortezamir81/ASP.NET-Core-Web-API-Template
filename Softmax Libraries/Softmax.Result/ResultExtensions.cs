@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace Dtat.Results.Server
+namespace Dtat.Result
 {
-	public static class ResultExtensions
+    public static class ResultExtensions
 	{
 		static ResultExtensions()
 		{

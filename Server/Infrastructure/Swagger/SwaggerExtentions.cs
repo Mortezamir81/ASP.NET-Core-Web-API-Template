@@ -16,20 +16,11 @@ public static class SwaggerExtentions
 			options.EnableAnnotations();
 
 			#region Include XML Docs
-			var currentProjectName =
-				Assembly.GetExecutingAssembly().FullName?.Split(',')?[0];
+			var xmlFiles =
+				Directory.GetFiles
+					(AppContext.BaseDirectory, "*.xml", searchOption: SearchOption.TopDirectoryOnly).ToList();
 
-			var xmlDocPath =
-				Path.Combine(AppContext.BaseDirectory, $"{currentProjectName}.xml");
-
-			var xmlDocPathForSharedProject =
-				Path.Combine(AppContext.BaseDirectory, $"Shared.xml");
-
-			options.IncludeXmlComments
-				(filePath: xmlDocPathForSharedProject);
-
-			options.IncludeXmlComments
-				(filePath: xmlDocPath, includeControllerXmlComments: true);
+			xmlFiles.ForEach(xmlFile => options.IncludeXmlComments(filePath: xmlFile, includeControllerXmlComments: true));
 			#endregion /Include XML Docs
 
 			#region Filters
@@ -38,6 +29,12 @@ public static class SwaggerExtentions
 
 			//Set summary of action if not already set
 			options.OperationFilter<ApplySummariesOperationFilter>();
+
+			//Add bad request sample data for actions
+			options.OperationFilter<BadRequestResponsesOperationFilter>();
+
+			//Add not found sample data for actions
+			options.OperationFilter<NotFoundResponsesOperationFilter>();
 
 			//Add (Lock icon) to actions that need authorization and add responses
 			options.OperationFilter<UnauthorizedResponsesOperationFilter>(true, "OAuth2");
@@ -54,7 +51,7 @@ public static class SwaggerExtentions
 						TokenUrl = new Uri(swaggerSettings.AuthenticationUrl),
 					},
 				},
-				
+
 			});
 			#endregion
 		});

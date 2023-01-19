@@ -1,4 +1,4 @@
-﻿using Dtat.Logging.NLog;
+﻿using Dtat.Logging.NLogAdapter;
 using System.Text.Json.Serialization;
 
 namespace Infrastructure.Extentions;

@@ -1,4 +1,6 @@
-﻿namespace Infrastructure.Swagger;
+﻿using Dtat.Result;
+
+namespace Infrastructure.Swagger;
 
 public class UnauthorizedResponsesOperationFilter : IOperationFilter
 {
@@ -39,7 +41,8 @@ public class UnauthorizedResponsesOperationFilter : IOperationFilter
 			#region Unauthorized Response
 			var unauthorizedResult = new Result();
 
-			unauthorizedResult.AddErrorMessage("Unauthorized");
+			unauthorizedResult.AddErrorMessage
+				(message: "Unauthorized", messageCodes: MessageCodes.HttpUnauthorizeError);
 
 			var unauthorizedResponse =
 				new Dictionary<string, OpenApiMediaType>
@@ -63,7 +66,8 @@ public class UnauthorizedResponsesOperationFilter : IOperationFilter
 			#region Forbidden Response
 			var forbiddenResult = new Result();
 
-			forbiddenResult.AddErrorMessage("Forbidden");
+			forbiddenResult.AddErrorMessage
+				(message: "Forbidden", messageCodes: MessageCodes.HttpForbidenError);
 
 			var forbiddenResponse =
 				new Dictionary<string, OpenApiMediaType>

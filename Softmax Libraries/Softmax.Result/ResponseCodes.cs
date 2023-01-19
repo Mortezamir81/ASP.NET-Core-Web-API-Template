@@ -1,4 +1,4 @@
-﻿namespace Dtat.Results.Server;
+﻿namespace Dtat.Result;
 
 public enum MessageCodes : int
 {

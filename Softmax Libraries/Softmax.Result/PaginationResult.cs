@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Dtat.Results.Server
+namespace Dtat.Result
 {
 	public class PaginationResult<T> : Result<T>
 	{

@@ -1,4 +1,6 @@
-﻿namespace Server.Controllers.V1;
+﻿using Dtat.Result;
+
+namespace Server.Controllers.V1;
 
 /// <summary>
 /// User Managment and Authentication or Authorization

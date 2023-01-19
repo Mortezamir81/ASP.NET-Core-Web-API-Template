@@ -1,4 +1,6 @@
-﻿namespace Services;
+﻿using Dtat.Result;
+
+namespace Services;
 
 public partial class UserServices : BaseServices, IUserServices
 {
@@ -156,6 +158,8 @@ public partial class UserServices : BaseServices, IUserServices
 	public async Task<Result<LoginResponseViewModel>>
 		RefreshTokenAsync(string refreshToken, string? ipAddress)
 	{
+		throw new NotImplementedException();
+
 		var result =
 			 new Result<LoginResponseViewModel>();
 

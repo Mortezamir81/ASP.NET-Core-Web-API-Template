@@ -1,5 +1,5 @@
 ﻿global using System;
-global using Dtat.Results.Server;
+global using Dtat.Result;
 global using Infrastructure.Enums;
 global using Infrastructure;
 global using Infrastructure.Settings;
