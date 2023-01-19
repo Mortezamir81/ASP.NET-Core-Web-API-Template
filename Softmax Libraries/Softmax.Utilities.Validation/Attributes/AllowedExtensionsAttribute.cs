@@ -5,36 +5,36 @@ using System.Linq;
 
 namespace Softmax.Utilities.Validation.Attributes
 {
-    public class AllowedExtensionsAttribute : ValidationAttribute
-    {
-        private readonly string[] _extensions;
-        private const string _defualtMessage = "This extension is not allowed!";
+	public class AllowedExtensionsAttribute : ValidationAttribute
+	{
+		private readonly string[] _extensions;
+		private const string _defualtMessage = "This extension is not allowed!";
 
-        public AllowedExtensionsAttribute(string[] extensions)
-        {
-            _extensions = extensions;
-        }
+		public AllowedExtensionsAttribute(string[] extensions)
+		{
+			_extensions = extensions;
+		}
 
 
-		protected override ValidationResult 
-            IsValid(object value, ValidationContext validationContext)
-        {
-            var file = value as IFormFile;
+		protected override ValidationResult
+			IsValid(object value, ValidationContext validationContext)
+		{
+			var file = value as IFormFile;
 
-            if (file != null)
+			if (file != null)
 
-            {
-                var extension = 
-                    Path.GetExtension(file.FileName);
+			{
+				var extension =
+					Path.GetExtension(file.FileName);
 
-                if (!_extensions.Contains(extension?.ToLower()))
-                {
-                    return new ValidationResult
-                        (string.Format(ErrorMessageString, extension) ?? ErrorMessage ?? _defualtMessage);
-                }
-            }
+				if (!_extensions.Contains(extension?.ToLower()))
+				{
+					return new ValidationResult
+						(string.Format(ErrorMessageString, extension) ?? ErrorMessage ?? _defualtMessage);
+				}
+			}
 
-            return ValidationResult.Success;
-        }
-    }
+			return ValidationResult.Success;
+		}
+	}
 }

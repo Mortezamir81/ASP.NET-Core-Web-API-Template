@@ -6,5 +6,5 @@ global using Microsoft.EntityFrameworkCore.Metadata.Builders;
 global using System.Linq;
 global using System.Threading;
 global using System.Threading.Tasks;
-global using Common.Utilities;
 global using ViewModels.General;
+global using Softmax.Utilities.Validation;

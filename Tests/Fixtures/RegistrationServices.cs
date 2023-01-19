@@ -60,8 +60,8 @@ public class RegistrationServices : IDisposable
 		var roleManager =
 			ServiceProvider.GetService<RoleManager<Role>>();
 
-		Common.Utilities.Assert.NotNull(userManager, name: nameof(userManager));
-		Common.Utilities.Assert.NotNull(roleManager, name: nameof(roleManager));
+		Softmax.Utilities.Validation.Assert.NotNull(userManager, name: nameof(userManager));
+		Softmax.Utilities.Validation.Assert.NotNull(roleManager, name: nameof(roleManager));
 
 		await roleManager!.CreateAsync(new Role(Constants.Role.SystemAdmin));
 		await roleManager!.CreateAsync(new Role(Constants.Role.Admin));
