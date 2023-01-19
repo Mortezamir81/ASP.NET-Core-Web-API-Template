@@ -1,9 +1,4 @@
-﻿using Domain.UserManagment;
-using Infrastructure.Enums;
-using Microsoft.AspNetCore.Http;
-using System.Security.Claims;
-
-namespace Services;
+﻿namespace Services;
 
 public partial class UserServices : BaseServices, IUserServices
 {
@@ -58,7 +53,17 @@ public partial class UserServices : BaseServices, IUserServices
 			string errorMessage = string.Format
 				(Resources.Messages.ErrorMessages.UserNotFound);
 
-			result.AddErrorMessage(errorMessage);
+			result.AddErrorMessage(errorMessage, MessageCodes.HttpNotFoundError);
+
+			return result;
+		}
+
+		if (foundedUser.IsSystemic)
+		{
+			var errorMessage = string.Format
+				(Resources.Messages.ErrorMessages.AccessDenied);
+
+			result.AddErrorMessage(errorMessage, MessageCodes.HttpForbidenError);
 
 			return result;
 		}
@@ -106,7 +111,7 @@ public partial class UserServices : BaseServices, IUserServices
 			string errorMessage = string.Format
 				(Resources.Messages.ErrorMessages.UserNotFound);
 
-			result.AddErrorMessage(errorMessage);
+			result.AddErrorMessage(errorMessage, MessageCodes.HttpNotFoundError);
 
 			return result;
 		}
@@ -116,7 +121,7 @@ public partial class UserServices : BaseServices, IUserServices
 			string errorMessage = string.Format
 				(Resources.Messages.ErrorMessages.AccessDenied);
 
-			result.AddErrorMessage(errorMessage);
+			result.AddErrorMessage(errorMessage, MessageCodes.HttpForbidenError);
 
 			return result;
 		}
@@ -154,9 +159,6 @@ public partial class UserServices : BaseServices, IUserServices
 		var result =
 			 new Result<LoginResponseViewModel>();
 
-		if (result.IsFailed)
-			return result;
-
 		if (!Guid.TryParse(refreshToken, out var inputRefreshToken))
 		{
 			string errorMessage = string.Format
@@ -184,7 +186,7 @@ public partial class UserServices : BaseServices, IUserServices
 		if (userLogin.User == null)
 		{
 			string errorMessage = string.Format
-				(Resources.Messages.ErrorMessages.UserNotFound);
+				(Resources.Messages.ErrorMessages.InvalidRefreshToken);
 
 			result.AddErrorMessage(errorMessage);
 
@@ -288,7 +290,7 @@ public partial class UserServices : BaseServices, IUserServices
 			string errorMessage = string.Format
 				(Resources.Messages.ErrorMessages.UserNotFound);
 
-			result.AddErrorMessage(errorMessage);
+			result.AddErrorMessage(errorMessage, MessageCodes.HttpNotFoundError);
 
 			return result;
 		}
@@ -325,7 +327,7 @@ public partial class UserServices : BaseServices, IUserServices
 			var errorMessage =
 				string.Format(nameof(HttpStatusCode.Unauthorized));
 
-			result.AddErrorMessage(errorMessage);
+			result.AddErrorMessage(errorMessage, MessageCodes.HttpUnauthorizeError);
 
 			return result;
 		}
@@ -338,7 +340,7 @@ public partial class UserServices : BaseServices, IUserServices
 			var errorMessage =
 				string.Format(nameof(HttpStatusCode.Unauthorized));
 
-			result.AddErrorMessage(errorMessage);
+			result.AddErrorMessage(errorMessage, MessageCodes.HttpUnauthorizeError);
 
 			return result;
 		}
@@ -351,7 +353,7 @@ public partial class UserServices : BaseServices, IUserServices
 			string errorMessage = string.Format
 				(Resources.Messages.ErrorMessages.UserNotFound);
 
-			result.AddErrorMessage(errorMessage);
+			result.AddErrorMessage(errorMessage, MessageCodes.HttpNotFoundError);
 
 			return result;
 		}
@@ -366,7 +368,7 @@ public partial class UserServices : BaseServices, IUserServices
 				string errorMessage = string.Format
 					(Resources.Messages.ErrorMessages.AccessDeniedForUpdateThisUser);
 
-				result.AddErrorMessage(errorMessage);
+				result.AddErrorMessage(errorMessage, MessageCodes.HttpForbidenError);
 
 				return result;
 			}
@@ -376,7 +378,7 @@ public partial class UserServices : BaseServices, IUserServices
 				string errorMessage = string.Format
 					(Resources.Messages.ErrorMessages.AccessDeniedForUpdateThisUser);
 
-				result.AddErrorMessage(errorMessage);
+				result.AddErrorMessage(errorMessage, MessageCodes.HttpForbidenError);
 
 				return result;
 			}
@@ -451,9 +453,6 @@ public partial class UserServices : BaseServices, IUserServices
 	{
 		var result =
 			new Result<LoginResponseViewModel>();
-
-		if (result.IsFailed == true)
-			return result;
 
 		var foundedUser =
 			await _userManager.FindByNameAsync(loginRequestViewModel.Username!);
@@ -747,7 +746,7 @@ public partial class UserServices : BaseServices, IUserServices
 			var errorMessage =
 				string.Format(nameof(HttpStatusCode.Unauthorized));
 
-			result.AddErrorMessage(errorMessage);
+			result.AddErrorMessage(errorMessage, MessageCodes.HttpUnauthorizeError);
 
 			return result;
 		}
@@ -760,7 +759,7 @@ public partial class UserServices : BaseServices, IUserServices
 			var errorMessage = string.Format
 				(Resources.Messages.ErrorMessages.RoleNotFound);
 
-			result.AddErrorMessage(errorMessage);
+			result.AddErrorMessage(errorMessage, MessageCodes.HttpNotFoundError);
 
 			return result;
 		}
@@ -777,7 +776,7 @@ public partial class UserServices : BaseServices, IUserServices
 			string errorMessage = string.Format
 				(Resources.Messages.ErrorMessages.UserNotFound);
 
-			result.AddErrorMessage(errorMessage);
+			result.AddErrorMessage(errorMessage, MessageCodes.HttpNotFoundError);
 
 			return result;
 		}
@@ -790,7 +789,7 @@ public partial class UserServices : BaseServices, IUserServices
 			var errorMessage = string.Format
 				(Resources.Messages.ErrorMessages.AccessDeniedForChangeRole);
 
-			result.AddErrorMessage(errorMessage);
+			result.AddErrorMessage(errorMessage, MessageCodes.HttpForbidenError);
 
 			return result;
 		}
@@ -800,7 +799,7 @@ public partial class UserServices : BaseServices, IUserServices
 			var errorMessage = string.Format
 				(Resources.Messages.ErrorMessages.AccessDeniedForChangeRole);
 
-			result.AddErrorMessage(errorMessage);
+			result.AddErrorMessage(errorMessage, MessageCodes.HttpForbidenError);
 
 			return result;
 		}
@@ -810,7 +809,7 @@ public partial class UserServices : BaseServices, IUserServices
 			var errorMessage = string.Format
 				(Resources.Messages.ErrorMessages.AccessDeniedForChangeRole);
 
-			result.AddErrorMessage(errorMessage);
+			result.AddErrorMessage(errorMessage, MessageCodes.HttpForbidenError);
 
 			return result;
 		}

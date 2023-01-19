@@ -5,22 +5,18 @@
 		public Result() : base()
 		{
 			IsSuccess = true;
-			IsFailed = false;
 
-			Errors =
-				new System.Collections.Generic.List<string>();
+			MessageCode = (int) MessageCodes.HttpSuccessCode;
 
-			Successes =
+			Messages =
 				new System.Collections.Generic.List<string>();
 		}
 
-		public bool IsFailed { get; set; }
-
 		public bool IsSuccess { get; set; }
 
-		public System.Collections.Generic.List<string> Errors {	get; }
+		public int MessageCode { get; set; }
 
-		public System.Collections.Generic.List<string> Successes { get; }
+		public System.Collections.Generic.List<string> Messages { get; }
 
 		public void AddErrorMessage(string message)
 		{
@@ -32,43 +28,32 @@
 				return;
 			}
 
-			if (Errors.Contains(message))
+			if (Messages.Contains(message))
 			{
 				return;
 			}
 
-			Errors.Add(message);
+			Messages.Add(message);
 
-			IsFailed = true;
+			MessageCode = (int) MessageCodes.HttpBadRequestCode;
+
 			IsSuccess = false;
 		}
 
-		public void RemoveErrorMessage(string message)
+		public void AddErrorMessage(string message, MessageCodes messageCodes)
 		{
-			message =
-				String.Fix(text: message);
+			AddErrorMessage(message);
 
-			if (message == null)
-			{
-				return;
-			}
-
-			Errors.Remove(message);
-
-			if (Errors.Count == 0)
-			{
-				IsFailed = false;
-				IsSuccess = true;
-			}
+			MessageCode = (int) messageCodes;
 		}
 
-		public void ClearErrorMessages()
+		public void AddErrorMessage(string message, int messageCodes)
 		{
-			IsFailed = false;
-			IsSuccess = true;
+			AddErrorMessage(message);
 
-			Errors.Clear();
+			MessageCode = messageCodes;
 		}
+
 
 		public void AddSuccessMessage(string message)
 		{
@@ -80,16 +65,34 @@
 				return;
 			}
 
-			if (Successes.Contains(message))
+			if (Messages.Contains(message))
 			{
 				return;
 			}
 
+			Messages.Add(message);
+
+			MessageCode = (int) MessageCodes.HttpSuccessCode;
+
 			IsSuccess = true;
-			Successes.Add(message);
 		}
 
-		public void RemoveSuccessMessage(string message)
+		public void AddSuccessMessage(string message, MessageCodes messageCodes)
+		{
+			AddSuccessMessage(message);
+
+			MessageCode = (int) messageCodes;
+		}
+
+		public void AddSuccessMessage(string message, int messageCodes)
+		{
+			AddSuccessMessage(message);
+
+			MessageCode = messageCodes;
+		}
+
+
+		public void RemoveMessage(string message)
 		{
 			message =
 				String.Fix(text: message);
@@ -99,18 +102,19 @@
 				return;
 			}
 
-			Successes.Remove(message);
+			Messages.Remove(message);
+
+			if (Messages.Count == 0)
+			{
+				IsSuccess = true;
+			}
 		}
 
-		public void ClearSuccessMessages()
+		public void ClearMessages()
 		{
-			Successes.Clear();
-		}
+			IsSuccess = true;
 
-		public void ClearAllMessages()
-		{
-			ClearErrorMessages();
-			ClearSuccessMessages();
+			Messages.Clear();
 		}
 	}
 }

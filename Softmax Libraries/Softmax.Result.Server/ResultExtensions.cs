@@ -11,12 +11,25 @@ namespace Dtat.Results.Server
 
 		public static ObjectResult ApiResult(this Result result)
 		{
-			if (result.IsFailed)
+			ObjectResult objectResult = null;
+
+			if (result.IsSuccess)
 			{
-				return new BadRequestObjectResult(result);
+				objectResult = new OkObjectResult(result);
 			}
 
-			return new OkObjectResult(result);
+			switch (result.MessageCode)
+			{
+				case (int) MessageCodes.HttpBadRequestCode:
+					objectResult = new BadRequestObjectResult(result);
+					break;
+
+				case (int) MessageCodes.HttpNotFoundError:
+					objectResult = new NotFoundObjectResult(result);
+					break;
+			}
+
+			return objectResult;
 		}
 	}
 }

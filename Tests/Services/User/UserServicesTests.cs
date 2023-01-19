@@ -75,7 +75,7 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 			await userServices.LoginAsync(loginRequestViewModel, ipAddress);
 
 		var isErrorExist =
-			result.Errors.Any(current => current == exceptedErrorMessage);
+			result.Messages.Any(current => current == exceptedErrorMessage);
 
 		// Assert
 		Assert.NotNull(result);
@@ -107,7 +107,7 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 			await userServices.LoginAsync(loginRequestViewModel, ipAddress);
 
 		var isErrorExist =
-			result.Errors.Any(current => current == exceptedErrorMessage);
+			result.Messages.Any(current => current == exceptedErrorMessage);
 
 		// Assert
 		Assert.NotNull(result);
@@ -139,7 +139,7 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 			await userServices.LoginAsync(loginRequestViewModel, null);
 
 		var isSuccessExist =
-			result.Successes.Any(current => current == exceptedSuccessMessage);
+			result.Messages.Any(current => current == exceptedSuccessMessage);
 
 		// Assert
 		Assert.NotNull(result);
@@ -176,7 +176,7 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 			await userServices.RegisterAsync(registerRequestViewModel);
 
 		var isErrorExist =
-			result.Errors.Any(current => current == exceptedErrorMessage);
+			result.Messages.Any(current => current == exceptedErrorMessage);
 
 		// Assert
 		Assert.NotNull(result);
@@ -209,7 +209,7 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 			await userServices.RegisterAsync(registerRequestViewModel);
 
 		var isErrorExist =
-			result.Errors.Any(current => current == exceptedErrorMessage);
+			result.Messages.Any(current => current == exceptedErrorMessage);
 
 		// Assert
 		Assert.NotNull(result);
@@ -242,7 +242,7 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 			await userServices.RegisterAsync(registerRequestViewModel);
 
 		var isErrorExist =
-			result.Errors.Any(current => current == exceptedErrorMessage);
+			result.Messages.Any(current => current == exceptedErrorMessage);
 
 		// Assert
 		Assert.NotNull(result);
@@ -275,7 +275,7 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 			await userServices.RegisterAsync(registerRequestViewModel);
 
 		var isErrorExist =
-			result.Errors.Any(current => current == exceptedErrorMessage);
+			result.Messages.Any(current => current == exceptedErrorMessage);
 
 		// Assert
 		Assert.NotNull(result);
@@ -306,7 +306,7 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 			await userServices.RegisterAsync(registerRequestViewModel);
 
 		var isSuccessExist =
-			result.Successes.Any(current => current == exceptedSuccessMessage);
+			result.Messages.Any(current => current == exceptedSuccessMessage);
 
 		// Assert
 		Assert.NotNull(result);
@@ -330,7 +330,7 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 			await userServices.RefreshTokenAsync("12345", "123");
 
 		var isErrorExist =
-			result.Errors.Any(current => current == exceptedErrorMessage);
+			result.Messages.Any(current => current == exceptedErrorMessage);
 
 		// Assert
 		Assert.NotNull(result);
@@ -363,7 +363,7 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 			await userServices.RefreshTokenAsync(userLogined.Value.RefreshToken.ToString(), null);
 
 		var isSuccessExist =
-			result.Successes.Any(current => current == exceptedSuccessMessage);
+			result.Messages.Any(current => current == exceptedSuccessMessage);
 
 		// Assert
 		Assert.NotNull(result);
@@ -390,7 +390,7 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 			await userServices.ToggleBanUser(int.MaxValue);
 
 		var isErrorExist =
-			result.Errors.Any(current => current == exceptedErrorMessage);
+			result.Messages.Any(current => current == exceptedErrorMessage);
 
 		// Assert
 		Assert.NotNull(result);
@@ -416,14 +416,14 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 			await userServices.ToggleBanUser(Consts.UserServices.UserId);
 
 		var isSuccessBanExist =
-			resultBanUser.Successes.Any(current => current == exceptedSuccessfullyBanedMessage);
+			resultBanUser.Messages.Any(current => current == exceptedSuccessfullyBanedMessage);
 
 
 		var resultUnBanUser =
 			await userServices.ToggleBanUser(Consts.UserServices.UserId);
 
 		var isSuccessUnBanExist =
-			resultUnBanUser.Successes.Any(current => current == exceptedSuccessfullyUnBanedMessage);
+			resultUnBanUser.Messages.Any(current => current == exceptedSuccessfullyUnBanedMessage);
 
 		// Assert
 		Assert.NotNull(resultBanUser);
@@ -449,7 +449,7 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 			await userServices.UserSoftDeleteAsync(int.MaxValue);
 
 		var isErrorExist =
-			result.Errors.Any(current => current == exceptedErrorMessage);
+			result.Messages.Any(current => current == exceptedErrorMessage);
 
 		// Assert
 		Assert.NotNull(result);
@@ -472,7 +472,7 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 			await userServices.UserSoftDeleteAsync(Consts.UserServices.UserForDeleteId);
 
 		var isSuccessExist =
-			result.Successes.Any(current => current == exceptedSuccessMessage);
+			result.Messages.Any(current => current == exceptedSuccessMessage);
 
 		// Assert
 		Assert.NotNull(result);
@@ -496,7 +496,7 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 			await userServices.LogoutAsync("12345");
 
 		var isErrorExist =
-			result.Errors.Any(current => current == exceptedErrorMessage);
+			result.Messages.Any(current => current == exceptedErrorMessage);
 
 		// Assert
 		Assert.NotNull(result);
@@ -519,7 +519,7 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 			await userServices.LogoutAsync(Guid.NewGuid().ToString());
 
 		var isErrorExist =
-			result.Errors.Any(current => current == exceptedErrorMessage);
+			result.Messages.Any(current => current == exceptedErrorMessage);
 
 		// Assert
 		Assert.NotNull(result);
@@ -552,7 +552,7 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 			await userServices.LogoutAsync(userLogin.Value.RefreshToken.ToString());
 
 		var isSuccessExist =
-			result.Successes.Any(current => current == exceptedSuccessMessage);
+			result.Messages.Any(current => current == exceptedSuccessMessage);
 
 		// Assert
 		Assert.NotNull(result);
@@ -576,7 +576,7 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 			await userServices.ChangeUserRoleAsync(null, 0);
 
 		var isErrorExist =
-			result.Errors.Any(current => current == exceptedErrorMessage);
+			result.Messages.Any(current => current == exceptedErrorMessage);
 
 		// Assert
 		Assert.NotNull(result);
@@ -606,7 +606,7 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 			await userServices.ChangeUserRoleAsync(requestViewModel, Consts.UserServices.SystemAdminId);
 
 		var isErrorExist =
-			result.Errors.Any(current => current == exceptedErrorMessage);
+			result.Messages.Any(current => current == exceptedErrorMessage);
 
 		// Assert
 		Assert.NotNull(result);
@@ -636,7 +636,7 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 			await userServices.ChangeUserRoleAsync(requestViewModel, Consts.UserServices.SystemAdminId);
 
 		var isErrorExist =
-			result.Errors.Any(current => current == exceptedErrorMessage);
+			result.Messages.Any(current => current == exceptedErrorMessage);
 
 		// Assert
 		Assert.NotNull(result);
@@ -666,7 +666,7 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 			await userServices.ChangeUserRoleAsync(requestViewModel, Consts.UserServices.SystemAdminId);
 
 		var isErrorExist =
-			result.Errors.Any(current => current == exceptedErrorMessage);
+			result.Messages.Any(current => current == exceptedErrorMessage);
 
 		// Assert
 		Assert.NotNull(result);
@@ -696,7 +696,7 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 			await userServices.ChangeUserRoleAsync(requestViewModel, Consts.UserServices.SecoundSystemAdminId);
 
 		var isErrorExist =
-			result.Errors.Any(current => current == exceptedErrorMessage);
+			result.Messages.Any(current => current == exceptedErrorMessage);
 
 		// Assert
 		Assert.NotNull(result);
@@ -726,7 +726,7 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 			await userServices.ChangeUserRoleAsync(requestViewModel, Consts.UserServices.SystemAdminId);
 
 		var isErrorExist =
-			result.Successes.Any(current => current == exceptedSuccessMessage);
+			result.Messages.Any(current => current == exceptedSuccessMessage);
 
 		// Assert
 		Assert.NotNull(result);
@@ -750,7 +750,7 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 			await userServices.UpdateUserByAdminAsync(null, 0);
 
 		var isErrorExist =
-			result.Errors.Any(current => current == exceptedErrorMessage);
+			result.Messages.Any(current => current == exceptedErrorMessage);
 
 		// Assert
 		Assert.NotNull(result);
@@ -779,7 +779,7 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 			await userServices.UpdateUserByAdminAsync(requestViewModel, Consts.UserServices.AdminId);
 
 		var isErrorExist =
-			result.Errors.Any(current => current == exceptedErrorMessage);
+			result.Messages.Any(current => current == exceptedErrorMessage);
 
 		// Assert
 		Assert.NotNull(result);
@@ -808,7 +808,7 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 			await userServices.UpdateUserByAdminAsync(requestViewModel, Consts.UserServices.AdminId);
 
 		var isErrorExist =
-			result.Errors.Any(current => current == exceptedErrorMessage);
+			result.Messages.Any(current => current == exceptedErrorMessage);
 
 		// Assert
 		Assert.NotNull(result);
@@ -838,7 +838,7 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 			await userServices.UpdateUserByAdminAsync(requestViewModel, Consts.UserServices.AdminId);
 
 		var isErrorExist =
-			result.Errors.Any(current => current == exceptedErrorMessage);
+			result.Messages.Any(current => current == exceptedErrorMessage);
 
 		// Assert
 		Assert.NotNull(result);
@@ -868,7 +868,7 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 			await userServices.UpdateUserByAdminAsync(requestViewModel, Consts.UserServices.AdminId);
 
 		var isErrorExist =
-			result.Errors.Any(current => current == exceptedErrorMessage);
+			result.Messages.Any(current => current == exceptedErrorMessage);
 
 		// Assert
 		Assert.NotNull(result);
@@ -900,7 +900,7 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 			await userServices.UpdateUserByAdminAsync(requestViewModel, Consts.UserServices.AdminId);
 
 		var isSuccessExist =
-			result.Successes.Any(current => current == exceptedSuccessMessage);
+			result.Messages.Any(current => current == exceptedSuccessMessage);
 
 		// Assert
 		Assert.NotNull(result);

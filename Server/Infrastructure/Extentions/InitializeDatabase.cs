@@ -1,8 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Storage;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-
-namespace Infrastructure.Extentions;
+﻿namespace Infrastructure.Extentions;
 
 public static class InitializeDatabase
 {

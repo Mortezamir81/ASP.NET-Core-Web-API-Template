@@ -44,7 +44,7 @@ public class UsersController : BaseController
 		var serviceResult =
 			await _userServices.LoginByOAuthAsync(requestViewModel, ipAddress: GetIPAddress());
 
-		if (serviceResult.IsFailed)
+		if (!serviceResult.IsSuccess)
 		{
 			return BadRequest();
 		}
