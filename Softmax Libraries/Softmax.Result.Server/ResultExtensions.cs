@@ -27,6 +27,11 @@ namespace Dtat.Results.Server
 				case (int) MessageCodes.HttpNotFoundError:
 					objectResult = new NotFoundObjectResult(result);
 					break;
+
+				case (int) MessageCodes.HttpServerError:
+					objectResult = new ObjectResult(result);
+					objectResult.StatusCode = (int) MessageCodes.HttpServerError;
+					break;
 			}
 
 			return objectResult;

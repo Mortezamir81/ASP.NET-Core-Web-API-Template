@@ -26,16 +26,16 @@ public class GlobalExceptionMiddleware
 			//******************************
 
 			//******************************
-			httpContext.Response.StatusCode = 500;
-
-			httpContext.Response.ContentType = "application/json";
-
 			var result = new Result();
 
 			string errorMessage = string.Format
 				(Resources.Messages.ErrorMessages.UnkonwnError);
 
-			result.AddErrorMessage(errorMessage);
+			result.AddErrorMessage(message: errorMessage, messageCodes: MessageCodes.HttpServerError);
+
+			httpContext.Response.StatusCode = 500;
+
+			httpContext.Response.ContentType = "application/json";
 
 			await httpContext.Response.WriteAsJsonAsync(result);
 			//******************************
