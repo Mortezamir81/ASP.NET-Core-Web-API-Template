@@ -1,4 +1,6 @@
 ﻿using Dtat.Result;
+using System.Security.Claims;
+using ViewModels.General;
 
 namespace Services;
 
@@ -158,8 +160,6 @@ public partial class UserServices : BaseServices, IUserServices
 	public async Task<Result<LoginResponseViewModel>>
 		RefreshTokenAsync(string refreshToken, string? ipAddress)
 	{
-		throw new NotImplementedException();
-
 		var result =
 			 new Result<LoginResponseViewModel>();
 
@@ -207,45 +207,25 @@ public partial class UserServices : BaseServices, IUserServices
 			return result;
 		}
 
-		var newRefreshToken = GenerateRefreshToken(ipAddress);
-		userLogin.RefreshToken = newRefreshToken.RefreshToken;
+		var newRefreshToken = Guid.NewGuid();
+
+		userLogin.RefreshToken = newRefreshToken;
 		userLogin.CreatedByIp = ipAddress;
 
 		await _userRepository.SaveChangesAsync();
 
-		var userRoles =
-			await _userManager.GetRolesAsync(userLogin.User);
+		var claimsIdentity =
+			await CreateClaimsIdentity(user: userLogin.User);
 
-		var claims = new List<Claim>()
-		{
-			new Claim(ClaimTypes.NameIdentifier, userLogin.User.Id.ToString()!),
-			new Claim(ClaimTypes.Name, userLogin.User.UserName!),
-			new Claim(ClaimTypes.Email, userLogin.User.Email!),
-			new Claim(nameof(User.SecurityStamp), userLogin.User.SecurityStamp!),
-		};
-
-		foreach (var userRole in userRoles)
-		{
-			claims.Add(new Claim(ClaimTypes.Role, userRole));
-		}
-
-		var claimIdentity = new ClaimsIdentity(claims);
-
-		var expiredTime =
-			DateTime.UtcNow.AddMinutes(_applicationSettings.JwtSettings?.TokenExpiresTime ?? 15);
-
-		string jwtToken =
-			_tokenServices.GenerateJwtToken
-				(securityKey: _applicationSettings.JwtSettings?.SecretKeyForToken,
-				claimsIdentity: claimIdentity,
-				dateTime: expiredTime);
+		var accessToken =
+			CreateAccessToken(claimsIdentity: claimsIdentity);
 
 		var response =
 			new LoginResponseViewModel()
 			{
-				Token = jwtToken,
+				Token = accessToken,
 				Username = userLogin!.User?.UserName,
-				RefreshToken = newRefreshToken.RefreshToken,
+				RefreshToken = newRefreshToken,
 			};
 
 		result.Value = response;
@@ -449,17 +429,17 @@ public partial class UserServices : BaseServices, IUserServices
 	/// <summary>
 	/// Login a user by username and password
 	/// </summary>
-	/// <param name="loginRequestViewModel"></param>
+	/// <param name="requestViewModel"></param>
 	/// <param name="ipAddress"></param>
 	/// <returns>Success or Failed Result</returns>
 	public async Task<Result<LoginResponseViewModel>>
-		LoginAsync(LoginRequestViewModel loginRequestViewModel, string? ipAddress)
+		LoginAsync(LoginRequestViewModel requestViewModel, string? ipAddress)
 	{
 		var result =
 			new Result<LoginResponseViewModel>();
 
 		var foundedUser =
-			await _userManager.FindByNameAsync(loginRequestViewModel.Username!);
+			await GetUserByName(requestViewModel.Username!);
 
 		if (foundedUser == null)
 		{
@@ -472,7 +452,7 @@ public partial class UserServices : BaseServices, IUserServices
 		}
 
 		var isPasswordValid =
-			await _userManager.CheckPasswordAsync(foundedUser, loginRequestViewModel.Password!);
+			await CheckPasswordValid(user: foundedUser, password: requestViewModel.Password!);
 
 		if (!isPasswordValid)
 		{
@@ -494,40 +474,14 @@ public partial class UserServices : BaseServices, IUserServices
 			return result;
 		}
 
-		var expiredTime =
-			DateTime.UtcNow.AddMinutes(_applicationSettings.JwtSettings?.TokenExpiresTime ?? 15);
+		var refreshToken =
+			await AddRefreshTokenToDB(userId: foundedUser.Id, ipAddress: ipAddress);
 
-		var refreshToken = GenerateRefreshToken(ipAddress);
+		var claimsIdentity =
+			await CreateClaimsIdentity(user: foundedUser);
 
-		refreshToken.UserId = foundedUser.Id;
-
-		await _userRepository.AddUserLoginAsync(refreshToken);
-
-		await _userRepository.SaveChangesAsync();
-
-		var userRoles =
-			await _userManager.GetRolesAsync(foundedUser);
-
-		var claims = new List<Claim>()
-		{
-			new Claim(ClaimTypes.NameIdentifier, foundedUser.Id.ToString()!),
-			new Claim(ClaimTypes.Name, foundedUser.UserName!),
-			new Claim(ClaimTypes.Email, foundedUser.Email!),
-			new Claim(nameof(User.SecurityStamp), foundedUser.SecurityStamp!),
-		};
-
-		foreach (var userRole in userRoles)
-		{
-			claims.Add(new Claim(ClaimTypes.Role, userRole));
-		}
-
-		var claimIdentity = new ClaimsIdentity(claims);
-
-		string token =
-			_tokenServices.GenerateJwtToken
-				(securityKey: _applicationSettings.JwtSettings?.SecretKeyForToken,
-				claimsIdentity: claimIdentity,
-				dateTime: expiredTime);
+		var accessToken =
+			CreateAccessToken(claimsIdentity: claimsIdentity);
 
 		string successMessage = string.Format
 			(Resources.Messages.SuccessMessages.LoginSuccessful);
@@ -537,9 +491,9 @@ public partial class UserServices : BaseServices, IUserServices
 		var response =
 			new LoginResponseViewModel()
 			{
-				Token = token,
+				Token = accessToken,
 				Username = foundedUser.UserName,
-				RefreshToken = refreshToken.RefreshToken,
+				RefreshToken = refreshToken,
 			};
 
 		result.Value = response;
@@ -550,7 +504,7 @@ public partial class UserServices : BaseServices, IUserServices
 		{
 			new
 			{
-				UserName = loginRequestViewModel.Username,
+				UserName = requestViewModel.Username,
 			}
 		});
 
@@ -580,7 +534,7 @@ public partial class UserServices : BaseServices, IUserServices
 		}
 
 		var foundedUser =
-			await _userManager.FindByNameAsync(requestViewModel.Username!);
+			await GetUserByName(requestViewModel.Username!);
 
 		if (foundedUser == null)
 		{
@@ -593,7 +547,7 @@ public partial class UserServices : BaseServices, IUserServices
 		}
 
 		var isPasswordValid =
-			await _userManager.CheckPasswordAsync(foundedUser, requestViewModel.Password!);
+			await CheckPasswordValid(user: foundedUser, password: requestViewModel.Password!);
 
 		if (!isPasswordValid)
 		{
@@ -615,40 +569,14 @@ public partial class UserServices : BaseServices, IUserServices
 			return result;
 		}
 
-		var expiredTime =
-			DateTime.UtcNow.AddMinutes(_applicationSettings.JwtSettings?.TokenExpiresTime ?? 15);
+		var refreshToken =
+			await AddRefreshTokenToDB(userId: foundedUser.Id, ipAddress: ipAddress);
 
-		var refreshToken = GenerateRefreshToken(ipAddress);
+		var claimsIdentity =
+			await CreateClaimsIdentity(user: foundedUser);
 
-		refreshToken.UserId = foundedUser.Id;
-
-		await _userRepository.AddUserLoginAsync(refreshToken);
-
-		await _userRepository.SaveChangesAsync();
-
-		var userRoles =
-			await _userManager.GetRolesAsync(foundedUser);
-
-		var claims = new List<Claim>()
-		{
-			new Claim(ClaimTypes.NameIdentifier, foundedUser.Id.ToString()!),
-			new Claim(ClaimTypes.Name, foundedUser.UserName!),
-			new Claim(ClaimTypes.Email, foundedUser.Email!),
-			new Claim(nameof(User.SecurityStamp), foundedUser.SecurityStamp!),
-		};
-
-		foreach (var userRole in userRoles)
-		{
-			claims.Add(new Claim(ClaimTypes.Role, userRole));
-		}
-
-		var claimIdentity = new ClaimsIdentity(claims);
-
-		string token =
-			_tokenServices.GenerateJwtToken
-				(securityKey: _applicationSettings.JwtSettings?.SecretKeyForToken,
-				claimsIdentity: claimIdentity,
-				dateTime: expiredTime);
+		var accessToken =
+			CreateAccessToken(claimsIdentity: claimsIdentity);
 
 		string successMessage = string.Format
 			(Resources.Messages.SuccessMessages.LoginSuccessful);
@@ -658,9 +586,9 @@ public partial class UserServices : BaseServices, IUserServices
 		var response =
 			new LoginByOAuthResponseViewModel()
 			{
-				access_token = token,
+				access_token = accessToken,
 				username = foundedUser.UserName,
-				refresh_token = refreshToken.RefreshToken.ToString(),
+				refresh_token = refreshToken.ToString(),
 				token_type = "Bearer",
 			};
 
@@ -870,6 +798,65 @@ public partial class UserServices : BaseServices, IUserServices
 		};
 	}
 
+	private string CreateAccessToken(ClaimsIdentity claimsIdentity)
+	{
+		var expiredTime =
+			DateTime.UtcNow.AddMinutes(_applicationSettings.JwtSettings?.TokenExpiresTime ?? 15);
+
+		var accessToken =
+			_tokenServices.GenerateJwtToken
+				(securityKey: _applicationSettings.JwtSettings?.SecretKeyForToken,
+				claimsIdentity: claimsIdentity,
+				dateTime: expiredTime);
+
+		return accessToken;
+	}
+
+	private async Task<User?> GetUserByName(string name)
+	{
+		return await _userManager.FindByNameAsync(name);
+	}
+
+	private async Task<bool> CheckPasswordValid(string password, User user)
+	{
+		return await _userManager.CheckPasswordAsync(user: user, password: password);
+	}
+
+	private async Task<Guid> AddRefreshTokenToDB(int userId, string? ipAddress)
+	{
+		var refreshToken = GenerateRefreshToken(ipAddress);
+
+		refreshToken.UserId = userId;
+
+		await _userRepository.AddUserLoginAsync(refreshToken);
+
+		await _userRepository.SaveChangesAsync();
+
+		return refreshToken.RefreshToken;
+	}
+
+	private async Task<ClaimsIdentity> CreateClaimsIdentity(User user)
+	{
+		var userRoles =
+			await _userManager.GetRolesAsync(user);
+
+		var claims = new List<Claim>()
+		{
+			new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()!),
+			new Claim(ClaimTypes.Name, user.UserName!),
+			new Claim(ClaimTypes.Email, user.Email!),
+			new Claim(nameof(User.SecurityStamp), user.SecurityStamp!),
+		};
+
+		foreach (var userRole in userRoles)
+		{
+			claims.Add(new Claim(ClaimTypes.Role, userRole));
+		}
+
+		var claimIdentity = new ClaimsIdentity(claims);
+
+		return claimIdentity;
+	}
 
 	private async Task AddUserLoggedInToCache(int userId)
 	{

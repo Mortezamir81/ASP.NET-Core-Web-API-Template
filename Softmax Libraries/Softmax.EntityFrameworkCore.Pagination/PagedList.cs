@@ -28,7 +28,7 @@ namespace Softmax.Data.EntityFrameworkCore
 
 		#region Methods
 		public async static Task<PagedList<T>>
-		ToPagedList(IQueryable<T> source, int pageNumber, int pageSize)
+			ToPagedList(IQueryable<T> source, int pageNumber, int pageSize)
 		{
 			var count = await source.CountAsync();
 
