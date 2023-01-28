@@ -18,6 +18,7 @@ public class MonitoringController : BaseController
 	/// Get momeory information from current process
 	/// </summary>
 	[HttpGet("GetMemoryUsage")]
+	[Authorize(Roles = $"{Constants.Role.SystemAdmin}")]
 	public ActionResult GetMemoryUsage()
 	{
 		var currentProcess =
