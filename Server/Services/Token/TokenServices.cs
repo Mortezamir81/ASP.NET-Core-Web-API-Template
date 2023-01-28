@@ -11,7 +11,7 @@ public class TokenServices : ITokenServices
 	/// <param name="dateTime"></param>
 	/// <returns></returns>
 	public string GenerateJwtToken
-		(string? securityKey, ClaimsIdentity claimsIdentity, DateTime dateTime)
+		(string securityKey, ClaimsIdentity claimsIdentity, DateTime dateTime)
 	{
 		Assert.NotEmpty(securityKey, nameof(securityKey));
 
@@ -64,7 +64,7 @@ public class TokenServices : ITokenServices
 				//Audience = "",
 
 				Expires = dateTime,
-				SigningCredentials = signingCredentional
+				SigningCredentials = signingCredentional,
 			};
 
 		return tokenDescriptor;

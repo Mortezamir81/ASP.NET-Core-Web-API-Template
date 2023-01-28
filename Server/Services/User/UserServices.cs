@@ -1,8 +1,4 @@
-﻿using Dtat.Result;
-using System.Security.Claims;
-using ViewModels.General;
-
-namespace Services;
+﻿namespace Services;
 
 public partial class UserServices : BaseServices, IUserServices
 {
@@ -805,7 +801,7 @@ public partial class UserServices : BaseServices, IUserServices
 
 		var accessToken =
 			_tokenServices.GenerateJwtToken
-				(securityKey: _applicationSettings.JwtSettings?.SecretKeyForToken,
+				(securityKey: _applicationSettings.JwtSettings!.SecretKeyForToken,
 				claimsIdentity: claimsIdentity,
 				dateTime: expiredTime);
 

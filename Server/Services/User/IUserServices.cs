@@ -1,6 +1,4 @@
-﻿using Dtat.Result;
-
-namespace Services;
+﻿namespace Services;
 
 public interface IUserServices
 {
