@@ -8,19 +8,19 @@ public class RegisterRequestViewModel
 
 	[Required
 		(AllowEmptyStrings = false,
-		ErrorMessageResourceType = typeof(Resources.Messages.ErrorMessages),
-		ErrorMessageResourceName = nameof(Resources.Messages.ErrorMessages.MostNotBeNull))]
+		ErrorMessageResourceType = typeof(ValidationErros),
+		ErrorMessageResourceName = nameof(ValidationErros.MostNotBeNull))]
 	public string? Username { get; set; }
 
 	[Required
 		(AllowEmptyStrings = false,
-		ErrorMessageResourceType = typeof(Resources.Messages.ErrorMessages),
-		ErrorMessageResourceName = nameof(Resources.Messages.ErrorMessages.MostNotBeNull))]
+		ErrorMessageResourceType = typeof(ValidationErros),
+		ErrorMessageResourceName = nameof(ValidationErros.MostNotBeNull))]
 	public string? Email { get; set; }
 
 	[Required
 		(AllowEmptyStrings = false,
-		ErrorMessageResourceType = typeof(Resources.Messages.ErrorMessages),
-		ErrorMessageResourceName = nameof(Resources.Messages.ErrorMessages.MostNotBeNull))]
+		ErrorMessageResourceType = typeof(ValidationErros),
+		ErrorMessageResourceName = nameof(ValidationErros.MostNotBeNull))]
 	public string? Password { get; set; }
 }

@@ -42,7 +42,7 @@ public class UnauthorizedResponsesOperationFilter : IOperationFilter
 			var unauthorizedResult = new Result();
 
 			unauthorizedResult.AddErrorMessage
-				(message: "Unauthorized", messageCodes: MessageCodes.HttpUnauthorizeError);
+				(message: "Unauthorized", messageCode: MessageCode.HttpUnauthorizeError);
 
 			var unauthorizedResponse =
 				new Dictionary<string, OpenApiMediaType>
@@ -67,7 +67,7 @@ public class UnauthorizedResponsesOperationFilter : IOperationFilter
 			var forbiddenResult = new Result();
 
 			forbiddenResult.AddErrorMessage
-				(message: "Forbidden", messageCodes: MessageCodes.HttpForbidenError);
+				(message: "Forbidden", messageCode: MessageCode.HttpForbidenError);
 
 			var forbiddenResponse =
 				new Dictionary<string, OpenApiMediaType>

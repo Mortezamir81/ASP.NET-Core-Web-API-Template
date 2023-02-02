@@ -4,7 +4,7 @@ public class DeleteUserRequestViewModel
 {
 	[Required
 		(AllowEmptyStrings = false,
-		ErrorMessageResourceType = typeof(Resources.Messages.ErrorMessages),
-		ErrorMessageResourceName = nameof(Resources.Messages.ErrorMessages.MostNotBeNull))]
+		ErrorMessageResourceType = typeof(ValidationErros),
+		ErrorMessageResourceName = nameof(ValidationErros.MostNotBeNull))]
 	public Guid? Id { get; set; }
 }

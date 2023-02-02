@@ -86,5 +86,14 @@ namespace Softmax.Utilities.Validation.Resources.Messages {
                 return ResourceManager.GetString("MinValue", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The {0} must not be null or empty.
+        /// </summary>
+        public static string MostNotBeNull {
+            get {
+                return ResourceManager.GetString("MostNotBeNull", resourceCulture);
+            }
+        }
     }
 }

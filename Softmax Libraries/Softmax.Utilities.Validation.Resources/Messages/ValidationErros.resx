@@ -126,4 +126,7 @@
   <data name="MinValue" xml:space="preserve">
     <value>The {0} value must grather than {1}</value>
   </data>
+  <data name="MostNotBeNull" xml:space="preserve">
+    <value>The {0} must not be null or empty</value>
+  </data>
 </root>

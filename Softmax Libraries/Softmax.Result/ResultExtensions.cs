@@ -20,17 +20,17 @@ namespace Dtat.Result
 
 			switch (result.MessageCode)
 			{
-				case (int) MessageCodes.HttpBadRequestCode:
+				case (int) MessageCode.HttpBadRequestCode:
 					objectResult = new BadRequestObjectResult(result);
 					break;
 
-				case (int) MessageCodes.HttpNotFoundError:
+				case (int) MessageCode.HttpNotFoundError:
 					objectResult = new NotFoundObjectResult(result);
 					break;
 
-				case (int) MessageCodes.HttpServerError:
+				case (int) MessageCode.HttpServerError:
 					objectResult = new ObjectResult(result);
-					objectResult.StatusCode = (int) MessageCodes.HttpServerError;
+					objectResult.StatusCode = (int) MessageCode.HttpServerError;
 					break;
 			}
 

@@ -16,7 +16,7 @@ public class BadRequestResponsesOperationFilter : IOperationFilter
 		var badRequsetResult = new Result<object>();
 
 		badRequsetResult.AddErrorMessage
-			(nameof(MessageCodes.HttpBadRequestCode), messageCodes: MessageCodes.HttpBadRequestCode);
+			(nameof(MessageCode.HttpBadRequestCode), messageCode: MessageCode.HttpBadRequestCode);
 
 		var badRequestResponse =
 			new Dictionary<string, OpenApiMediaType>

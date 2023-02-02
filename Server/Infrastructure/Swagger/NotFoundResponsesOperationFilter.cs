@@ -16,7 +16,7 @@ public class NotFoundResponsesOperationFilter : IOperationFilter
 		var badRequsetResult = new Result<object>();
 
 		badRequsetResult.AddErrorMessage
-			(nameof(MessageCodes.HttpNotFoundError), messageCodes: MessageCodes.HttpNotFoundError);
+			(nameof(MessageCode.HttpNotFoundError), messageCode: MessageCode.HttpNotFoundError);
 
 		var badRequestResponse =
 			new Dictionary<string, OpenApiMediaType>

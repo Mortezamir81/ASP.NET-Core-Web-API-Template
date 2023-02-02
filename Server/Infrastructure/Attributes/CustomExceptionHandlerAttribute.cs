@@ -28,7 +28,7 @@ public class CustomExceptionHandlerAttribute : ActionFilterAttribute
 			string errorMessage = string.Format
 				(Resources.Messages.ErrorMessages.UnkonwnError);
 
-			result.AddErrorMessage(message: errorMessage, messageCodes: MessageCodes.HttpServerError);
+			result.AddErrorMessage(message: errorMessage, messageCode: MessageCode.HttpServerError);
 
 			context.Result = result.ApiResult();
 

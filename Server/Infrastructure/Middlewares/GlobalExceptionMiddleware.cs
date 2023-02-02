@@ -33,7 +33,7 @@ public class GlobalExceptionMiddleware
 			string errorMessage = string.Format
 				(Resources.Messages.ErrorMessages.UnkonwnError);
 
-			result.AddErrorMessage(message: errorMessage, messageCodes: MessageCodes.HttpServerError);
+			result.AddErrorMessage(message: errorMessage, messageCode: MessageCode.HttpServerError);
 
 			httpContext.Response.StatusCode = 500;
 

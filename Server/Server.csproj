@@ -38,10 +38,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Infrastructure\Utilities\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Constants\Constants.csproj" />
     <ProjectReference Include="..\Domain\Domain.csproj" />
     <ProjectReference Include="..\Persistence\Persistence.csproj" />

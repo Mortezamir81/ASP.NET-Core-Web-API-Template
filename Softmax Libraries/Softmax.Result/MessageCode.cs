@@ -1,6 +1,6 @@
 ﻿namespace Dtat.Result;
 
-public enum MessageCodes : int
+public enum MessageCode : int
 {
 	HttpSuccessCode = 200,
 	HttpBadRequestCode = 400,

@@ -6,7 +6,7 @@
 		{
 			IsSuccess = true;
 
-			MessageCode = (int) MessageCodes.HttpSuccessCode;
+			MessageCode = (int) Dtat.Result.MessageCode.HttpSuccessCode;
 
 			Messages =
 				new System.Collections.Generic.List<string>();
@@ -35,23 +35,23 @@
 
 			Messages.Add(message);
 
-			MessageCode = (int) MessageCodes.HttpBadRequestCode;
+			MessageCode = (int) Dtat.Result.MessageCode.HttpBadRequestCode;
 
 			IsSuccess = false;
 		}
 
-		public void AddErrorMessage(string message, MessageCodes messageCodes)
+		public void AddErrorMessage(string message, MessageCode messageCode)
 		{
 			AddErrorMessage(message);
 
-			MessageCode = (int) messageCodes;
+			MessageCode = (int) messageCode;
 		}
 
-		public void AddErrorMessage(string message, int messageCodes)
+		public void AddErrorMessage(string message, int messageCode)
 		{
 			AddErrorMessage(message);
 
-			MessageCode = messageCodes;
+			MessageCode = messageCode;
 		}
 
 
@@ -72,23 +72,23 @@
 
 			Messages.Add(message);
 
-			MessageCode = (int) MessageCodes.HttpSuccessCode;
+			MessageCode = (int) Dtat.Result.MessageCode.HttpSuccessCode;
 
 			IsSuccess = true;
 		}
 
-		public void AddSuccessMessage(string message, MessageCodes messageCodes)
+		public void AddSuccessMessage(string message, MessageCode messageCode)
 		{
 			AddSuccessMessage(message);
 
-			MessageCode = (int) messageCodes;
+			MessageCode = (int) messageCode;
 		}
 
-		public void AddSuccessMessage(string message, int messageCodes)
+		public void AddSuccessMessage(string message, int messageCode)
 		{
 			AddSuccessMessage(message);
 
-			MessageCode = messageCodes;
+			MessageCode = messageCode;
 		}
 
 
