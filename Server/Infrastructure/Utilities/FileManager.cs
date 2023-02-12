@@ -32,22 +32,28 @@ public class FileManager : IFileManager
 		string newFileName =
 			$"{fileName}{fileExtension}";
 
-		string finalPathName;
-
-		finalPathName =
-			Path.Combine
-				(path1: path, path2: newFileName);
+		string finalPath;
 
 		if (includeRootPath)
 		{
 			var rootPath =
 				_hostEnvironment.ContentRootPath;
 
-			finalPathName =
-				Path.Combine(path1: rootPath, path2: "wwwroot", path3: finalPathName);
+			finalPath =
+				Path.Combine(path1: rootPath, path2: "wwwroot");
+		}
+		else
+		{
+			finalPath = path;
 		}
 
-		await CopyFileToAsync(file: file, path: path);
+		if (!Directory.Exists(finalPath))
+		{
+			Directory.CreateDirectory(finalPath);
+		}
+
+		await CopyFileToAsync
+			(file: file, path: Path.Combine(path1: finalPath, path2: newFileName));
 
 		var result =
 			new SaveFileResult()
@@ -76,22 +82,28 @@ public class FileManager : IFileManager
 		string newFileName =
 			$"{Guid.NewGuid()}{fileExtension}";
 
-		string finalPathName;
-
-		finalPathName =
-			Path.Combine
-				(path1: path, path2: newFileName);
+		string finalPath;
 
 		if (includeRootPath)
 		{
 			var rootPath =
 				_hostEnvironment.ContentRootPath;
 
-			finalPathName =
-				Path.Combine(path1: rootPath, path2: "wwwroot", path3: finalPathName);
+			finalPath =
+				Path.Combine(path1: rootPath, path2: "wwwroot");
+		}
+		else
+		{
+			finalPath = path;
 		}
 
-		await CopyFileToAsync(file: file, path: path);
+		if (!Directory.Exists(finalPath))
+		{
+			Directory.CreateDirectory(finalPath);
+		}
+
+		await CopyFileToAsync
+			(file: file, path: Path.Combine(path1: finalPath, path2: newFileName));
 
 		var result =
 			new SaveFileResult()
