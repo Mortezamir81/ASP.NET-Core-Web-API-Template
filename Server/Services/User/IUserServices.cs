@@ -15,7 +15,7 @@ public interface IUserServices
 		(RegisterRequestViewModel registerRequestViewModel);
 
 
-	Task<Result>UpdateUserByAdminAsync
+	Task<Result> UpdateUserByAdminAsync
 			(UpdateUserByAdminRequestViewModel viewModel, int adminId);
 
 
@@ -27,7 +27,7 @@ public interface IUserServices
 		LoginByOAuthAsync(LoginByOAuthRequestViewModel requestViewModel, string? ipAddress);
 
 
-	Task<Result>ChangeUserRoleAsync
+	Task<Result> ChangeUserRoleAsync
 		(ChangeUserRoleRequestViewModel changeUserRoleRequestViewModel, int adminId);
 
 

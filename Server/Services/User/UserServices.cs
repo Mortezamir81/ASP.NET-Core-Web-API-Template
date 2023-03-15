@@ -1,6 +1,6 @@
 ﻿namespace Services;
 
-public partial class UserServices : BaseServices, IUserServices
+public partial class UserServices : BaseServices, IUserServices, IRegisterAsScoped
 {
 	#region Fields
 	private readonly IMapper _mapper;

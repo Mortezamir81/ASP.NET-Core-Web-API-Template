@@ -1,18 +1,28 @@
-﻿using Dtat.Logging.NLogAdapter;
-using System.Text.Json.Serialization;
-
-namespace Infrastructure.Extentions;
+﻿namespace Infrastructure.Extentions;
 
 public static class RegistrationSevicesExtentions
 {
-	public static void AddScopedServices(this IServiceCollection services)
+	public static void AddAutoDetectedServices(this IServiceCollection services)
 	{
-		services
-			.AddScoped<IUserServices, UserServices>()
-			.AddScoped<IUserRepository, UserRepository>()
-			.AddScoped<IUnitOfWork, UnitOfWork>()
-			.AddScoped<ITokenServices, TokenServices>()
-			.AddScoped<LogInputParameterAttribute>();
+		services.Scan(scan => scan
+		//Register Scoped Services
+		.FromApplicationDependencies()
+		.AddClasses(classes => classes.AssignableTo<IRegisterAsScoped>())
+		.AsImplementedInterfaces()
+		.AsSelf()
+		.WithScopedLifetime()
+
+		//Register Transient Services
+		.AddClasses(classes => classes.AssignableTo<IRegisterAsTransient>())
+		.AsImplementedInterfaces()
+		.AsSelf()
+		.WithTransientLifetime()
+
+		//Register Singleton Services
+		.AddClasses(classes => classes.AssignableTo<IRegisterAsSingleton>())
+		.AsImplementedInterfaces()
+		.AsSelf()
+		.WithSingletonLifetime());
 	}
 
 

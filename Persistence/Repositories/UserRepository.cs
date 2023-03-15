@@ -1,13 +1,13 @@
 ﻿namespace Persistence.Repositories;
 
-public class UserRepository : IUserRepository
+public class UserRepository : IUserRepository, IRegisterAsScoped
 {
 	#region Properties
 	private DatabaseContext _databaseContext { get; }
 
 	private DbSet<User> _entities { get; }
 
-	private  IQueryable<User> _table => _entities;
+	private IQueryable<User> _table => _entities;
 
 	private IQueryable<User> _tableNoTracking => _entities.AsNoTracking();
 	#endregion /Properties

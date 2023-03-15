@@ -214,7 +214,7 @@
     <value>RoleId value is invalid</value>
   </data>
   <data name="InvalidUserAndOrPass" xml:space="preserve">
-    <value>Invalid Username and/or Password</value>
+    <value>Invalid Username or Password</value>
   </data>
   <data name="InvalidUserId" xml:space="preserve">
     <value>UserId value is invalid</value>

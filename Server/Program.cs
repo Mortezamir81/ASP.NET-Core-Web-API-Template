@@ -1,6 +1,4 @@
 //******************************
-using Infrastructure.Extentions;
-
 var builder =
 	WebApplication.CreateBuilder(args);
 //******************************
@@ -23,7 +21,7 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddCustomLogger();
 
-builder.Services.AddScopedServices();
+builder.Services.AddAutoDetectedServices();
 
 builder.Services.AddAutoMapper(typeof(Program));
 

@@ -1,6 +1,6 @@
 ﻿namespace Persistence;
 
-public class UnitOfWork : IUnitOfWork
+public class UnitOfWork : IUnitOfWork, IRegisterAsScoped
 {
 	public UnitOfWork(DatabaseContext databaseContext)
 	{

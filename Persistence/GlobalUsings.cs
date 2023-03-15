@@ -1,10 +1,10 @@
-﻿global using System;
-global using Domain.UserManagment;
-global using System.Collections.Generic;
+﻿global using Domain.UserManagment;
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.EntityFrameworkCore.Metadata.Builders;
+global using Shared.DICommon;
+global using Softmax.Utilities.Validation;
+global using System;
 global using System.Linq;
 global using System.Threading;
 global using System.Threading.Tasks;
 global using ViewModels.General;
-global using Softmax.Utilities.Validation;

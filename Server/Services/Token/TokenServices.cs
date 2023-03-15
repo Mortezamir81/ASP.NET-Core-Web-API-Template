@@ -1,6 +1,6 @@
 ﻿namespace Services;
 
-public class TokenServices : ITokenServices
+public class TokenServices : ITokenServices, IRegisterAsScoped
 {
 	#region MainMethods
 	/// <summary>

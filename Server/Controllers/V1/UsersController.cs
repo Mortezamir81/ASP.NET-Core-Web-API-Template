@@ -1,6 +1,4 @@
-﻿using Dtat.Result;
-
-namespace Server.Controllers.V1;
+﻿namespace Server.Controllers.V1;
 
 /// <summary>
 /// User Managment and Authentication or Authorization
@@ -75,7 +73,7 @@ public class UsersController : BaseController
 	{
 		if (string.IsNullOrWhiteSpace(refreshToken))
 		{
-			var result = 
+			var result =
 				new Result<LoginResponseViewModel>();
 
 			string errorMessage = string.Format
@@ -153,7 +151,7 @@ public class UsersController : BaseController
 	[Authorize(Roles = $"{Constants.Role.SystemAdmin}")]
 	[LogInputParameter(InputLogLevel.Warning)]
 	[HttpDelete("UserDelete")]
-	public async Task<ActionResult<Result>> 
+	public async Task<ActionResult<Result>>
 		UserSoftDeleteAsync([FromQuery] UserSoftDeleteRequestViewModel requestViewModel)
 	{
 		var serviceResult =

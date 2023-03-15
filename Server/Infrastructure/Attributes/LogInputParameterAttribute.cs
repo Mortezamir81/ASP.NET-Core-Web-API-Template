@@ -1,6 +1,6 @@
 ﻿namespace Infrastructure.Attributes;
 
-public class LogInputParameterAttribute : ActionFilterAttribute
+public class LogInputParameterAttribute : ActionFilterAttribute, IRegisterAsScoped
 {
 	private readonly InputLogLevel _inputLogLevel;
 
