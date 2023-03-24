@@ -14,7 +14,7 @@ public interface IUserRepository
 	Task AddUserLoginAsync(UserLogin userLogin);
 
 
-	Task<bool> CheckUsernameExist(string? username);
+	Task<bool> CheckUserNameExist(string? username);
 
 
 	Task<User?> GetUserById(int userId, bool isTracking);

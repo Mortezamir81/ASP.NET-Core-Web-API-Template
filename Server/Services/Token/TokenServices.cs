@@ -6,10 +6,6 @@ public class TokenServices : ITokenServices, IRegisterAsScoped
 	/// <summary>
 	/// Generate jwt access token
 	/// </summary>
-	/// <param name="securityKey"></param>
-	/// <param name="claimsIdentity"></param>
-	/// <param name="dateTime"></param>
-	/// <returns></returns>
 	public string GenerateJwtToken
 		(string securityKey, ClaimsIdentity claimsIdentity, DateTime dateTime)
 	{

@@ -63,7 +63,7 @@ public class UserRepository : IUserRepository, IRegisterAsScoped
 	}
 
 
-	public async Task<bool> CheckUsernameExist(string? username)
+	public async Task<bool> CheckUserNameExist(string? username)
 	{
 		var result =
 			await _databaseContext.Users!

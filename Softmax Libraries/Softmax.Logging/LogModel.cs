@@ -28,7 +28,7 @@ namespace Dtat.Logging
 
 		public string RemoteIP { get; set; }
 
-		public string Username { get; set; }
+		public string UserName { get; set; }
 
 		public string RequestPath { get; set; }
 

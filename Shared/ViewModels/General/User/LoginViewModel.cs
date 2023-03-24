@@ -4,7 +4,7 @@ public class LoginViewModel
 {
 	public LoginViewModel(string username, int roleId, string roleName)
 	{
-		Username = username;
+		UserName = username;
 		RoleId = roleId;
 		RoleName = roleName;
 	}
@@ -14,6 +14,6 @@ public class LoginViewModel
 	public string? Email { get; set; }
 	public bool IsBanned { get; set; }
 	public string RoleName { get; set; }
-	public string Username { get; set; }
+	public string UserName { get; set; }
 	public required string SecurityStamp { get; set; }
 }

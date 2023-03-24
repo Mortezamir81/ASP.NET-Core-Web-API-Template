@@ -68,7 +68,7 @@ public class RegistrationServices : IDisposable
 		await roleManager!.CreateAsync(new Role(Constants.Role.User));
 
 		var systemAdminUser =
-			new User(Consts.UserServices.SystemAdminUsername)
+			new User(Consts.UserServices.SystemAdminUserName)
 			{
 				Email = Consts.UserServices.SystemAdminEmail,
 				EmailConfirmed = true,
@@ -77,7 +77,7 @@ public class RegistrationServices : IDisposable
 			};
 
 		var secoundSystemAdminUser =
-			new User(Consts.UserServices.SecoundSystemAdminUsername)
+			new User(Consts.UserServices.SecoundSystemAdminUserName)
 			{
 				Email = Consts.UserServices.SecoundSystemAdminEmail,
 				EmailConfirmed = true,
@@ -85,7 +85,7 @@ public class RegistrationServices : IDisposable
 			};
 
 		var adminUser =
-			new User(Consts.UserServices.AdminUsername)
+			new User(Consts.UserServices.AdminUserName)
 			{
 				Email = Consts.UserServices.AdminEmail,
 				EmailConfirmed = true,
@@ -93,7 +93,7 @@ public class RegistrationServices : IDisposable
 			};
 
 		var secoundAdminUser =
-			new User(Consts.UserServices.SecoundAdminUsername)
+			new User(Consts.UserServices.SecoundAdminUserName)
 			{
 				Email = Consts.UserServices.SecoundAdminEmail,
 				EmailConfirmed = true,
@@ -101,7 +101,7 @@ public class RegistrationServices : IDisposable
 			};
 
 		var user =
-			new User(Consts.UserServices.UserUsername)
+			new User(Consts.UserServices.UserUserName)
 			{
 				Email = Consts.UserServices.UserEmail,
 				EmailConfirmed = true,
@@ -109,7 +109,7 @@ public class RegistrationServices : IDisposable
 			};
 
 		var banUser =
-			new User(Consts.UserServices.BanUserUsername)
+			new User(Consts.UserServices.BanUserUserName)
 			{
 				Email = Consts.UserServices.BanUserEmail,
 				EmailConfirmed = true,
@@ -118,7 +118,7 @@ public class RegistrationServices : IDisposable
 			};
 
 		var userForDelete =
-			new User(Consts.UserServices.UserForDeleteUsername)
+			new User(Consts.UserServices.UserForDeleteUserName)
 			{
 				Email = Consts.UserServices.UserForDeleteEmail,
 				EmailConfirmed = true,
@@ -126,7 +126,7 @@ public class RegistrationServices : IDisposable
 			};
 
 		var userForEditRole =
-			new User(Consts.UserServices.UserForEditRoleUsername)
+			new User(Consts.UserServices.UserForEditRoleUserName)
 			{
 				Email = Consts.UserServices.UserForEditRoleEmail,
 				EmailConfirmed = true,
@@ -134,7 +134,7 @@ public class RegistrationServices : IDisposable
 			};
 
 		var userForUpdate =
-			new User(Consts.UserServices.UserForUpdateUsername)
+			new User(Consts.UserServices.UserForUpdateUserName)
 			{
 				Email = Consts.UserServices.UserForUpdateEmail,
 				EmailConfirmed = true,

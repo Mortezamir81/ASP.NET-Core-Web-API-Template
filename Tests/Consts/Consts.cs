@@ -20,15 +20,15 @@ internal class Consts
 		public const int UserForEditRoleId = 8;
 		public const int UserForUpdateId = 9;
 
-		public const string SystemAdminUsername = "SystemAdminUser";
-		public const string SecoundSystemAdminUsername = "SecoundSystemAdminUser";
-		public const string AdminUsername = "AdminUser";
-		public const string SecoundAdminUsername = "SecoundAdminUser";
-		public const string UserUsername = "NormalUser";
-		public const string BanUserUsername = "BanUser";
-		public const string UserForDeleteUsername = "UserForDelete";
-		public const string UserForEditRoleUsername = "UserForEditRole";
-		public const string UserForUpdateUsername = "UserForUpdate";
+		public const string SystemAdminUserName = "SystemAdminUser";
+		public const string SecoundSystemAdminUserName = "SecoundSystemAdminUser";
+		public const string AdminUserName = "AdminUser";
+		public const string SecoundAdminUserName = "SecoundAdminUser";
+		public const string UserUserName = "NormalUser";
+		public const string BanUserUserName = "BanUser";
+		public const string UserForDeleteUserName = "UserForDelete";
+		public const string UserForEditRoleUserName = "UserForEditRole";
+		public const string UserForUpdateUserName = "UserForUpdate";
 
 		public const string SystemAdminEmail = "SystemAdminUser@gmail.com";
 		public const string SecoundSystemAdminEmail = "SecoundSystemAdminUser@gmail.com";

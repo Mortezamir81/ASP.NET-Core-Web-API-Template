@@ -349,7 +349,7 @@ namespace Resources.Messages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Invalid Username or Password.
+        ///   Looks up a localized string similar to Invalid UserName or Password.
         /// </summary>
         public static string InvalidUserAndOrPass {
             get {
@@ -657,9 +657,9 @@ namespace Resources.Messages {
         /// <summary>
         ///   Looks up a localized string similar to This username has already been registered.
         /// </summary>
-        public static string UsernameExist {
+        public static string UserNameExist {
             get {
-                return ResourceManager.GetString("UsernameExist", resourceCulture);
+                return ResourceManager.GetString("UserNameExist", resourceCulture);
             }
         }
         

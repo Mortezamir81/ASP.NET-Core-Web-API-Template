@@ -53,7 +53,7 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 
 	#region LoginTests
 	[Fact]
-	public async Task LoginAsync_PassingNotFoundUsername_UserNotFoundError()
+	public async Task LoginAsync_PassingNotFoundUserName_UserNotFoundError()
 	{
 		// Arrange
 		var userServices = CreateUserServices();
@@ -61,7 +61,7 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 		var loginRequestViewModel =
 			new LoginRequestViewModel
 			{
-				Username = Guid.NewGuid().ToString(),
+				UserName = Guid.NewGuid().ToString(),
 				Password = Guid.NewGuid().ToString()
 			};
 
@@ -85,7 +85,7 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 
 
 	[Fact]
-	public async Task LoginAsync_PassingBannedUsername_UserBannedError()
+	public async Task LoginAsync_PassingBannedUserName_UserBannedError()
 	{
 		// Arrange
 		var userServices = CreateUserServices();
@@ -93,7 +93,7 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 		var loginRequestViewModel =
 			new LoginRequestViewModel
 			{
-				Username = Consts.UserServices.BanUserUsername,
+				UserName = Consts.UserServices.BanUserUserName,
 				Password = Consts.UserServices.UsersPassword,
 			};
 
@@ -117,17 +117,17 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 
 
 	[Fact]
-	public async Task LoginAsync_PassingCorrectUsername_SuccessMessage()
+	public async Task LoginAsync_PassingCorrectUserName_SuccessMessage()
 	{
 		// Arrange
 		var userServices = CreateUserServices();
 
-		var username = Consts.UserServices.UserUsername;
+		var username = Consts.UserServices.UserUserName;
 
 		var loginRequestViewModel =
 			new LoginRequestViewModel
 			{
-				Username = username,
+				UserName = username,
 				Password = Consts.UserServices.UsersPassword,
 			};
 
@@ -145,7 +145,7 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 		Assert.NotNull(result);
 		Assert.True(result.IsSuccess);
 		Assert.True(isSuccessExist);
-		Assert.Equal(expected: result.Value.Username, actual: username);
+		Assert.Equal(expected: result.Value.UserName, actual: username);
 		Assert.NotEmpty(result.Value?.Token);
 		Assert.NotEmpty(result.Value.RefreshToken.ToString());
 	}
@@ -161,7 +161,7 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 		var registerRequestViewModel =
 			new RegisterRequestViewModel
 			{
-				Username = Guid.NewGuid().ToString(),
+				UserName = Guid.NewGuid().ToString(),
 				Email = $"{Guid.NewGuid().ToString()[0..10]}@gmail.com",
 				Password = "1234567"
 			};
@@ -186,7 +186,7 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 
 
 	[Fact]
-	public async Task RegisterAsync_PassingExistingUsername_IdentityUsernameExistError()
+	public async Task RegisterAsync_PassingExistingUserName_IdentityUserNameExistError()
 	{
 		// Arrange
 		var userServices = CreateUserServices();
@@ -194,14 +194,14 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 		var registerRequestViewModel =
 			new RegisterRequestViewModel
 			{
-				Username = Consts.UserServices.UserUsername,
+				UserName = Consts.UserServices.UserUserName,
 				Email = $"{Guid.NewGuid().ToString()[0..10]}@gmail.com",
 				Password = Consts.UserServices.UsersPassword
 			};
 
 		var exceptedErrorMessage =
 			new IdentityErrorDescriber()
-			.DuplicateUserName(registerRequestViewModel.Username)
+			.DuplicateUserName(registerRequestViewModel.UserName)
 			.Description;
 
 		// Act
@@ -227,7 +227,7 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 		var registerRequestViewModel =
 			new RegisterRequestViewModel
 			{
-				Username = Guid.NewGuid().ToString(),
+				UserName = Guid.NewGuid().ToString(),
 				Email = Guid.NewGuid().ToString(),
 				Password = Consts.UserServices.UsersPassword
 			};
@@ -260,7 +260,7 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 		var registerRequestViewModel =
 			new RegisterRequestViewModel
 			{
-				Username = Guid.NewGuid().ToString(),
+				UserName = Guid.NewGuid().ToString(),
 				Email = Consts.UserServices.AdminEmail,
 				Password = Consts.UserServices.UsersPassword
 			};
@@ -293,7 +293,7 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 		var registerRequestViewModel =
 			new RegisterRequestViewModel
 			{
-				Username = Guid.NewGuid().ToString(),
+				UserName = Guid.NewGuid().ToString(),
 				Email = $"{Guid.NewGuid().ToString().Replace("-", "").AsSpan().Slice(0, 10)}@gmail.com",
 				Password = Consts.UserServices.UsersPassword
 			};
@@ -351,7 +351,7 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 		var loginRequestViewModel =
 			new LoginRequestViewModel
 			{
-				Username = Consts.UserServices.AdminUsername,
+				UserName = Consts.UserServices.AdminUserName,
 				Password = Consts.UserServices.UsersPassword
 			};
 
@@ -369,7 +369,7 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 		Assert.NotNull(result);
 		Assert.NotNull(result.Value);
 		Assert.NotNull(result.Value.Token);
-		Assert.NotNull(result.Value.Username);
+		Assert.NotNull(result.Value.UserName);
 		Assert.True(result.IsSuccess);
 		Assert.True(isSuccessExist);
 	}
@@ -537,7 +537,7 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 		var loginRequestViewModel =
 			new LoginRequestViewModel
 			{
-				Username = Consts.UserServices.UserUsername,
+				UserName = Consts.UserServices.UserUserName,
 				Password = Consts.UserServices.UsersPassword
 			};
 
@@ -827,11 +827,11 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 			new UpdateUserByAdminRequestViewModel
 			{
 				UserId = Consts.UserServices.UserId,
-				Username = Consts.UserServices.AdminUsername
+				UserName = Consts.UserServices.AdminUserName
 			};
 
 		var exceptedErrorMessage =
-			Resources.Messages.ErrorMessages.UsernameExist;
+			Resources.Messages.ErrorMessages.UserNameExist;
 
 		// Act
 		var result =
@@ -888,7 +888,7 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 			{
 				UserId = Consts.UserServices.UserForUpdateId,
 				Email = $"{Guid.NewGuid().ToString()[0..10]}@gmail.com",
-				Username = Guid.NewGuid().ToString().Replace("-", "")[0..10],
+				UserName = Guid.NewGuid().ToString().Replace("-", "")[0..10],
 				FullName = Guid.NewGuid().ToString()
 			};
 

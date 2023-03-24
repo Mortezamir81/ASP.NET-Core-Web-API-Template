@@ -11,7 +11,7 @@ public static class MaxLength : object
 	public const int Name = 50;
 	public const int Title = 50;
 
-	public const int Username = 20;
+	public const int UserName = 20;
 	public const int FullName = 50;
 	public const int Password = 20;
 

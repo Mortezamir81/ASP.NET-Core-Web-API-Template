@@ -28,5 +28,5 @@ public class UpdateUserByAdminRequestViewModel
 		(AllowEmptyStrings = false,
 		ErrorMessageResourceType = typeof(ValidationErros),
 		ErrorMessageResourceName = nameof(ValidationErros.MostNotBeNull))]
-	public string? Username { get; set; }
+	public string? UserName { get; set; }
 }

@@ -11,7 +11,7 @@ public static class RegularExpression : object
 
 	public const string NationalCode = @"^\d{10}$";
 	public const string CellPhoneNumber = @"^09\d{9}";
-	public const string Username = @"^[a-zA-Z0-9_]";
+	public const string UserName = @"^[a-zA-Z0-9_]";
 	public const string Password = @"^[a-zA-Z0-9_@#$%^&*!~]{8,20}$";
 	public const string AToZDigitsUnderline = @"^[a-zA-Z][a-zA-Z0-9_]*$";
 	public const string EmailAddress = @"^[a-zA-Z0-9_.-]+@[a-zA-Z0-9_.-]+$";

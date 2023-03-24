@@ -214,7 +214,7 @@
     <value>RoleId value is invalid</value>
   </data>
   <data name="InvalidUserAndOrPass" xml:space="preserve">
-    <value>Invalid Username or Password</value>
+    <value>Invalid UserName or Password</value>
   </data>
   <data name="InvalidUserId" xml:space="preserve">
     <value>UserId value is invalid</value>
@@ -315,7 +315,7 @@
   <data name="UserListEmpty" xml:space="preserve">
     <value>The users list is empty</value>
   </data>
-  <data name="UsernameExist" xml:space="preserve">
+  <data name="UserNameExist" xml:space="preserve">
     <value>This username has already been registered</value>
   </data>
   <data name="UserNotFound" xml:space="preserve">

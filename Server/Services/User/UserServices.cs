@@ -220,7 +220,7 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 			new LoginResponseViewModel()
 			{
 				Token = accessToken,
-				Username = userLogin!.User?.UserName,
+				UserName = userLogin!.User?.UserName,
 				RefreshToken = newRefreshToken,
 			};
 
@@ -364,16 +364,16 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 			}
 		}
 
-		if (user.UserName != requestViewModel.Username)
+		if (user.UserName != requestViewModel.UserName)
 		{
-			var isUsernameExist =
-				await _userRepository.CheckUsernameExist
-					(username: _userManager.NormalizeName(requestViewModel.Username));
+			var isUserNameExist =
+				await _userRepository.CheckUserNameExist
+					(username: _userManager.NormalizeName(requestViewModel.UserName));
 
-			if (isUsernameExist)
+			if (isUserNameExist)
 			{
 				string errorMessage = string.Format
-					(Resources.Messages.ErrorMessages.UsernameExist);
+					(Resources.Messages.ErrorMessages.UserNameExist);
 
 				result.AddErrorMessage(errorMessage);
 
@@ -399,7 +399,7 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 		}
 
 		user.Email = requestViewModel.Email;
-		user.UserName = requestViewModel.Username;
+		user.UserName = requestViewModel.UserName;
 		user.FullName = requestViewModel.FullName;
 
 		await _userRepository.SaveChangesAsync();
@@ -435,7 +435,7 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 			new Result<LoginResponseViewModel>();
 
 		var foundedUser =
-			await GetUserByName(requestViewModel.Username!);
+			await GetUserByName(requestViewModel.UserName!);
 
 		if (foundedUser == null)
 		{
@@ -488,7 +488,7 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 			new LoginResponseViewModel()
 			{
 				Token = accessToken,
-				Username = foundedUser.UserName,
+				UserName = foundedUser.UserName,
 				RefreshToken = refreshToken,
 			};
 
@@ -500,7 +500,7 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 		{
 			new
 			{
-				UserName = requestViewModel.Username,
+				UserName = requestViewModel.UserName,
 			}
 		});
 
@@ -530,7 +530,7 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 		}
 
 		var foundedUser =
-			await GetUserByName(requestViewModel.Username!);
+			await GetUserByName(requestViewModel.UserName!);
 
 		if (foundedUser == null)
 		{
@@ -596,7 +596,7 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 		{
 			new
 			{
-				UserName = requestViewModel.Username,
+				UserName = requestViewModel.UserName,
 			}
 		});
 
@@ -615,7 +615,7 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 		var result = new Result();
 
 		var registerUser =
-			new User(registerRequestViewModel.Username!)
+			new User(registerRequestViewModel.UserName!)
 			{
 				Email = registerRequestViewModel.Email,
 			};
