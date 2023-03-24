@@ -49,6 +49,7 @@
     <ProjectReference Include="..\Softmax Libraries\Softmax.Logging\Dtat.Logging.csproj" />
     <ProjectReference Include="..\Softmax Libraries\Softmax.Result\Dtat.Result.csproj" />
     <ProjectReference Include="..\Softmax Libraries\Softmax.Utilities.Security\Softmax.Utilities.Security.csproj" />
+    <ProjectReference Include="..\Softmax.Swagger\Softmax.Swagger.csproj" />
   </ItemGroup>
 
   <ItemGroup>

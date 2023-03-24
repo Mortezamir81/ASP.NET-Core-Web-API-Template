@@ -1,4 +1,4 @@
-﻿namespace Infrastructure.Swagger;
+﻿namespace Softmax.Swagger;
 
 public static class SwaggerExtentions
 {
@@ -16,19 +16,25 @@ public static class SwaggerExtentions
 			options.EnableAnnotations();
 
 			#region Include XML Docs
-			var xmlFiles =
-				Directory.GetFiles
-					(AppContext.BaseDirectory, "*.xml", searchOption: SearchOption.TopDirectoryOnly).ToList();
+			if (swaggerSettings.EnableXmlDocs)
+			{
+				var xmlFiles =
+					Directory.GetFiles
+						(AppContext.BaseDirectory, "*.xml", searchOption: SearchOption.TopDirectoryOnly).ToList();
 
-			xmlFiles.ForEach(xmlFile => options.IncludeXmlComments(filePath: xmlFile, includeControllerXmlComments: true));
+				xmlFiles.ForEach
+					(xmlFile => options.IncludeXmlComments(filePath: xmlFile, includeControllerXmlComments: true));
+			}
 			#endregion /Include XML Docs
 
 			#region Filters
 			// Convert Enum To String Value And Show In The Schema Model Section
-			options.SchemaFilter<EnumSchemaFilter>();
+			if (swaggerSettings.EnableEnumSchema)
+				options.SchemaFilter<EnumSchemaFilter>();
 
 			//Set summary of action if not already set
-			options.OperationFilter<ApplySummariesOperationFilter>();
+			if (swaggerSettings.EnableDefaultActionDescription)
+				options.OperationFilter<ApplySummariesOperationFilter>();
 
 			//Add bad request sample data for actions
 			options.OperationFilter<BadRequestResponsesOperationFilter>();
@@ -37,22 +43,27 @@ public static class SwaggerExtentions
 			options.OperationFilter<NotFoundResponsesOperationFilter>();
 
 			//Add (Lock icon) to actions that need authorization and add responses
-			options.OperationFilter<UnauthorizedResponsesOperationFilter>(true, "OAuth2");
+			if (swaggerSettings.EnableAuthroizationResponsesAndIcon)
+				options.OperationFilter<AuthorizeOperationFilter>(true, "OAuth2");
 			#endregion /Filters
 
 			#region Add OAuth Authentication
-			options.AddSecurityDefinition("OAuth2", new OpenApiSecurityScheme
+			if (swaggerSettings.EnableAuthroizationResponsesAndIcon &&
+				!string.IsNullOrWhiteSpace(swaggerSettings.AuthenticationUrl))
 			{
-				Type = SecuritySchemeType.OAuth2,
-				Flows = new OpenApiOAuthFlows()
+				options.AddSecurityDefinition("OAuth2", new OpenApiSecurityScheme
 				{
-					Password = new OpenApiOAuthFlow()
+					Type = SecuritySchemeType.OAuth2,
+					Flows = new OpenApiOAuthFlows()
 					{
-						TokenUrl = new Uri(swaggerSettings.AuthenticationUrl),
+						Password = new OpenApiOAuthFlow()
+						{
+							TokenUrl = new Uri(swaggerSettings.AuthenticationUrl),
+						},
 					},
-				},
 
-			});
+				});
+			}
 			#endregion
 		});
 	}

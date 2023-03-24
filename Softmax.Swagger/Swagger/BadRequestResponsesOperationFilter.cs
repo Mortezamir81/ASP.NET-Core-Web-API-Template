@@ -1,6 +1,4 @@
-﻿using Dtat.Result;
-
-namespace Infrastructure.Swagger;
+﻿namespace Softmax.Swagger;
 
 public class BadRequestResponsesOperationFilter : IOperationFilter
 {

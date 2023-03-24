@@ -1,14 +1,12 @@
-﻿using Dtat.Result;
+﻿namespace Softmax.Swagger;
 
-namespace Infrastructure.Swagger;
-
-public class UnauthorizedResponsesOperationFilter : IOperationFilter
+public class AuthorizeOperationFilter : IOperationFilter
 {
 	private readonly string _schemeName;
 	private readonly IOpenApiObjectBuilder _objectBuilder;
 	private readonly bool _includeUnauthorizedAndForbiddenResponses;
 
-	public UnauthorizedResponsesOperationFilter
+	public AuthorizeOperationFilter
 		(string schemeName,
 		IOpenApiObjectBuilder objectBuilder,
 		bool includeUnauthorizedAndForbiddenResponses)

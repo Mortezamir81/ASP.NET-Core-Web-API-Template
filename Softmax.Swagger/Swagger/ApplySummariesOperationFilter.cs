@@ -1,4 +1,4 @@
-﻿namespace Infrastructure.Swagger;
+﻿namespace Softmax.Swagger;
 
 public class ApplySummariesOperationFilter : IOperationFilter
 {

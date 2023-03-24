@@ -47,6 +47,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Softmax.Utilities.Validatio
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Softmax.Utilities.Validation.Resources", "Softmax Libraries\Softmax.Utilities.Validation.Resources\Softmax.Utilities.Validation.Resources.csproj", "{20845060-E255-46BD-9F5B-54691F3F41C7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Softmax.Swagger", "Softmax.Swagger\Softmax.Swagger.csproj", "{9EB08744-0789-4A94-8789-41DC73DF909F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -109,6 +111,10 @@ Global
 		{20845060-E255-46BD-9F5B-54691F3F41C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{20845060-E255-46BD-9F5B-54691F3F41C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{20845060-E255-46BD-9F5B-54691F3F41C7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9EB08744-0789-4A94-8789-41DC73DF909F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9EB08744-0789-4A94-8789-41DC73DF909F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9EB08744-0789-4A94-8789-41DC73DF909F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9EB08744-0789-4A94-8789-41DC73DF909F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -135,6 +141,7 @@ Global
 		{3C164FFA-27FE-438E-A3B5-F923EABC9BFC} = {F25D826B-FD94-45C2-BC16-6AD4974EAB97}
 		{3857E3B2-C216-431D-A188-A15CE0654F2D} = {6A79570C-92F6-4234-BED4-0D52C3911A10}
 		{20845060-E255-46BD-9F5B-54691F3F41C7} = {6A79570C-92F6-4234-BED4-0D52C3911A10}
+		{9EB08744-0789-4A94-8789-41DC73DF909F} = {6A79570C-92F6-4234-BED4-0D52C3911A10}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {14A6BE61-0F64-4153-A0EC-07447291B81B}
