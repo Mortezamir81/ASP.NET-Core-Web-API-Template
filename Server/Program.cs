@@ -49,12 +49,15 @@ var app =
 //******************************
 await app.IntializeDatabase();
 
-#if DEBUG
-app.UseDeveloperExceptionPage();
-#else
-app.UseGlobalExceptionMiddleware();
-app.UseSwaggerBasicAuthorization();
-#endif
+if (app.Environment.IsProduction())
+{
+	app.UseGlobalExceptionMiddleware();
+	app.UseSwaggerBasicAuthorization();
+}
+else
+{
+	app.UseDeveloperExceptionPage();
+}
 
 app.UseCustomSwaggerAndUI();
 
