@@ -1,8 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
-namespace Dtat.Result
+﻿namespace Infrastructure.Results
 {
-    public static class ResultExtensions
+	public static class ResultExtensions
 	{
 		static ResultExtensions()
 		{

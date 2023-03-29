@@ -6,7 +6,6 @@
 
 	<ItemGroup>
 		<PackageReference Include="DTAT" Version="1.0.4" />
-		<PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
 	</ItemGroup>
 
 </Project>

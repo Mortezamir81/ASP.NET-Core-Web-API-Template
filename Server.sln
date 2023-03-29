@@ -47,7 +47,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Softmax.Utilities.Validatio
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Softmax.Utilities.Validation.Resources", "Softmax Libraries\Softmax.Utilities.Validation.Resources\Softmax.Utilities.Validation.Resources.csproj", "{20845060-E255-46BD-9F5B-54691F3F41C7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Softmax.Swagger", "Softmax.Swagger\Softmax.Swagger.csproj", "{9EB08744-0789-4A94-8789-41DC73DF909F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Softmax.Swagger", "Softmax Libraries\Softmax.Swagger\Softmax.Swagger.csproj", "{9EB08744-0789-4A94-8789-41DC73DF909F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

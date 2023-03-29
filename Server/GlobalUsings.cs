@@ -9,6 +9,7 @@ global using Infrastructure.Attributes;
 global using Infrastructure.Enums;
 global using Infrastructure.Extentions;
 global using Infrastructure.Middlewares;
+global using Infrastructure.Results;
 global using Infrastructure.Settings;
 global using Microsoft.AspNetCore.Authentication.JwtBearer;
 global using Microsoft.AspNetCore.Authorization;
@@ -41,4 +42,3 @@ global using System.Text;
 global using System.Text.Json.Serialization;
 global using System.Threading.Tasks;
 global using ViewModels.General;
-
