@@ -72,15 +72,15 @@
 	"ShortcutMenuBar.toggleWordWrap": true,
 	"ShortcutMenuBar.undo": true,
 	"files.exclude": {
-		".gitattributes": false,
-		".gitignore": false,
-		"**/.vs": false,
-		"**/.vscode": false,
-		"**/*.csproj": false,
-		"**/*.csproj.user": false,
-		"**/*.sln": false,
-		"**/bin": false,
-		"**/obj": false,
-		"global.json": false
+		".gitattributes": true,
+		".gitignore": true,
+		"**/.vs": true,
+		"**/.vscode": true,
+		"**/*.csproj": true,
+		"**/*.csproj.user": true,
+		"**/*.sln": true,
+		"**/bin": true,
+		"**/obj": true,
+		"global.json": true
 	}
 }

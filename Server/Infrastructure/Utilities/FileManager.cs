@@ -61,7 +61,7 @@ public class FileManager : IFileManager
 				Extention = fileExtension,
 				FileName = newFileName,
 				ByteSize = file.Length,
-				SavedUrl = $"{path}/{newFileName}"
+				SavedUrl = Path.Combine(path, newFileName),
 			};
 
 		return result;
@@ -111,7 +111,7 @@ public class FileManager : IFileManager
 				Extention = fileExtension,
 				FileName = newFileName,
 				ByteSize = file.Length,
-				SavedUrl = $"{path}/{newFileName}"
+				SavedUrl = Path.Combine(path, newFileName),
 			};
 
 		return result;
