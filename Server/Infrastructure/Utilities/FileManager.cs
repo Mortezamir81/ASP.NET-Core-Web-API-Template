@@ -32,28 +32,30 @@ public class FileManager : IFileManager
 		string newFileName =
 			$"{fileName}{fileExtension}";
 
-		string finalPath;
+		string finalPathName;
+
+		finalPathName =
+			Path.Combine
+				(path1: path, path2: newFileName);
 
 		if (includeRootPath)
 		{
 			var rootPath =
 				_hostEnvironment.ContentRootPath;
 
-			finalPath =
-				Path.Combine(path1: rootPath, path2: "wwwroot");
+			finalPathName =
+				Path.Combine(path1: rootPath, path2: finalPathName);
 		}
-		else
-		{
-			finalPath = path;
-		}
+
+		var finalPath =
+			Path.GetDirectoryName(finalPathName);
 
 		if (!Directory.Exists(finalPath))
 		{
-			Directory.CreateDirectory(finalPath);
+			Directory.CreateDirectory(finalPath!);
 		}
 
-		await CopyFileToAsync
-			(file: file, path: Path.Combine(path1: finalPath, path2: newFileName));
+		await CopyFileToAsync(file: file, path: finalPathName);
 
 		var result =
 			new SaveFileResult()
@@ -61,7 +63,7 @@ public class FileManager : IFileManager
 				Extention = fileExtension,
 				FileName = newFileName,
 				ByteSize = file.Length,
-				SavedUrl = Path.Combine(path, newFileName),
+				SavedUrl = $"{path}/{newFileName}"
 			};
 
 		return result;
@@ -82,28 +84,30 @@ public class FileManager : IFileManager
 		string newFileName =
 			$"{Guid.NewGuid()}{fileExtension}";
 
-		string finalPath;
+		string finalPathName;
+
+		finalPathName =
+			Path.Combine
+				(path1: path, path2: newFileName);
 
 		if (includeRootPath)
 		{
 			var rootPath =
 				_hostEnvironment.ContentRootPath;
 
-			finalPath =
-				Path.Combine(path1: rootPath, path2: "wwwroot");
+			finalPathName =
+				Path.Combine(path1: rootPath, path2: finalPathName);
 		}
-		else
-		{
-			finalPath = path;
-		}
+
+		var finalPath =
+			Path.GetDirectoryName(finalPathName);
 
 		if (!Directory.Exists(finalPath))
 		{
-			Directory.CreateDirectory(finalPath);
+			Directory.CreateDirectory(finalPath!);
 		}
 
-		await CopyFileToAsync
-			(file: file, path: Path.Combine(path1: finalPath, path2: newFileName));
+		await CopyFileToAsync(file: file, path: finalPathName);
 
 		var result =
 			new SaveFileResult()
@@ -111,7 +115,7 @@ public class FileManager : IFileManager
 				Extention = fileExtension,
 				FileName = newFileName,
 				ByteSize = file.Length,
-				SavedUrl = Path.Combine(path, newFileName),
+				SavedUrl = $"{path}/{newFileName}"
 			};
 
 		return result;
