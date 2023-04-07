@@ -16,7 +16,7 @@
 
 		public int MessageCode { get; set; }
 
-		public System.Collections.Generic.List<string> Messages { get; }
+		public System.Collections.Generic.List<string> Messages { get; set; }
 
 		public void AddErrorMessage(string message)
 		{

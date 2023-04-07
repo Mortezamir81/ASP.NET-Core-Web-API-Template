@@ -47,7 +47,7 @@ var app =
 
 #region Middlewares
 //******************************
-await app.IntializeDatabase();
+await app.IntializeDatabaseAsync();
 
 if (app.Environment.IsProduction())
 {

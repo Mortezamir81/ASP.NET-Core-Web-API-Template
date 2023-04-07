@@ -1,21 +1,18 @@
-﻿using Resources;
-using Resources.Messages;
-
-namespace Infrastructure.Extentions;
+﻿namespace Infrastructure.Extentions;
 
 public static class InitializeDatabase
 {
-	public static async Task IntializeDatabase(this IApplicationBuilder app)
+	public static async Task IntializeDatabaseAsync(this IApplicationBuilder app)
 	{
 		using (var scope = app.ApplicationServices.CreateScope())
 		{
 			var databaseContext =
 				scope.ServiceProvider.GetRequiredService<DatabaseContext>();
 
-			var userManager = 
+			var userManager =
 				scope.ServiceProvider.GetRequiredService<UserManager<User>>();
 
-			var roleManager = 
+			var roleManager =
 				scope.ServiceProvider.GetRequiredService<RoleManager<Role>>();
 
 			var anyUserExist =
@@ -31,13 +28,13 @@ public static class InitializeDatabase
 			if (!systemAdminRoleResult.Succeeded)
 				throw new Exception(message: $"Can not create role {Constants.Role.SystemAdmin} - {GetErrors(systemAdminRoleResult.Errors)}");
 
-			var adminRoleResult = 
+			var adminRoleResult =
 				await roleManager.CreateAsync(new Role(Constants.Role.Admin));
 
 			if (!adminRoleResult.Succeeded)
 				throw new Exception(message: $"Can not create role {Constants.Role.Admin}- {GetErrors(adminRoleResult.Errors)}");
 
-			var userRoleResult = 
+			var userRoleResult =
 				await roleManager.CreateAsync(new Role(Constants.Role.User));
 
 			if (!userRoleResult.Succeeded)

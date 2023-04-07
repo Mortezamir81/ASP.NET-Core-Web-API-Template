@@ -9,7 +9,7 @@ namespace Dtat.Result
 		}
 
 
-		public Pagination Pagination { get; private set; }
+		public Pagination Pagination { get; set; }
 
 
 		public void AddPagination(int currentPage, int totalPages, int pageSize, int totalCount)
