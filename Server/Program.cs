@@ -1,6 +1,14 @@
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Logging;
+
 //******************************
 var builder =
 	WebApplication.CreateBuilder(args);
+
+builder.Logging.ClearProviders();
+
+if (builder.Environment.IsDevelopment())
+	builder.Logging.AddConsole();
 //******************************
 
 
