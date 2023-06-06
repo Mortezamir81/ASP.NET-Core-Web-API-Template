@@ -20,7 +20,7 @@ jobs:
      
       - name: 📂 Publish
         run: |
-          dotnet publish -c Release -o ./publish --runtime win-x64 --self-contained false
+          dotnet publish -c Release -o ./publish -r win-x64 -p:PublishReadyToRun=true
           mkdir stop_app
       - name: Add app_offline
         uses: "finnp/create-file-action@master"
