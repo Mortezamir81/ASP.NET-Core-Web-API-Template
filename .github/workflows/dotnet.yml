@@ -1,0 +1,55 @@
+name: Build and deploy ASP.Net Core app to IIS via FTP
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build_and_deploy_to_ftp:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: 🚀 Setup .NET
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: '7.0.x'
+     
+      - name: 📂 Publish
+        run: |
+          dotnet publish -c Release -o ./publish --runtime win-x64 --self-contained false
+          mkdir stop_app
+      - name: Add app_offline
+        uses: "finnp/create-file-action@master"
+        env:
+          FILE_NAME: "./stop_app/app_offline.htm"
+      - name: Stop App
+        uses: SamKirkland/FTP-Deploy-Action@4.3.3
+        with:
+          # Deployment destination server & path. Formatted as protocol://domain.com:port/full/destination/path/
+          ftp-server: ${{ secrets.FTP_SERVER }}
+          protocol: ftps
+          security: strict
+          # FTP account username
+          username: ${{ secrets.FTP_USERNAME }}
+          # FTP account password
+          password: ${{ secrets.FTP_PASSWORD }}
+          # The local folder to copy, defaults to root project folder
+          local-dir: ./stop_app/
+          server-dir: /          
+      - name: FTP Deploy
+        uses: SamKirkland/FTP-Deploy-Action@4.3.3
+        with:
+          ftp-server: ${{ secrets.FTP_SERVER }}
+          protocol: ftps
+          security: strict
+          # FTP account username
+          username: ${{ secrets.FTP_USERNAME }}
+          # FTP account password
+          password: ${{ secrets.FTP_PASSWORD }}
+          # The local folder to copy, defaults to root project folder
+          local-dir: ./publish/
+          server-dir: /  
