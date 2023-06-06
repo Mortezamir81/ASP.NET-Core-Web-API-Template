@@ -30,7 +30,7 @@ jobs:
         uses: SamKirkland/FTP-Deploy-Action@4.3.3
         with:
           # Deployment destination server & path. Formatted as protocol://domain.com:port/full/destination/path/
-          ftp-server: ${{ secrets.FTP_SERVER }}
+          server: ${{ secrets.FTP_SERVER }}
           protocol: ftps
           security: strict
           # FTP account username
@@ -43,7 +43,7 @@ jobs:
       - name: FTP Deploy
         uses: SamKirkland/FTP-Deploy-Action@4.3.3
         with:
-          ftp-server: ${{ secrets.FTP_SERVER }}
+          server: ${{ secrets.FTP_SERVER }}
           protocol: ftps
           security: strict
           # FTP account username
