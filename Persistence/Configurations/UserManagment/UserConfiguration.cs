@@ -9,7 +9,6 @@ internal class UserConfiguration : IEntityTypeConfiguration<User>
 			(current => !current.IsDeleted);
 		//********************
 
-
 		//********************
 		builder.Property
 			(current => current.Email)

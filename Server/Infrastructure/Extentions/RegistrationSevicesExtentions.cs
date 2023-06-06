@@ -28,9 +28,9 @@ public static class RegistrationSevicesExtentions
 
 	public static void AddCustomLogger(this IServiceCollection services)
 	{
-		services.AddTransient<ILogger, NLogAdapter>();
+		services.AddSingleton<ILogger, NLogAdapter>();
 
-		services.AddTransient
+		services.AddSingleton
 			(serviceType: typeof(ILogger<>),
 				implementationType: typeof(NLogAdapter<>));
 	}
