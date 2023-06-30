@@ -11,43 +11,43 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation Layer", "Prese
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{7409BF11-5276-4221-ADE1-FF5C9AB3056D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Persistence", "Persistence\Persistence.csproj", "{E01BFBC6-363B-4661-A4D9-EF99BAE72D7C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Persistence", "src\Persistence\Persistence.csproj", "{E01BFBC6-363B-4661-A4D9-EF99BAE72D7C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain", "Domain\Domain.csproj", "{0E35D163-4E38-43FA-899E-B3F74FD209FD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain", "src\Domain\Domain.csproj", "{0E35D163-4E38-43FA-899E-B3F74FD209FD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Server", "Server\Server.csproj", "{C648C3C7-7B8D-4A1E-8ECB-0E081DD6C35D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Server", "src\Server\Server.csproj", "{C648C3C7-7B8D-4A1E-8ECB-0E081DD6C35D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libraries", "Libraries", "{6A79570C-92F6-4234-BED4-0D52C3911A10}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shared", "Shared\Shared.csproj", "{B085A113-351E-4D23-B9C7-0813F3533DB0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shared", "src\Shared\Shared.csproj", "{B085A113-351E-4D23-B9C7-0813F3533DB0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dtat.Result", "Softmax Libraries\Softmax.Result\Dtat.Result.csproj", "{358C5EE6-B2BC-4A73-9D89-F91540A107C8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dtat.Result", "src\Softmax Libraries\Softmax.Result\Dtat.Result.csproj", "{358C5EE6-B2BC-4A73-9D89-F91540A107C8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Softmax.Data.EntityFrameworkCore.Pagination", "Softmax Libraries\Softmax.EntityFrameworkCore.Pagination\Softmax.Data.EntityFrameworkCore.Pagination.csproj", "{9E137E01-8E06-4ACC-896A-E42B384C65AB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Softmax.Data.EntityFrameworkCore.Pagination", "src\Softmax Libraries\Softmax.EntityFrameworkCore.Pagination\Softmax.Data.EntityFrameworkCore.Pagination.csproj", "{9E137E01-8E06-4ACC-896A-E42B384C65AB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dtat.Logging", "Softmax Libraries\Softmax.Logging\Dtat.Logging.csproj", "{6964C770-5B67-489B-BE4E-C7F698CE89E0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dtat.Logging", "src\Softmax Libraries\Softmax.Logging\Dtat.Logging.csproj", "{6964C770-5B67-489B-BE4E-C7F698CE89E0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dtat.Logging.NLogAdapter", "Softmax Libraries\Softmax.Logging.NLog\Dtat.Logging.NLogAdapter.csproj", "{1352C698-0594-4336-A73D-348C024733FE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dtat.Logging.NLogAdapter", "src\Softmax Libraries\Softmax.Logging.NLog\Dtat.Logging.NLogAdapter.csproj", "{1352C698-0594-4336-A73D-348C024733FE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Softmax.Utilities.Security", "Softmax Libraries\Softmax.Utilities.Security\Softmax.Utilities.Security.csproj", "{55E2FEDF-D828-4481-AC4B-BEC4869607A0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Softmax.Utilities.Security", "src\Softmax Libraries\Softmax.Utilities.Security\Softmax.Utilities.Security.csproj", "{55E2FEDF-D828-4481-AC4B-BEC4869607A0}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Resources", "Resources", "{CB04E696-6A9C-4A59-8AC2-52AE49DA1081}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{4287E354-B11C-42F6-9AA9-D5AEE18F6A20}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Resources", "Resources\Resources.csproj", "{F5BAA91F-4B35-487F-91F2-753A0A9338F6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Resources", "src\Resources\Resources.csproj", "{F5BAA91F-4B35-487F-91F2-753A0A9338F6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Constants", "Constants\Constants.csproj", "{34D783ED-A179-4B53-A510-C7D32FFF8166}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Constants", "src\Constants\Constants.csproj", "{34D783ED-A179-4B53-A510-C7D32FFF8166}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{F25D826B-FD94-45C2-BC16-6AD4974EAB97}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests", "Tests\Tests.csproj", "{3C164FFA-27FE-438E-A3B5-F923EABC9BFC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests", "src\Tests\Tests.csproj", "{3C164FFA-27FE-438E-A3B5-F923EABC9BFC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Softmax.Utilities.Validation", "Softmax Libraries\Softmax.Utilities.Validation\Softmax.Utilities.Validation.csproj", "{3857E3B2-C216-431D-A188-A15CE0654F2D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Softmax.Utilities.Validation", "src\Softmax Libraries\Softmax.Utilities.Validation\Softmax.Utilities.Validation.csproj", "{3857E3B2-C216-431D-A188-A15CE0654F2D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Softmax.Utilities.Validation.Resources", "Softmax Libraries\Softmax.Utilities.Validation.Resources\Softmax.Utilities.Validation.Resources.csproj", "{20845060-E255-46BD-9F5B-54691F3F41C7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Softmax.Utilities.Validation.Resources", "src\Softmax Libraries\Softmax.Utilities.Validation.Resources\Softmax.Utilities.Validation.Resources.csproj", "{20845060-E255-46BD-9F5B-54691F3F41C7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Softmax.Swagger", "Softmax Libraries\Softmax.Swagger\Softmax.Swagger.csproj", "{9EB08744-0789-4A94-8789-41DC73DF909F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Softmax.Swagger", "src\Softmax Libraries\Softmax.Swagger\Softmax.Swagger.csproj", "{9EB08744-0789-4A94-8789-41DC73DF909F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
