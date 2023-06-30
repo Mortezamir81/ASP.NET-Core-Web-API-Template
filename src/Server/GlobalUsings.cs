@@ -1,4 +1,5 @@
 ﻿global using AutoMapper;
+global using DNTCommon.Web.Core;
 global using Domain.UserManagment;
 global using Dtat.Logging;
 global using Dtat.Logging.NLogAdapter;
@@ -14,6 +15,7 @@ global using Infrastructure.Settings;
 global using Microsoft.AspNetCore.Authentication.JwtBearer;
 global using Microsoft.AspNetCore.Authorization;
 global using Microsoft.AspNetCore.Builder;
+global using Microsoft.AspNetCore.Hosting;
 global using Microsoft.AspNetCore.Http;
 global using Microsoft.AspNetCore.Identity;
 global using Microsoft.AspNetCore.Mvc;

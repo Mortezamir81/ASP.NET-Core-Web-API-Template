@@ -1,5 +1,3 @@
-using DNTCommon.Web.Core;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
 
 //******************************
@@ -10,6 +8,8 @@ builder.Logging.ClearProviders();
 
 if (builder.Environment.IsDevelopment())
 	builder.Logging.AddConsole();
+
+builder.Configuration.AddEnvironmentVariables();
 //******************************
 
 
@@ -67,16 +67,15 @@ await app.IntializeDatabaseAsync();
 if (app.Environment.IsProduction())
 {
 	app.UseGlobalExceptionMiddleware();
-	app.UseSwaggerBasicAuthorization();
 }
 else
 {
 	app.UseDeveloperExceptionPage();
+	app.UseSwaggerBasicAuthorization();
+	app.UseCustomSwaggerAndUI();
 }
 
 app.UseAntiDos();
-
-app.UseCustomSwaggerAndUI();
 
 app.UseCors("DevCorsPolicy");
 
