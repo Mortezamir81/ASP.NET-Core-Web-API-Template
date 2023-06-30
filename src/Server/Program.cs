@@ -4,31 +4,31 @@ using Microsoft.Extensions.Logging;
 
 //******************************
 var builder =
-    WebApplication.CreateBuilder(args);
+	WebApplication.CreateBuilder(args);
 
 builder.Logging.ClearProviders();
 
 if (builder.Environment.IsDevelopment())
-    builder.Logging.AddConsole();
+	builder.Logging.AddConsole();
 //******************************
 
 
 #region Services
 //******************************
 builder.Services.Configure<ApplicationSettings>
-    (builder.Configuration.GetSection(ApplicationSettings.KeyName));
+	(builder.Configuration.GetSection(ApplicationSettings.KeyName));
 
 builder.Services.Configure<AntiDosConfig>
-    (options => builder.Configuration.GetSection("AntiDosConfig").Bind(options));
+	(options => builder.Configuration.GetSection("AntiDosConfig").Bind(options));
 
 builder.Services.AddMemoryCacheService();
 builder.Services.AddAntiDosFirewall();
 
 builder.Services.AddCustomDbContext
-    (connectionString: builder.Configuration.GetConnectionString("MySqlServerConnectionString"));
+	(connectionString: builder.Configuration.GetConnectionString("SqlConnectionString"));
 
 builder.Services.AddCustomIdentity
-    (builder.Configuration.GetSection($"{nameof(ApplicationSettings)}:{nameof(IdentitySettings)}").Get<IdentitySettings>());
+	(builder.Configuration.GetSection($"{nameof(ApplicationSettings)}:{nameof(IdentitySettings)}").Get<IdentitySettings>());
 
 builder.Services.AddCustomCORS();
 
@@ -47,7 +47,7 @@ builder.Services.AddCustomApiVersioning();
 builder.Services.AddCustomController();
 
 builder.Services.AddCustomJwtAuthentication
-    (builder.Configuration.GetSection($"{nameof(ApplicationSettings)}:{nameof(JwtSettings)}").Get<JwtSettings>());
+	(builder.Configuration.GetSection($"{nameof(ApplicationSettings)}:{nameof(JwtSettings)}").Get<JwtSettings>());
 
 builder.Services.AddCustomSwaggerGen(builder.Configuration);
 //******************************
@@ -56,7 +56,7 @@ builder.Services.AddCustomSwaggerGen(builder.Configuration);
 
 //******************************
 var app =
-    builder.Build();
+	builder.Build();
 //******************************
 
 
@@ -66,12 +66,12 @@ await app.IntializeDatabaseAsync();
 
 if (app.Environment.IsProduction())
 {
-    app.UseGlobalExceptionMiddleware();
-    app.UseSwaggerBasicAuthorization();
+	app.UseGlobalExceptionMiddleware();
+	app.UseSwaggerBasicAuthorization();
 }
 else
 {
-    app.UseDeveloperExceptionPage();
+	app.UseDeveloperExceptionPage();
 }
 
 app.UseAntiDos();

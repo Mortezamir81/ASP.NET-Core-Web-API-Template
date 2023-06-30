@@ -47,7 +47,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Softmax.Utilities.Validatio
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Softmax.Utilities.Validation.Resources", "src\Softmax Libraries\Softmax.Utilities.Validation.Resources\Softmax.Utilities.Validation.Resources.csproj", "{20845060-E255-46BD-9F5B-54691F3F41C7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Softmax.Swagger", "src\Softmax Libraries\Softmax.Swagger\Softmax.Swagger.csproj", "{9EB08744-0789-4A94-8789-41DC73DF909F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Softmax.Swagger", "src\Softmax Libraries\Softmax.Swagger\Softmax.Swagger.csproj", "{9EB08744-0789-4A94-8789-41DC73DF909F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1E0E11C0-A562-4648-BBA3-0E4B4B6DA8D0}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
