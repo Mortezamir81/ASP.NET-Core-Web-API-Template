@@ -25,8 +25,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Server\Server.csproj" />
-    <ProjectReference Include="..\Softmax Libraries\Softmax.Result\Dtat.Result.csproj" />
-    <ProjectReference Include="..\Softmax Libraries\Softmax.Utilities.Security\Softmax.Utilities.Security.csproj" />
+    <ProjectReference Include="..\Shared\Softmax Libraries\Softmax.Result\Dtat.Result.csproj" />
+    <ProjectReference Include="..\Shared\Softmax Libraries\Softmax.Utilities.Security\Softmax.Utilities.Security.csproj" />
   </ItemGroup>
 
 </Project>

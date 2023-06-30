@@ -40,17 +40,17 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Constants\Constants.csproj" />
+    <ProjectReference Include="..\Shared\Constants\Constants.csproj" />
     <ProjectReference Include="..\Domain\Domain.csproj" />
     <ProjectReference Include="..\Persistence\Persistence.csproj" />
-    <ProjectReference Include="..\Resources\Resources.csproj" />
-    <ProjectReference Include="..\Shared\Shared.csproj" />
-    <ProjectReference Include="..\Softmax Libraries\Softmax.EntityFrameworkCore.Pagination\Softmax.Data.EntityFrameworkCore.Pagination.csproj" />
-    <ProjectReference Include="..\Softmax Libraries\Softmax.Logging.NLog\Dtat.Logging.NLogAdapter.csproj" />
-    <ProjectReference Include="..\Softmax Libraries\Softmax.Logging\Dtat.Logging.csproj" />
-    <ProjectReference Include="..\Softmax Libraries\Softmax.Result\Dtat.Result.csproj" />
-    <ProjectReference Include="..\Softmax Libraries\Softmax.Utilities.Security\Softmax.Utilities.Security.csproj" />
-    <ProjectReference Include="..\Softmax Libraries\Softmax.Swagger\Softmax.Swagger.csproj" />
+    <ProjectReference Include="..\Shared\Resources\Resources.csproj" />
+    <ProjectReference Include="..\Shared\Shared\Shared.csproj" />
+    <ProjectReference Include="..\Shared\Softmax Libraries\Softmax.EntityFrameworkCore.Pagination\Softmax.Data.EntityFrameworkCore.Pagination.csproj" />
+    <ProjectReference Include="..\Shared\Softmax Libraries\Softmax.Logging.NLog\Dtat.Logging.NLogAdapter.csproj" />
+    <ProjectReference Include="..\Shared\Softmax Libraries\Softmax.Logging\Dtat.Logging.csproj" />
+    <ProjectReference Include="..\Shared\Softmax Libraries\Softmax.Result\Dtat.Result.csproj" />
+    <ProjectReference Include="..\Shared\Softmax Libraries\Softmax.Utilities.Security\Softmax.Utilities.Security.csproj" />
+    <ProjectReference Include="..\Shared\Softmax Libraries\Softmax.Swagger\Softmax.Swagger.csproj" />
   </ItemGroup>
 
   <ItemGroup>
