@@ -4,65 +4,64 @@ public static class InitializeDatabase
 {
 	public static async Task IntializeDatabaseAsync(this IApplicationBuilder app)
 	{
-		using (var scope = app.ApplicationServices.CreateScope())
-		{
-			var databaseContext =
-				scope.ServiceProvider.GetRequiredService<DatabaseContext>();
+		using var scope = app.ApplicationServices.CreateScope();
 
-			var userManager =
-				scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+		var databaseContext =
+			scope.ServiceProvider.GetRequiredService<DatabaseContext>();
 
-			var roleManager =
-				scope.ServiceProvider.GetRequiredService<RoleManager<Role>>();
+		var userManager =
+			scope.ServiceProvider.GetRequiredService<UserManager<User>>();
 
-			var anyUserExist =
-				await databaseContext.Users
-				.AnyAsync();
+		var roleManager =
+			scope.ServiceProvider.GetRequiredService<RoleManager<Role>>();
 
-			if (anyUserExist)
-				return;
+		var anyUserExist =
+			await databaseContext.Users
+			.AnyAsync();
 
-			var systemAdminRoleResult =
-				await roleManager.CreateAsync(new Role(Constants.Role.SystemAdmin));
+		if (anyUserExist)
+			return;
 
-			if (!systemAdminRoleResult.Succeeded)
-				throw new Exception(message: $"Can not create role {Constants.Role.SystemAdmin} - {GetErrors(systemAdminRoleResult.Errors)}");
+		var systemAdminRoleResult =
+			await roleManager.CreateAsync(new Role(Constants.Role.SystemAdmin));
 
-			var adminRoleResult =
-				await roleManager.CreateAsync(new Role(Constants.Role.Admin));
+		if (!systemAdminRoleResult.Succeeded)
+			throw new Exception(message: $"Can not create role {Constants.Role.SystemAdmin} - {GetErrors(systemAdminRoleResult.Errors)}");
 
-			if (!adminRoleResult.Succeeded)
-				throw new Exception(message: $"Can not create role {Constants.Role.Admin}- {GetErrors(adminRoleResult.Errors)}");
+		var adminRoleResult =
+			await roleManager.CreateAsync(new Role(Constants.Role.Admin));
 
-			var userRoleResult =
-				await roleManager.CreateAsync(new Role(Constants.Role.User));
+		if (!adminRoleResult.Succeeded)
+			throw new Exception(message: $"Can not create role {Constants.Role.Admin}- {GetErrors(adminRoleResult.Errors)}");
 
-			if (!userRoleResult.Succeeded)
-				throw new Exception(message: $"Can not create role {Constants.Role.User} - {GetErrors(userRoleResult.Errors)}");
+		var userRoleResult =
+			await roleManager.CreateAsync(new Role(Constants.Role.User));
 
-			var adminUser =
-				new User("Morteza.m")
-				{
-					Email = "admin@gmail.com",
-					EmailConfirmed = true,
-					PhoneNumberConfirmed = true,
-					FullName = "admin",
-					PhoneNumber = "09165059874",
-					IsSystemic = true,
-				};
+		if (!userRoleResult.Succeeded)
+			throw new Exception(message: $"Can not create role {Constants.Role.User} - {GetErrors(userRoleResult.Errors)}");
 
-			var systemAdminUser =
-				await userManager.CreateAsync(adminUser, password: "morteza@12345");
+		var adminUser =
+			new User("Morteza.m")
+			{
+				Email = "admin@gmail.com",
+				EmailConfirmed = true,
+				PhoneNumberConfirmed = true,
+				FullName = "admin",
+				PhoneNumber = "09165059874",
+				IsSystemic = true,
+			};
 
-			if (!systemAdminUser.Succeeded)
-				throw new Exception(message: $"Can not create user {adminUser.UserName} - {GetErrors(systemAdminUser.Errors)}");
+		var systemAdminUser =
+			await userManager.CreateAsync(adminUser, password: "morteza@12345");
 
-			var adminUserToRole =
-				await userManager.AddToRoleAsync(user: adminUser, role: Constants.Role.SystemAdmin);
+		if (!systemAdminUser.Succeeded)
+			throw new Exception(message: $"Can not create user {adminUser.UserName} - {GetErrors(systemAdminUser.Errors)}");
 
-			if (!adminUserToRole.Succeeded)
-				throw new Exception(message: $"Can not add role {Constants.Role.SystemAdmin} to user {adminUser.UserName} - {GetErrors(adminUserToRole.Errors)}");
-		}
+		var adminUserToRole =
+			await userManager.AddToRoleAsync(user: adminUser, role: Constants.Role.SystemAdmin);
+
+		if (!adminUserToRole.Succeeded)
+			throw new Exception(message: $"Can not add role {Constants.Role.SystemAdmin} to user {adminUser.UserName} - {GetErrors(adminUserToRole.Errors)}");
 	}
 
 	public static string GetErrors(IEnumerable<IdentityError> errors)
