@@ -1,33 +1,33 @@
 ﻿namespace Domain.SeedWork;
 
-public abstract class RecursiveEntity<TEntity, TKeyType>
-	: BaseEntity, IRecursiveEntity<TEntity, TKeyType>
+public abstract class RecursiveEntity<TEntity, TEntityKey>
+	: BaseEntity<TEntityKey>, IRecursiveEntity<TEntity, TEntityKey>
 {
-	public required TKeyType ParentId { get; set; }
+	public TEntityKey? ParentId { get; set; }
 
-	public required TEntity Parent { get; set; }
+	public TEntity? Parent { get; set; }
 
-	public required TKeyType RootId { get; set; }
+	public TEntityKey? RootId { get; set; }
 
 	public int Depth { get; set; }
 
 	public string? RecursivePath { get; set; }
 
-	public required IList<TEntity> Children { get; set; }
+	public IList<TEntity>? Children { get; set; }
 }
 
 
-public interface IRecursiveEntity<TEntity, TKeyType>
+public interface IRecursiveEntity<TEntity, TEntityKey>
 {
-	TKeyType ParentId { get; set; }
+	TEntityKey? ParentId { get; set; }
 
-	TEntity Parent { get; set; }
+	TEntity? Parent { get; set; }
 
-	TKeyType RootId { get; set; }
+	TEntityKey? RootId { get; set; }
 
 	int Depth { get; set; }
 
 	string? RecursivePath { get; }
 
-	IList<TEntity> Children { get; set; }
+	IList<TEntity>? Children { get; set; }
 }

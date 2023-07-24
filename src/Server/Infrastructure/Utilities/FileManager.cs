@@ -1,6 +1,6 @@
 ﻿namespace Infrastructure.Utilities;
 
-public class FileManager : IFileManager, IRegisterAsScoped
+public class FileManager : IFileManager
 {
 	#region Fields
 	private readonly IHostEnvironment _hostEnvironment;
@@ -13,13 +13,14 @@ public class FileManager : IFileManager, IRegisterAsScoped
 		ILogger<FileManager> logger)
 	{
 		_hostEnvironment = hostEnvironment;
+
 		_logger = logger;
 	}
 	#endregion /Constractor
 
 	#region Public Methods
 	public async Task<SaveFileResult> SaveFileAsync
-		(IFormFile file, string path, string fileName, bool includeRootPath = false)
+		(IFormFile file, string path, string fileName, bool includeRootPath = false, string? root = null)
 	{
 		var fileExtension =
 				GetFileExtention(file.FileName);
@@ -34,9 +35,18 @@ public class FileManager : IFileManager, IRegisterAsScoped
 
 		string finalPathName;
 
-		finalPathName =
-			Path.Combine
-				(path1: path, path2: newFileName);
+		if (!string.IsNullOrWhiteSpace(root))
+		{
+			finalPathName =
+				Path.Combine
+					(path1: root, path2: path, path3: newFileName);
+		}
+		else
+		{
+			finalPathName =
+				Path.Combine
+					(path1: path, path2: newFileName);
+		}
 
 		if (includeRootPath)
 		{
@@ -60,10 +70,11 @@ public class FileManager : IFileManager, IRegisterAsScoped
 		var result =
 			new SaveFileResult()
 			{
+				ContentType = file.ContentType,
 				Extention = fileExtension,
 				FileName = newFileName,
 				ByteSize = file.Length,
-				SavedUrl = $"{path}/{newFileName}"
+				SavedUrl = Path.Combine(path, newFileName)
 			};
 
 		return result;
@@ -71,7 +82,7 @@ public class FileManager : IFileManager, IRegisterAsScoped
 
 
 	public async Task<SaveFileResult> SaveFileWithRandomeNameAsync
-		(IFormFile file, string path, bool includeRootPath = false)
+		(IFormFile file, string path, bool includeRootPath = false, string? root = null)
 	{
 		var fileExtension =
 			GetFileExtention(file.FileName);
@@ -86,9 +97,18 @@ public class FileManager : IFileManager, IRegisterAsScoped
 
 		string finalPathName;
 
-		finalPathName =
-			Path.Combine
-				(path1: path, path2: newFileName);
+		if (!string.IsNullOrWhiteSpace(root))
+		{
+			finalPathName =
+				Path.Combine
+					(path1: root, path2: path, path3: newFileName);
+		}
+		else
+		{
+			finalPathName =
+				Path.Combine
+					(path1: path, path2: newFileName);
+		}
 
 		if (includeRootPath)
 		{
@@ -112,17 +132,18 @@ public class FileManager : IFileManager, IRegisterAsScoped
 		var result =
 			new SaveFileResult()
 			{
+				ContentType = file.ContentType,
 				Extention = fileExtension,
 				FileName = newFileName,
 				ByteSize = file.Length,
-				SavedUrl = $"{path}/{newFileName}"
+				SavedUrl = Path.Combine(path, newFileName)
 			};
 
 		return result;
 	}
 
 
-	public bool DeleteFile(string? path, bool includeRootPath = false)
+	public bool DeleteFile(string? path, bool includeRootPath = false, string? root = null)
 	{
 		try
 		{
@@ -131,13 +152,19 @@ public class FileManager : IFileManager, IRegisterAsScoped
 
 			var finalPath = path;
 
+			if (!string.IsNullOrWhiteSpace(root))
+			{
+				finalPath =
+					Path.Combine(path1: root, path2: path);
+			}
+
 			if (includeRootPath)
 			{
 				var rootPath =
 					_hostEnvironment.ContentRootPath;
 
 				finalPath =
-					Path.Combine(path1: rootPath, path2: "wwwroot", path3: path);
+					Path.Combine(path1: rootPath, path2: finalPath);
 			}
 
 			var isFileExist =
@@ -186,6 +213,8 @@ public class FileManager : IFileManager, IRegisterAsScoped
 
 public class SaveFileResult
 {
+	public required string ContentType { get; set; }
+
 	public required string FileName { get; set; }
 
 	public required string Extention { get; set; }

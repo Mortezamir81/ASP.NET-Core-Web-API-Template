@@ -205,6 +205,15 @@ namespace Resources.Messages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Delete was successful.
+        /// </summary>
+        public static string DeleteSuccessful {
+            get {
+                return ResourceManager.GetString("DeleteSuccessful", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The user was deleted successful.
         /// </summary>
         public static string DeleteUserSuccessful {

@@ -117,17 +117,8 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="AddSuccessful" xml:space="preserve">
-    <value>Addition was successful</value>
-  </data>
-  <data name="DeleteSuccessful" xml:space="preserve">
-    <value>Delete was successful</value>
-  </data>
   <data name="InputPropertiesInfo" xml:space="preserve">
     <value>The input properties info</value>
-  </data>
-  <data name="UpdateSuccessful" xml:space="preserve">
-    <value>Update was successful</value>
   </data>
   <data name="UserLoginSuccessfulInformation" xml:space="preserve">
     <value>User was login successful</value>

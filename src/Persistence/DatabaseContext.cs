@@ -7,9 +7,6 @@ public class DatabaseContext : IdentityDbContext<User, Role, int>
 	#region Constractor
 	public DatabaseContext(DbContextOptions dbContextOptions) : base(dbContextOptions)
 	{
-#if DEBUG
-		Database.EnsureCreated();
-#endif
 	}
 	#endregion /Constractor
 

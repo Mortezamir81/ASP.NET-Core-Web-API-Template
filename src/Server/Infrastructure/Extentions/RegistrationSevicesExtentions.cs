@@ -1,4 +1,6 @@
-﻿namespace Infrastructure.Extentions;
+﻿using Infrastructure.Utilities;
+
+namespace Infrastructure.Extentions;
 
 public static class RegistrationSevicesExtentions
 {
@@ -23,6 +25,13 @@ public static class RegistrationSevicesExtentions
 		.AsImplementedInterfaces()
 		.AsSelf()
 		.WithSingletonLifetime());
+	}
+
+	public static void AddRecursiveEntityUtilites(this IServiceCollection services)
+	{
+		services.AddTransient
+			(serviceType: typeof(IRecursiveEntityUtilites<>),
+				implementationType: typeof(RecursiveEntityUtilites<>));
 	}
 
 

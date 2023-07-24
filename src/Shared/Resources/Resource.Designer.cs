@@ -61,38 +61,11 @@ namespace Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Addition was successful.
-        /// </summary>
-        public static string AddSuccessful {
-            get {
-                return ResourceManager.GetString("AddSuccessful", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Delete was successful.
-        /// </summary>
-        public static string DeleteSuccessful {
-            get {
-                return ResourceManager.GetString("DeleteSuccessful", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The input properties info.
         /// </summary>
         public static string InputPropertiesInfo {
             get {
                 return ResourceManager.GetString("InputPropertiesInfo", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Update was successful.
-        /// </summary>
-        public static string UpdateSuccessful {
-            get {
-                return ResourceManager.GetString("UpdateSuccessful", resourceCulture);
             }
         }
         

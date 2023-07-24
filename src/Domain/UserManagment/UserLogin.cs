@@ -1,6 +1,6 @@
 ﻿namespace Domain.UserManagment;
 
-public class UserLogin : BaseEntity
+public class UserLogin : BaseEntity<int>
 {
 	public UserLogin(Guid refreshToken) : base()
 	{

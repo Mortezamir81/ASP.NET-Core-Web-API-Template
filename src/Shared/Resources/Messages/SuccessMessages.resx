@@ -165,6 +165,9 @@
   <data name="DeletePostTypeSuccessful" xml:space="preserve">
     <value>The post type was deleted successful</value>
   </data>
+  <data name="DeleteSuccessful" xml:space="preserve">
+    <value>Delete was successful</value>
+  </data>
   <data name="DeleteUserSuccessful" xml:space="preserve">
     <value>The user was deleted successful</value>
   </data>
