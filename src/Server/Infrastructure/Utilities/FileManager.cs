@@ -1,6 +1,6 @@
 ﻿namespace Infrastructure.Utilities;
 
-public class FileManager : IFileManager
+public class FileManager : IFileManager, IRegisterAsScoped
 {
 	#region Fields
 	private readonly IHostEnvironment _hostEnvironment;

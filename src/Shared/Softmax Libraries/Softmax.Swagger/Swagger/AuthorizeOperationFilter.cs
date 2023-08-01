@@ -31,7 +31,12 @@ public class AuthorizeOperationFilter : IOperationFilter
 			.OfType<AuthorizeAttribute>()
 			.Any();
 
-		if (!hasAuthorize)
+		var hasOptionalAuthorize = context.MethodInfo
+			.GetCustomAttributes(true)
+			.OfType<Softmax.Swagger.Attributes.OptionalAuthorizeAttribute>()
+			.Any();
+
+		if (!hasAuthorize && !hasOptionalAuthorize)
 			return;
 
 		if (_includeUnauthorizedAndForbiddenResponses)
