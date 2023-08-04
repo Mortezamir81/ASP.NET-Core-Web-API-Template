@@ -15,17 +15,16 @@ builder.Configuration.AddEnvironmentVariables();
 
 #region Services
 //******************************
+var applicationSettings =
+	builder.Configuration.GetSection
+	(ApplicationSettings.KeyName).Get<ApplicationSettings>();
+
 builder.Services.Configure<ApplicationSettings>
 	(builder.Configuration.GetSection(ApplicationSettings.KeyName));
 
-builder.Services.Configure<AntiDosConfig>
-	(options => builder.Configuration.GetSection("AntiDosConfig").Bind(options));
-
 builder.Services.AddMemoryCacheService();
-builder.Services.AddAntiDosFirewall();
 
-builder.Services.AddCustomDbContext
-	(connectionString: builder.Configuration.GetConnectionString("SqlConnectionString"));
+builder.Services.AddCustomDbContext(applicationSettings!.DatabaseSetting);
 
 builder.Services.AddCustomIdentity
 	(builder.Configuration.GetSection($"{nameof(ApplicationSettings)}:{nameof(IdentitySettings)}").Get<IdentitySettings>());
@@ -39,6 +38,8 @@ builder.Services.AddCustomLogger();
 builder.Services.AddAutoDetectedServices();
 
 builder.Services.AddAutoMapper(typeof(Program));
+
+builder.Services.AddCustomEFSecondLevelCache();
 
 builder.Services.AddCustomCaching();
 
@@ -74,8 +75,6 @@ else
 	app.UseSwaggerBasicAuthorization();
 	app.UseCustomSwaggerAndUI();
 }
-
-app.UseAntiDos();
 
 app.UseCors("DevCorsPolicy");
 

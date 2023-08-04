@@ -21,12 +21,16 @@ public class RegistrationServices : IDisposable
 		Services.Configure<ApplicationSettings>
 			(configuration.GetSection(ApplicationSettings.KeyName));
 
+		var applicationSettings =
+			configuration.GetSection
+			(ApplicationSettings.KeyName).Get<ApplicationSettings>();
+
 		var identitySettings =
 			configuration.GetSection($"{nameof(ApplicationSettings)}:{nameof(IdentitySettings)}").Get<IdentitySettings>();
 
 		Services.AddCustomIdentity(identitySettings);
 
-		Services.AddCustomDbContext(connectionString: Consts.General.ConnectionString);
+		Services.AddCustomDbContext(applicationSettings!.DatabaseSetting);
 
 		Services.AddLogging(config => config.AddConsole());
 

@@ -1,4 +1,5 @@
-﻿using Infrastructure.Utilities;
+﻿using EFCoreSecondLevelCacheInterceptor;
+using Infrastructure.Utilities;
 
 namespace Infrastructure.Extentions;
 
@@ -27,11 +28,29 @@ public static class RegistrationSevicesExtentions
 		.WithSingletonLifetime());
 	}
 
+
 	public static void AddRecursiveEntityUtilites(this IServiceCollection services)
 	{
 		services.AddTransient
 			(serviceType: typeof(IRecursiveEntityUtilites<>),
 				implementationType: typeof(RecursiveEntityUtilites<>));
+	}
+
+
+	public static void AddCustomEFSecondLevelCache(this IServiceCollection services)
+	{
+		services.AddEFSecondLevelCache(options =>
+		{
+			options
+				.UseMemoryCacheProvider()
+				.DisableLogging(false)
+				.UseCacheKeyPrefix("EF_")
+				.SkipCachingCommands(commandText => commandText.Contains("NEWID()", StringComparison.InvariantCultureIgnoreCase))
+				.SkipCachingResults(result => result.Value == null || (result.Value is EFTableRows rows && rows.RowsCount == 0));
+
+			options.CacheAllQueries(CacheExpirationMode.Absolute, TimeSpan.FromMinutes(30));
+		});
+
 	}
 
 
@@ -45,14 +64,51 @@ public static class RegistrationSevicesExtentions
 	}
 
 
-	public static void AddCustomDbContext(this IServiceCollection services, string? connectionString)
+	public static void AddCustomDbContext(this IServiceCollection services, DatabaseSetting databaseSetting)
 	{
-		Assert.NotEmpty(obj: connectionString, name: nameof(connectionString));
+		Assert.NotEmpty(obj: databaseSetting, name: nameof(databaseSetting));
 
-		services.AddDbContextPool<DatabaseContext>(option =>
+		switch (databaseSetting.DatabaseProviderType)
 		{
-			option.UseSqlServer(connectionString: connectionString);
-		});
+			case Settings.Enums.DatabaseProviderType.SQLite:
+				services.AddDbContextPool<DatabaseContext>((serviceProvider, optionsBuilder) =>
+				{
+					optionsBuilder
+						.UseSqlite(databaseSetting.SQLiteConnectionString, sqliteOptionsAction: current =>
+						{
+							current.MigrationsAssembly
+								(assemblyName: "Persistence.SQLite");
+						})
+						.AddInterceptors(serviceProvider.GetRequiredService<SecondLevelCacheInterceptor>());
+				});
+				break;
+
+			case Settings.Enums.DatabaseProviderType.SqlServer:
+				services.AddDbContextPool<DatabaseContext>((serviceProvider, optionsBuilder) =>
+				{
+					optionsBuilder
+						.UseSqlServer(databaseSetting.SqlServerConnectionString, sqlServerOptionsAction: current =>
+						{
+							current.MigrationsAssembly
+								(assemblyName: "Persistence.SqlServer");
+						})
+						.AddInterceptors(serviceProvider.GetRequiredService<SecondLevelCacheInterceptor>());
+				});
+				break;
+
+			case Settings.Enums.DatabaseProviderType.PostgreSql:
+				services.AddDbContextPool<DatabaseContext>((serviceProvider, optionsBuilder) =>
+				{
+					optionsBuilder
+						.UseNpgsql(databaseSetting.PostgreSqlConnectionString, npgsqlOptionsAction: current =>
+						{
+							current.MigrationsAssembly
+								(assemblyName: "Persistence.PostgreSql");
+						})
+						.AddInterceptors(serviceProvider.GetRequiredService<SecondLevelCacheInterceptor>());
+				});
+				break;
+		}
 	}
 
 

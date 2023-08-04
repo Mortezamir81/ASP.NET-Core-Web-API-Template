@@ -7,6 +7,7 @@ public class DatabaseContext : IdentityDbContext<User, Role, int>
 	#region Constractor
 	public DatabaseContext(DbContextOptions dbContextOptions) : base(dbContextOptions)
 	{
+		Database.Migrate();
 	}
 	#endregion /Constractor
 
@@ -30,6 +31,33 @@ public class DatabaseContext : IdentityDbContext<User, Role, int>
 		base.OnModelCreating(modelBuilder);
 
 		modelBuilder.ApplyConfigurationsFromAssembly(GetType().Assembly);
+
+		AddDateTimeOffsetSupportToSqllite(modelBuilder);
+	}
+
+	private void AddDateTimeOffsetSupportToSqllite(ModelBuilder modelBuilder)
+	{
+		if (Database.IsSqlite())
+		{
+			foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+			{
+				var properties =
+					entityType.ClrType.GetProperties()
+					.Where(current =>
+						current.PropertyType == typeof(DateTimeOffset) ||
+						current.PropertyType == typeof(DateTimeOffset?));
+
+				foreach (var property in properties)
+				{
+					modelBuilder
+						.Entity(name: entityType.Name)
+						.Property(propertyName: property.Name)
+						.HasConversion(converter:
+							new Microsoft.EntityFrameworkCore
+							.Storage.ValueConversion.DateTimeOffsetToBinaryConverter());
+				}
+			}
+		}
 	}
 	#endregion /Methods
 }
