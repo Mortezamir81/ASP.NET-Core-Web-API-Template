@@ -38,12 +38,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Persistence.PostgreSql\Persistence.PostgreSql.csproj" />
-    <ProjectReference Include="..\..\Persistence.Sqlite\Persistence.Sqlite.csproj" />
-    <ProjectReference Include="..\..\Persistence.SqlServer\Persistence.SqlServer.csproj" />
+    <ProjectReference Include="..\Persistence\Persistence.PostgreSql\Persistence.PostgreSql.csproj" />
+    <ProjectReference Include="..\Persistence\Persistence.Sqlite\Persistence.Sqlite.csproj" />
+    <ProjectReference Include="..\Persistence\Persistence.SqlServer\Persistence.SqlServer.csproj" />
+    <ProjectReference Include="..\Persistence\Persistence\Persistence.csproj" />
     <ProjectReference Include="..\Shared\Constants\Constants.csproj" />
     <ProjectReference Include="..\Domain\Domain.csproj" />
-    <ProjectReference Include="..\Persistence\Persistence.csproj" />
     <ProjectReference Include="..\Shared\Resources\Resources.csproj" />
     <ProjectReference Include="..\Shared\Shared\Shared.csproj" />
     <ProjectReference Include="..\Shared\Softmax Libraries\Softmax.EntityFrameworkCore.Pagination\Softmax.Data.EntityFrameworkCore.Pagination.csproj" />
