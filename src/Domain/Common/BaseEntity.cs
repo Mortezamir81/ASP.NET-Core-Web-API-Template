@@ -11,7 +11,7 @@ public class BaseEntity<TEntityKey>
 	[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 	public TEntityKey? Id { get; set; }
 
-	public DateTime? CreatedDate { get; set; }
+	public DateTimeOffset? CreatedDate { get; set; }
 
 	public int Ordering { get; set; }
 }

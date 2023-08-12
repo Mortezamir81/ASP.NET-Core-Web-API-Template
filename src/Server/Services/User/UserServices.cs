@@ -788,8 +788,8 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 	{
 		return new UserLogin(refreshToken: Guid.NewGuid())
 		{
-			Expires = DateTime.UtcNow.AddDays(30),
-			Created = DateTime.UtcNow,
+			Expires = Domain.SeedWork.Utilities.DateTimeOffsetNow.AddDays(30),
+			Created = Domain.SeedWork.Utilities.DateTimeOffsetNow,
 			CreatedByIp = ipAddress
 		};
 	}
@@ -797,7 +797,7 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 	private string CreateAccessToken(ClaimsIdentity claimsIdentity)
 	{
 		var expiredTime =
-			DateTime.UtcNow.AddMinutes(_applicationSettings.JwtSettings?.TokenExpiresTime ?? 15);
+			Domain.SeedWork.Utilities.DateTimeOffsetNow.AddMinutes(_applicationSettings.JwtSettings?.TokenExpiresTime ?? 15);
 
 		var accessToken =
 			_tokenServices.GenerateJwtToken

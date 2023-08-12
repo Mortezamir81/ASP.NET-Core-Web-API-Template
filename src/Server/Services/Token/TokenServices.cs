@@ -7,7 +7,7 @@ public class TokenServices : ITokenServices, IRegisterAsScoped
 	/// Generate jwt access token
 	/// </summary>
 	public string GenerateJwtToken
-		(string securityKey, ClaimsIdentity claimsIdentity, DateTime dateTime)
+		(string securityKey, ClaimsIdentity claimsIdentity, DateTimeOffset dateTime)
 	{
 		Assert.NotEmpty(securityKey, nameof(securityKey));
 
@@ -15,7 +15,7 @@ public class TokenServices : ITokenServices, IRegisterAsScoped
 			GenerateSigningCredentional(securityKey!);
 
 		var tokenDescriptor =
-			GenerateTokenDescriptor(claimsIdentity, dateTime, signingCredentional);
+			GenerateTokenDescriptor(claimsIdentity, dateTime.DateTime, signingCredentional);
 
 		var tokenHandler = new JwtSecurityTokenHandler();
 

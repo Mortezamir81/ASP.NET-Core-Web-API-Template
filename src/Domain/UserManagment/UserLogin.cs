@@ -9,15 +9,15 @@ public class UserLogin : BaseEntity<int>
 
 	public User? User { get; set; }
 	public int? UserId { get; set; }
-	public DateTime? Expires { get; set; }
-	public DateTime? Created { get; set; }
+	public DateTimeOffset? Expires { get; set; }
+	public DateTimeOffset? Created { get; set; }
 	public Guid RefreshToken { get; set; }
 	public string? CreatedByIp { get; set; }
 	public bool IsExpired
 	{
 		get
 		{
-			return DateTime.UtcNow > Expires;
+			return Domain.SeedWork.Utilities.DateTimeOffsetNow > Expires;
 		}
 	}
 }
