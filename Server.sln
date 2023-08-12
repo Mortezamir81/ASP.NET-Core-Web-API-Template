@@ -21,7 +21,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libraries", "Libraries", "{
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shared", "src\Shared\Shared\Shared.csproj", "{B085A113-351E-4D23-B9C7-0813F3533DB0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dtat.Result", "src\Shared\Softmax Libraries\Softmax.Result\Dtat.Result.csproj", "{358C5EE6-B2BC-4A73-9D89-F91540A107C8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Softmax.Result", "src\Shared\Softmax Libraries\Softmax.Result\Softmax.Result.csproj", "{358C5EE6-B2BC-4A73-9D89-F91540A107C8}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Softmax.Data.EntityFrameworkCore.Pagination", "src\Shared\Softmax Libraries\Softmax.EntityFrameworkCore.Pagination\Softmax.Data.EntityFrameworkCore.Pagination.csproj", "{9E137E01-8E06-4ACC-896A-E42B384C65AB}"
 EndProject
@@ -54,11 +54,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Persistence.PostgreSql", "src\Persistence\Persistence.PostgreSql\Persistence.PostgreSql.csproj", "{F472D5E2-6226-472A-B873-A2AC8D2CC031}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Persistence.PostgreSql", "src\Persistence\Persistence.PostgreSql\Persistence.PostgreSql.csproj", "{F472D5E2-6226-472A-B873-A2AC8D2CC031}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Persistence.Sqlite", "src\Persistence\Persistence.Sqlite\Persistence.Sqlite.csproj", "{2BC6FCB3-73C9-4D17-8E7F-30EEA5D56C53}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Persistence.Sqlite", "src\Persistence\Persistence.Sqlite\Persistence.Sqlite.csproj", "{2BC6FCB3-73C9-4D17-8E7F-30EEA5D56C53}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Persistence.SqlServer", "src\Persistence\Persistence.SqlServer\Persistence.SqlServer.csproj", "{FA721213-829E-401D-AF93-98B19F8D0617}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Persistence.SqlServer", "src\Persistence\Persistence.SqlServer\Persistence.SqlServer.csproj", "{FA721213-829E-401D-AF93-98B19F8D0617}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,6 +1,4 @@
-﻿using Dtat.Result;
-
-namespace Infrastructure.Middlewares;
+﻿namespace Infrastructure.Middlewares;
 
 public class GlobalExceptionMiddleware
 {

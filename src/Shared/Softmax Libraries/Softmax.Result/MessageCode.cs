@@ -1,4 +1,4 @@
-﻿namespace Dtat.Result;
+﻿namespace Softmax.Results;
 
 public enum MessageCode : int
 {

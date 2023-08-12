@@ -49,7 +49,7 @@
     <ProjectReference Include="..\Shared\Softmax Libraries\Softmax.EntityFrameworkCore.Pagination\Softmax.Data.EntityFrameworkCore.Pagination.csproj" />
     <ProjectReference Include="..\Shared\Softmax Libraries\Softmax.Logging.NLog\Dtat.Logging.NLogAdapter.csproj" />
     <ProjectReference Include="..\Shared\Softmax Libraries\Softmax.Logging\Dtat.Logging.csproj" />
-    <ProjectReference Include="..\Shared\Softmax Libraries\Softmax.Result\Dtat.Result.csproj" />
+    <ProjectReference Include="..\Shared\Softmax Libraries\Softmax.Result\Softmax.Result.csproj" />
     <ProjectReference Include="..\Shared\Softmax Libraries\Softmax.Utilities.Security\Softmax.Utilities.Security.csproj" />
     <ProjectReference Include="..\Shared\Softmax Libraries\Softmax.Swagger\Softmax.Swagger.csproj" />
   </ItemGroup>

@@ -1,14 +1,11 @@
-﻿using System;
+﻿namespace Softmax.Results;
 
-namespace Dtat.Result
+public class Result<T> : Result
 {
-	public class Result<T> : Result
+	public Result() : base()
 	{
-		public Result() : base()
-		{
-		}
-
-
-		public T Value { get; set; }
 	}
+
+
+	public T Value { get; set; }
 }
