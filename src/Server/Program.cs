@@ -26,12 +26,9 @@ builder.Services.AddMemoryCacheService();
 
 builder.Services.AddCustomDbContext(applicationSettings!.DatabaseSetting);
 
-builder.Services.AddCustomIdentity
-	(builder.Configuration.GetSection($"{nameof(ApplicationSettings)}:{nameof(IdentitySettings)}").Get<IdentitySettings>());
+builder.Services.AddCustomIdentity(applicationSettings!.IdentitySettings);
 
 builder.Services.AddCustomCORS();
-
-builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddCustomLogger();
 
@@ -47,8 +44,9 @@ builder.Services.AddCustomApiVersioning();
 
 builder.Services.AddCustomController();
 
-builder.Services.AddCustomJwtAuthentication
-	(builder.Configuration.GetSection($"{nameof(ApplicationSettings)}:{nameof(JwtSettings)}").Get<JwtSettings>());
+builder.Services.AddRequestBodySizeLimit(applicationSettings.RequestBodyLimitSize);
+
+builder.Services.AddCustomJwtAuthentication(applicationSettings.JwtSettings);
 
 builder.Services.AddCustomSwaggerGen(builder.Configuration);
 //******************************
@@ -72,6 +70,10 @@ if (app.Environment.IsProduction())
 else
 {
 	app.UseDeveloperExceptionPage();
+}
+
+if (applicationSettings.EnableSwagger == true)
+{
 	app.UseSwaggerBasicAuthorization();
 	app.UseCustomSwaggerAndUI();
 }

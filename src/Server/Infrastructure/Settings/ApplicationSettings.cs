@@ -14,4 +14,9 @@ public class ApplicationSettings
 	public required IdentitySettings IdentitySettings { get; set; }
 
 	public DatabaseSetting DatabaseSetting { get; init; }
+
+
+	public int RequestBodyLimitSize { get; set; } = 30_000_000;
+
+	public bool EnableSwagger { get; set; } = false;
 }

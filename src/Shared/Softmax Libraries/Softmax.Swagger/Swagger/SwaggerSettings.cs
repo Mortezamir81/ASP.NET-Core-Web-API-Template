@@ -2,6 +2,8 @@
 
 public class SwaggerSettings
 {
+	public bool UseHttpsForAuth { get; set; } = true;
+
 	public string? AuthenticationUrl { get; set; }
 
 	public bool EnableEnumSchema { get; set; }

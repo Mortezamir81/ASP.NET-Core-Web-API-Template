@@ -1,4 +1,6 @@
-﻿namespace Softmax.Swagger;
+﻿using Microsoft.AspNetCore.Http;
+
+namespace Softmax.Swagger;
 
 public static class SwaggerExtentions
 {
@@ -6,6 +8,8 @@ public static class SwaggerExtentions
 	{
 		var swaggerSettings = new SwaggerSettings();
 		configuration.GetSection("SwaggerSettings").Bind(swaggerSettings);
+
+		services.AddHttpContextAccessor();
 
 		services.AddTransient<IConfigureOptions<SwaggerGenOptions>, SwaggerConfigureOptions>();
 
@@ -51,6 +55,18 @@ public static class SwaggerExtentions
 			if (swaggerSettings.EnableAuthroizationResponsesAndIcon &&
 				!string.IsNullOrWhiteSpace(swaggerSettings.AuthenticationUrl))
 			{
+				using var serviceProvider =
+					services.BuildServiceProvider();
+
+				var httpContextAccessor =
+					serviceProvider.GetRequiredService<IHttpContextAccessor>();
+
+				var hostDomain =
+					httpContextAccessor.HttpContext?.Request.Host.Value;
+
+				var httpProtocol =
+					swaggerSettings.UseHttpsForAuth ? "https" : "http";
+
 				options.AddSecurityDefinition("OAuth2", new OpenApiSecurityScheme
 				{
 					Type = SecuritySchemeType.OAuth2,
@@ -58,10 +74,10 @@ public static class SwaggerExtentions
 					{
 						Password = new OpenApiOAuthFlow()
 						{
-							TokenUrl = new Uri(swaggerSettings.AuthenticationUrl),
+							TokenUrl =
+								new Uri($"{httpProtocol}://{hostDomain}/{swaggerSettings.AuthenticationUrl}"),
 						},
 					},
-
 				});
 			}
 			#endregion

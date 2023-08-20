@@ -1,5 +1,7 @@
 ﻿using EFCoreSecondLevelCacheInterceptor;
 using Infrastructure.Utilities;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 namespace Infrastructure.Extentions;
 
@@ -169,6 +171,27 @@ public static class RegistrationSevicesExtentions
 		{
 			options.GroupNameFormat = "'v'VVV";
 			options.SubstituteApiVersionInUrl = true;
+		});
+	}
+
+
+	public static void AddRequestBodySizeLimit(this IServiceCollection services, int limitSize)
+	{
+		services.Configure<IISServerOptions>(options =>
+		{
+			options.MaxRequestBodySize = limitSize;
+		});
+
+		services.Configure<KestrelServerOptions>(options =>
+		{
+			options.Limits.MaxRequestBodySize = limitSize;
+		});
+
+		services.Configure<FormOptions>(options =>
+		{
+			options.ValueLengthLimit = limitSize;
+			options.MultipartBodyLengthLimit = limitSize;
+			options.MultipartHeadersLengthLimit = limitSize;
 		});
 	}
 

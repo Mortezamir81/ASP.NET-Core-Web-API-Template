@@ -61,7 +61,16 @@ namespace Softmax.Utilities.Validation.Resources.Messages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The content or extention of your upload file is not allowed for ({0})!.
+        ///   Looks up a localized string similar to You did not specify any content file for uploading!.
+        /// </summary>
+        public static string ContentFileNull {
+            get {
+                return ResourceManager.GetString("ContentFileNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The content or extention of your upload file {0} is not allowed for ({1})!.
         /// </summary>
         public static string InvalidContentOrExtentionFile {
             get {
@@ -75,6 +84,15 @@ namespace Softmax.Utilities.Validation.Resources.Messages {
         public static string MaxLength {
             get {
                 return ResourceManager.GetString("MaxLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The {0} can not less than {1} character.
+        /// </summary>
+        public static string MinLength {
+            get {
+                return ResourceManager.GetString("MinLength", resourceCulture);
             }
         }
         
@@ -93,6 +111,15 @@ namespace Softmax.Utilities.Validation.Resources.Messages {
         public static string MostNotBeNull {
             get {
                 return ResourceManager.GetString("MostNotBeNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The {0} must between {1} and {2} character.
+        /// </summary>
+        public static string StringLength {
+            get {
+                return ResourceManager.GetString("StringLength", resourceCulture);
             }
         }
     }
