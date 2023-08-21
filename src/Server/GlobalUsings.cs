@@ -27,7 +27,7 @@ global using Microsoft.IdentityModel.Tokens;
 global using Persistence;
 global using Persistence.Repositories;
 global using Services;
-global using Shared.DICommon;
+global using Softmax.Abstraction.DICommon;
 global using Softmax.Results;
 global using Softmax.Swagger;
 global using Softmax.Utilities.Validation;

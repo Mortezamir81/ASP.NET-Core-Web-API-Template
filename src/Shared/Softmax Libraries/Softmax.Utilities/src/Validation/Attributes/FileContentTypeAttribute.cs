@@ -11,7 +11,7 @@ public class FileContentTypeAttribute : ValidationAttribute
 {
 	private bool _isBitmapCheck = false;
 	private bool _isImageCheck = false;
-	private readonly string[] _realExtensions;
+	private readonly string[]? _realExtensions;
 	private const string _defualtMessage =
 		"The content or extention of your upload file {0} extention is not allowed for ({1})";
 
@@ -36,7 +36,7 @@ public class FileContentTypeAttribute : ValidationAttribute
 	}
 
 
-	protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+	protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
 	{
 		var file = value as IFormFile;
 
@@ -59,7 +59,7 @@ public class FileContentTypeAttribute : ValidationAttribute
 		return ValidationResult.Success;
 	}
 
-	private ValidationResult CheckFile(IFormFile file, ValidationContext validationContext)
+	private ValidationResult? CheckFile(IFormFile file, ValidationContext validationContext)
 	{
 		var fileName = file.FileName;
 
@@ -125,7 +125,6 @@ public class FileContentTypeAttribute : ValidationAttribute
 
 		return ValidationResult.Success;
 	}
-
 
 	private ValidationResult InvalidFileContent(string fileName, string propertyName)
 	{

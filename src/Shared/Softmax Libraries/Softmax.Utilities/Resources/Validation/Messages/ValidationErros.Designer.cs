@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Softmax.Utilities.Validation.Resources.Messages {
+namespace Softmax.Utilities.Resources.Validation.Messages {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace Softmax.Utilities.Validation.Resources.Messages {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Softmax.Utilities.Validation.Resources.Messages.ValidationErros", typeof(ValidationErros).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Softmax.Utilities.Resources.Validation.Messages.ValidationErros", typeof(ValidationErros).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

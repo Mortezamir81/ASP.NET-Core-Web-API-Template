@@ -1,7 +1,7 @@
 ﻿global using Domain.UserManagment;
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.EntityFrameworkCore.Metadata.Builders;
-global using Shared.DICommon;
+global using Softmax.Abstraction.DICommon;
 global using Softmax.Utilities.Validation;
 global using System;
 global using System.Linq;
