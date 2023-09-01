@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-
-namespace Softmax.Swagger;
+﻿namespace Softmax.Swagger;
 
 public static class SwaggerExtentions
 {
@@ -48,38 +46,37 @@ public static class SwaggerExtentions
 
 			//Add (Lock icon) to actions that need authorization and add responses
 			if (swaggerSettings.EnableAuthroizationResponsesAndIcon)
-				options.OperationFilter<AuthorizeOperationFilter>(true, "OAuth2");
+				options.OperationFilter<AuthorizeOperationFilter>(true, "bearerAuth");
 
 			//options.OperationFilter<FileUploadFilter>();
 			#endregion /Filters
 
 			#region Add OAuth Authentication
-			if (swaggerSettings.EnableAuthroizationResponsesAndIcon &&
-				!string.IsNullOrWhiteSpace(swaggerSettings.AuthenticationUrl))
+			if (swaggerSettings.EnableAuthroizationResponsesAndIcon)
 			{
-				using var serviceProvider =
-					services.BuildServiceProvider();
-
-				var httpContextAccessor =
-					serviceProvider.GetRequiredService<IHttpContextAccessor>();
-
-				var hostDomain =
-					httpContextAccessor.HttpContext?.Request.Host.Value;
-
-				var httpProtocol =
-					swaggerSettings.UseHttpsForAuth ? "https" : "http";
-
-				options.AddSecurityDefinition("OAuth2", new OpenApiSecurityScheme
+				options.AddSecurityDefinition("bearerAuth", new OpenApiSecurityScheme
 				{
-					Type = SecuritySchemeType.OAuth2,
-					Flows = new OpenApiOAuthFlows()
+					Name = "Authorization",
+					Type = SecuritySchemeType.Http,
+					Scheme = "bearer",
+					BearerFormat = "JWT",
+					In = ParameterLocation.Header,
+					Description = "JWT Authorization header using the Bearer scheme."
+				});
+
+				options.AddSecurityRequirement(new OpenApiSecurityRequirement
+				{
 					{
-						Password = new OpenApiOAuthFlow()
+						new OpenApiSecurityScheme
 						{
-							TokenUrl =
-								new Uri($"{httpProtocol}://{hostDomain}/{swaggerSettings.AuthenticationUrl}"),
+							Reference = new OpenApiReference
+							{
+								Type = ReferenceType.SecurityScheme,
+								Id = "bearerAuth"
+							}
 						},
-					},
+						Array.Empty<string>()
+					}
 				});
 			}
 			#endregion
@@ -98,8 +95,14 @@ public static class SwaggerExtentions
 			#region Customizing
 			options.DisplayRequestDuration();
 
-			if (!string.IsNullOrWhiteSpace(uiOptions?.CustomJsPath))
-				options.InjectJavascript(uiOptions?.CustomJsPath);
+			if (uiOptions?.CustomJsPathes != null)
+			{
+				foreach (var jsPath in uiOptions.CustomJsPathes)
+				{
+					if (!string.IsNullOrWhiteSpace(jsPath))
+						options.InjectJavascript(jsPath);
+				}
+			}
 
 			options.DocExpansion(DocExpansion.None);
 			#endregion

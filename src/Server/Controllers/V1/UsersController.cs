@@ -34,23 +34,6 @@ public class UsersController : BaseController
 		return serviceResult.ApiResult();
 	}
 
-	/// <summary>
-	/// Login user with username and password by OAuth2
-	/// </summary>
-	[HttpPost("LoginByOAuth")]
-	public async Task<ActionResult<Result<LoginByOAuthResponseViewModel>>>
-		LoginByOAuthAsync([FromForm] LoginByOAuthRequestViewModel requestViewModel)
-	{
-		var serviceResult =
-			await _userServices.LoginByOAuthAsync(requestViewModel, ipAddress: GetIPAddress());
-
-		if (!serviceResult.IsSuccess)
-		{
-			return BadRequest();
-		}
-
-		return Ok(serviceResult.Value);
-	}
 
 	/// <summary>
 	/// Create a new User

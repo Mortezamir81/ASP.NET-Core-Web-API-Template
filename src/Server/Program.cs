@@ -77,7 +77,11 @@ if (applicationSettings.EnableSwagger == true)
 	app.UseSwaggerBasicAuthorization();
 	app.UseCustomSwaggerAndUI(uiOptions: new CustomSwaggerUiOptions
 	{
-		CustomJsPath = "/js/swagger/sort.js"
+		CustomJsPathes = new List<string>
+		{
+			"/js/swagger/sort.js",
+			"/js/swagger/swagger-utils.js"
+		}
 	});
 }
 

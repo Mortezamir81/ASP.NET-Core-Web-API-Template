@@ -23,10 +23,6 @@ public interface IUserServices
 		LoginAsync(LoginRequestViewModel loginRequestViewModel, string? ipAddress);
 
 
-	Task<Result<LoginByOAuthResponseViewModel>>
-		LoginByOAuthAsync(LoginByOAuthRequestViewModel requestViewModel, string? ipAddress);
-
-
 	Task<Result> ChangeUserRoleAsync
 		(ChangeUserRoleRequestViewModel changeUserRoleRequestViewModel, int adminId);
 

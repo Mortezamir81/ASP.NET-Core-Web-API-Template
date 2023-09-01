@@ -2,10 +2,6 @@
 
 public class SwaggerSettings
 {
-	public bool UseHttpsForAuth { get; set; } = true;
-
-	public string? AuthenticationUrl { get; set; }
-
 	public bool EnableEnumSchema { get; set; }
 
 	public bool EnableXmlDocs { get; set; }
@@ -17,5 +13,5 @@ public class SwaggerSettings
 
 public class CustomSwaggerUiOptions
 {
-	public string? CustomJsPath { get; set; }
+	public List<string>? CustomJsPathes { get; set; }
 }

@@ -213,15 +213,16 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 		var claimsIdentity =
 			await CreateClaimsIdentity(user: userLogin.User);
 
-		var accessToken =
+		var tokenResult =
 			CreateAccessToken(claimsIdentity: claimsIdentity);
 
 		var response =
 			new LoginResponseViewModel()
 			{
-				Token = accessToken,
+				Token = tokenResult.token,
 				UserName = userLogin!.User?.UserName,
 				RefreshToken = newRefreshToken,
+				ExpiresIn = tokenResult.expiresIn,
 			};
 
 		result.Value = response;
@@ -476,7 +477,7 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 		var claimsIdentity =
 			await CreateClaimsIdentity(user: foundedUser);
 
-		var accessToken =
+		var tokenResult =
 			CreateAccessToken(claimsIdentity: claimsIdentity);
 
 		string successMessage = string.Format
@@ -487,105 +488,10 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 		var response =
 			new LoginResponseViewModel()
 			{
-				Token = accessToken,
+				Token = tokenResult.token,
 				UserName = foundedUser.UserName,
 				RefreshToken = refreshToken,
-			};
-
-		result.Value = response;
-
-		await AddUserLoggedInToCache(foundedUser.Id);
-
-		_logger.LogInformation(Resources.Resource.UserLoginSuccessfulInformation, parameters: new List<object>
-		{
-			new
-			{
-				UserName = requestViewModel.UserName,
-			}
-		});
-
-		return result;
-	}
-
-
-	/// <summary>
-	/// Login a user by OAuth standard Authentication (for use in swagger ui)
-	/// </summary>
-	/// <param name="requestViewModel"></param>
-	/// <param name="ipAddress"></param>
-	/// <returns>Success or Failed Result</returns>
-	public async Task<Result<LoginByOAuthResponseViewModel>> LoginByOAuthAsync
-		(LoginByOAuthRequestViewModel requestViewModel, string? ipAddress)
-	{
-		var result =
-			new Result<LoginByOAuthResponseViewModel>();
-
-		if (!requestViewModel.Grant_Type?.Equals("password", StringComparison.OrdinalIgnoreCase) == true)
-		{
-			string errorMessage = "OAuth flow is not password.";
-
-			result.AddErrorMessage(errorMessage);
-
-			return result;
-		}
-
-		var foundedUser =
-			await GetUserByName(requestViewModel.UserName!);
-
-		if (foundedUser == null)
-		{
-			string errorMessage = string.Format
-				(Resources.Messages.ErrorMessages.InvalidUserAndOrPass);
-
-			result.AddErrorMessage(errorMessage);
-
-			return result;
-		}
-
-		var isPasswordValid =
-			await CheckPasswordValid(user: foundedUser, password: requestViewModel.Password!);
-
-		if (!isPasswordValid)
-		{
-			string errorMessage = string.Format
-				(Resources.Messages.ErrorMessages.InvalidUserAndOrPass);
-
-			result.AddErrorMessage(errorMessage);
-
-			return result;
-		}
-
-		if (foundedUser.IsBanned)
-		{
-			string errorMessage = string.Format
-				(Resources.Messages.ErrorMessages.UserBanned);
-
-			result.AddErrorMessage(errorMessage);
-
-			return result;
-		}
-
-		var refreshToken =
-			await AddRefreshTokenToDB(userId: foundedUser.Id, ipAddress: ipAddress);
-
-		var claimsIdentity =
-			await CreateClaimsIdentity(user: foundedUser);
-
-		var accessToken =
-			CreateAccessToken(claimsIdentity: claimsIdentity);
-
-		string successMessage = string.Format
-			(Resources.Messages.SuccessMessages.LoginSuccessful);
-
-		result.AddSuccessMessage(successMessage);
-
-		var response =
-			new LoginByOAuthResponseViewModel()
-			{
-				access_token = accessToken,
-				username = foundedUser.UserName,
-				refresh_token = refreshToken.ToString(),
-				token_type = "Bearer",
+				ExpiresIn = tokenResult.expiresIn,
 			};
 
 		result.Value = response;
@@ -794,7 +700,7 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 		};
 	}
 
-	private string CreateAccessToken(ClaimsIdentity claimsIdentity)
+	private (long expiresIn, string token) CreateAccessToken(ClaimsIdentity claimsIdentity)
 	{
 		var expiredTime =
 			Domain.SeedWork.Utilities.DateTimeOffsetNow.AddMinutes(_applicationSettings.JwtSettings?.TokenExpiresTime ?? 15);
@@ -805,7 +711,10 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 				claimsIdentity: claimsIdentity,
 				dateTime: expiredTime);
 
-		return accessToken;
+		var expiresIn =
+			(long) TimeSpan.FromMinutes(_applicationSettings.JwtSettings?.TokenExpiresTime ?? 15).TotalSeconds;
+
+		return (expiresIn: expiresIn, token: accessToken);
 	}
 
 	private async Task<User?> GetUserByName(string name)

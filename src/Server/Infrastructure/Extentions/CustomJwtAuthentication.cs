@@ -30,7 +30,7 @@ public static class CustomJwtAuthentication
 				{
 					ClockSkew = TimeSpan.Zero,
 					RequireSignedTokens = true,
-					
+
 					ValidateIssuerSigningKey = true,
 					IssuerSigningKey = new SymmetricSecurityKey(secretkey),
 
@@ -48,6 +48,40 @@ public static class CustomJwtAuthentication
 
 				options.Events = new JwtBearerEvents
 				{
+					OnMessageReceived = async context =>
+					{
+						string? access_token =
+							context.Request.Cookies["access_token"] ?? context.Request.Cookies["token"];
+
+						if (!string.IsNullOrEmpty(access_token))
+						{
+							context.Token = access_token;
+
+							return;
+						}
+
+						access_token = context.Request.Query["access_token"];
+
+						if (!string.IsNullOrEmpty(access_token))
+						{
+							context.Token = access_token;
+
+							return;
+						}
+
+						access_token = context.Request.Query["token"];
+
+						if (!string.IsNullOrEmpty(access_token))
+						{
+							context.Token = access_token;
+
+							return;
+						}
+
+						context.Token = access_token;
+
+						await Task.CompletedTask;
+					},
 					OnTokenValidated = async context =>
 					{
 						var cache =
