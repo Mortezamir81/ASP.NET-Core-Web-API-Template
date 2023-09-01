@@ -7,6 +7,46 @@ namespace Infrastructure.Extentions;
 
 public static class RegistrationSevicesExtentions
 {
+	public static void RegisterServices
+		(this IServiceCollection services, IConfiguration configuration, ApplicationSettings? applicationSettings)
+	{
+		if (applicationSettings == null)
+		{
+			throw new ArgumentNullException(nameof(applicationSettings));
+		}
+
+		services.Configure<ApplicationSettings>
+			(configuration.GetSection(ApplicationSettings.KeyName));
+
+		services.AddMemoryCacheService();
+
+		services.AddCustomDbContext(applicationSettings!.DatabaseSetting);
+
+		services.AddCustomIdentity(applicationSettings!.IdentitySettings);
+
+		services.AddCustomCORS();
+
+		services.AddCustomLogger();
+
+		services.AddAutoDetectedServices();
+
+		services.AddAutoMapper(typeof(Program));
+
+		services.AddCustomEFSecondLevelCache();
+
+		services.AddCustomCaching();
+
+		services.AddCustomApiVersioning();
+
+		services.AddCustomController();
+
+		services.AddRequestBodySizeLimit(applicationSettings.RequestBodyLimitSize);
+
+		services.AddCustomJwtAuthentication(applicationSettings.JwtSettings);
+
+		services.AddCustomSwaggerGen(configuration);
+	}
+
 	public static void AddAutoDetectedServices(this IServiceCollection services)
 	{
 		services.Scan(scan => scan
