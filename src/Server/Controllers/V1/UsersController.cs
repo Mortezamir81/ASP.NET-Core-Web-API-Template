@@ -3,18 +3,11 @@
 /// <summary>
 /// User Managment and Authentication or Authorization
 /// </summary>
-public class UsersController : BaseController
+public partial class UsersController : BaseController
 {
 	#region Fields
-	private readonly IUserServices _userServices;
+	[AutoInject] private readonly IUserServices _userServices;
 	#endregion /Fields
-
-	#region Constractor
-	public UsersController(IUserServices userServices) : base()
-	{
-		_userServices = userServices;
-	}
-	#endregion Constractor
 
 	#region HttpGet
 

@@ -913,14 +913,13 @@ public class UserServicesTests : IClassFixture<RegistrationServices>
 	private UserServices CreateUserServices()
 	{
 		return new UserServices
-			(_mockMapper.Object,
-			_mockEasyCachingProvider.Object,
-			_tokenServices,
-			_mockLogger.Object,
-			_userRepository,
-			options: _options,
-			userManager: _userManager,
-			roleManager: _roleManager);
+			(autoInjectedCache: _mockEasyCachingProvider.Object,
+			autoInjectedTokenServices: _tokenServices,
+			autoInjectedLogger: _mockLogger.Object,
+			autoInjectedUserRepository: _userRepository,
+			autoInjectedOptions: _options,
+			autoInjectedUserManager: _userManager,
+			autoInjectedRoleManager: _roleManager);
 	}
 	#endregion /OtherMethods
 }

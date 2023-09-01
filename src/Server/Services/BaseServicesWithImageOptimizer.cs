@@ -3,15 +3,9 @@ using Softmax.Utilities.Image;
 
 namespace Services;
 
-public abstract class BaseServicesWithSaveFile
+public abstract partial class BaseServicesWithSaveFile
 {
-	protected readonly IFileManager _fileManager;
-
-	public BaseServicesWithSaveFile(IFileManager fileManager) : base()
-	{
-		_fileManager = fileManager;
-	}
-
+	[AutoInject] protected readonly IFileManager _fileManager;
 
 	protected async Task<ApplicationFile> SaveImageWithRandomNameAsync(SaveImageSetting saveFileSetting)
 	{

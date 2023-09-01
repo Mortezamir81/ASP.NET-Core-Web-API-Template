@@ -3,37 +3,14 @@
 public partial class UserServices : BaseServices, IUserServices, IRegisterAsScoped
 {
 	#region Fields
-	private readonly IMapper _mapper;
-	private readonly IEasyCachingProvider _cache;
-	private readonly ITokenServices _tokenServices;
-	private readonly ILogger<UserServices> _logger;
-	private readonly IUserRepository _userRepository;
-	private readonly UserManager<User> _userManager;
-	private readonly RoleManager<Role> _roleManager;
-	private readonly ApplicationSettings _applicationSettings;
+	[AutoInject] private readonly IEasyCachingProvider _cache;
+	[AutoInject] private readonly ITokenServices _tokenServices;
+	[AutoInject] private readonly ILogger<UserServices> _logger;
+	[AutoInject] private readonly IUserRepository _userRepository;
+	[AutoInject] private readonly UserManager<User> _userManager;
+	[AutoInject] private readonly RoleManager<Role> _roleManager;
+	[AutoInject] private readonly IOptions<ApplicationSettings> _options;
 	#endregion /Fields
-
-	#region Constractor
-	public UserServices
-		(IMapper mapper,
-		IEasyCachingProvider cache,
-		ITokenServices tokenServices,
-		ILogger<UserServices> logger,
-		IUserRepository userRepository,
-		UserManager<User> userManager,
-		RoleManager<Role> roleManager,
-		IOptions<ApplicationSettings> options) : base()
-	{
-		_mapper = mapper;
-		_cache = cache;
-		_tokenServices = tokenServices;
-		_logger = logger;
-		_userRepository = userRepository;
-		_userManager = userManager;
-		_roleManager = roleManager;
-		_applicationSettings = options.Value;
-	}
-	#endregion /Constractor
 
 	#region Public Methods
 	/// <summary>
@@ -703,16 +680,16 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 	private (long expiresIn, string token) CreateAccessToken(ClaimsIdentity claimsIdentity)
 	{
 		var expiredTime =
-			Domain.SeedWork.Utilities.DateTimeOffsetNow.AddMinutes(_applicationSettings.JwtSettings?.TokenExpiresTime ?? 15);
+			Domain.SeedWork.Utilities.DateTimeOffsetNow.AddMinutes(_options.Value.JwtSettings?.TokenExpiresTime ?? 15);
 
 		var accessToken =
 			_tokenServices.GenerateJwtToken
-				(securityKey: _applicationSettings.JwtSettings!.SecretKeyForToken,
+				(securityKey: _options.Value.JwtSettings!.SecretKeyForToken,
 				claimsIdentity: claimsIdentity,
 				dateTime: expiredTime);
 
 		var expiresIn =
-			(long) TimeSpan.FromMinutes(_applicationSettings.JwtSettings?.TokenExpiresTime ?? 15).TotalSeconds;
+			(long) TimeSpan.FromMinutes(_options.Value.JwtSettings?.TokenExpiresTime ?? 15).TotalSeconds;
 
 		return (expiresIn: expiresIn, token: accessToken);
 	}
