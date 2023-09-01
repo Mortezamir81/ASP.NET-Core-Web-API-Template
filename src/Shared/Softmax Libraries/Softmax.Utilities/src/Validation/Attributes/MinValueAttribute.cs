@@ -21,10 +21,10 @@ public class MinValueAttribute : ValidationAttribute
 
 		long? propertyValue = null;
 
-		if (validationContext.ObjectType == typeof(int) ||
-			validationContext.ObjectType == typeof(long) ||
-			validationContext.ObjectType == typeof(int?) ||
-			validationContext.ObjectType == typeof(long?))
+		if (value.GetType() == typeof(int) ||
+			value.GetType() == typeof(long) ||
+			value.GetType() == typeof(int?) ||
+			value.GetType() == typeof(long?))
 		{
 			propertyValue = Convert.ToInt64(value);
 		}

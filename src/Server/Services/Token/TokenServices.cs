@@ -15,7 +15,7 @@ public class TokenServices : ITokenServices, IRegisterAsScoped
 			GenerateSigningCredentional(securityKey!);
 
 		var tokenDescriptor =
-			GenerateTokenDescriptor(claimsIdentity, dateTime.DateTime, signingCredentional);
+			GenerateTokenDescriptor(claimsIdentity, dateTime.UtcDateTime, signingCredentional);
 
 		var tokenHandler = new JwtSecurityTokenHandler();
 

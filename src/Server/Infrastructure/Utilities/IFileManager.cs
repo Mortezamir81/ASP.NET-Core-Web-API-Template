@@ -10,5 +10,12 @@ public interface IFileManager
 		(IFormFile file, string path, bool includeWebRootPath = false, string? root = null);
 
 
+	Task<SaveFileResult> SaveStreamWithRandomeNameAsync
+		(Stream stream, string fileExtension, string path, bool includeWebRootPath = false, string? root = null);
+
+
 	bool DeleteFile(string? path, bool includeWebRootPath = false, string? root = null);
+
+
+	public string? GetFileExtention(string fileName);
 }

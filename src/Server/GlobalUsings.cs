@@ -1,5 +1,6 @@
 ﻿global using AutoMapper;
 global using DNTCommon.Web.Core;
+global using Domain;
 global using Domain.UserManagment;
 global using Dtat.Logging;
 global using Dtat.Logging.NLogAdapter;

@@ -14,3 +14,8 @@ public class SwaggerSettings
 
 	public bool EnableAuthroizationResponsesAndIcon { get; set; }
 }
+
+public class CustomSwaggerUiOptions
+{
+	public string? CustomJsPath { get; set; }
+}

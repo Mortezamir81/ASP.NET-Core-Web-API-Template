@@ -49,6 +49,8 @@ public static class SwaggerExtentions
 			//Add (Lock icon) to actions that need authorization and add responses
 			if (swaggerSettings.EnableAuthroizationResponsesAndIcon)
 				options.OperationFilter<AuthorizeOperationFilter>(true, "OAuth2");
+
+			//options.OperationFilter<FileUploadFilter>();
 			#endregion /Filters
 
 			#region Add OAuth Authentication
@@ -84,7 +86,7 @@ public static class SwaggerExtentions
 		});
 	}
 
-	public static void UseCustomSwaggerAndUI(this IApplicationBuilder app)
+	public static void UseCustomSwaggerAndUI(this IApplicationBuilder app, CustomSwaggerUiOptions? uiOptions = null)
 	{
 		app.UseSwagger();
 
@@ -95,6 +97,10 @@ public static class SwaggerExtentions
 		{
 			#region Customizing
 			options.DisplayRequestDuration();
+
+			if (!string.IsNullOrWhiteSpace(uiOptions?.CustomJsPath))
+				options.InjectJavascript(uiOptions?.CustomJsPath);
+
 			options.DocExpansion(DocExpansion.None);
 			#endregion
 

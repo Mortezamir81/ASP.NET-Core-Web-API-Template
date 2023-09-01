@@ -45,7 +45,7 @@ public class FileContentTypeAttribute : ValidationAttribute
 
 		var files = value as IList<IFormFile>;
 
-		if (files != null)
+		if (files == null)
 			return ValidationResult.Success;
 
 		foreach (var currentFile in files)

@@ -75,10 +75,24 @@ else
 if (applicationSettings.EnableSwagger == true)
 {
 	app.UseSwaggerBasicAuthorization();
-	app.UseCustomSwaggerAndUI();
+	app.UseCustomSwaggerAndUI(uiOptions: new CustomSwaggerUiOptions
+	{
+		CustomJsPath = "/js/swagger/sort.js"
+	});
 }
 
 app.UseCors("DevCorsPolicy");
+
+app.UseStaticFiles(new StaticFileOptions()
+{
+	OnPrepareResponse = ctx =>
+	{
+		ctx.Context.Response.Headers.Append("Access-Control-Allow-Origin", "*");
+		ctx.Context.Response.Headers.Append("Access-Control-Allow-Headers",
+		  "Origin, X-Requested-With, Content-Type, Accept");
+	},
+
+});
 
 app.UseRouting();
 
