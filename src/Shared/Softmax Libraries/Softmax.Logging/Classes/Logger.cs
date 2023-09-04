@@ -1,24 +1,24 @@
 ﻿using Microsoft.AspNetCore.Http;
 using System;
-using System.Reflection;
-using System.Globalization;
-using System.Threading;
-using System.Runtime.CompilerServices;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Threading;
 
 namespace Dtat.Logging;
 
 public abstract class LoggerBase
 {
 	#region Constructor
-	protected LoggerBase(IHttpContextAccessor httpContextAccessor = null) : base()
+	protected LoggerBase(IHttpContextAccessor? httpContextAccessor = null) : base()
 	{
 		HttpContextAccessor = httpContextAccessor;
 	}
 	#endregion /Constructor
 
 	#region Properties
-	public IHttpContextAccessor HttpContextAccessor { get; }
+	public IHttpContextAccessor? HttpContextAccessor { get; }
 	public bool IsTraceEnabled { get; set; } = false;
 	public bool IsDebugEnabled { get; set; } = false;
 	public bool IsInformationEnabled { get; set; } = false;
@@ -28,23 +28,22 @@ public abstract class LoggerBase
 	#endregion /Properties
 
 	#region GetExceptions
-	protected virtual List<object> GetExceptions(Exception exception)
+	protected virtual List<ExceptionModel>? GetExceptions(Exception? exception)
 	{
 		if (exception == null)
 			return null;
 
-		var exceptions = new List<object>();
+		var exceptions = new List<ExceptionModel>();
 
-		Exception currentException = exception;
+		Exception? currentException = exception;
 
 		int index = 1;
 
 		while (currentException != null)
 		{
-			exceptions.Add(new
+			exceptions.Add(new ExceptionModel(message: $"{currentException.Message} - (Message Level: {index})")
 			{
-				Message = $"{currentException.Message} - (Message Level: {index})",
-				currentException.StackTrace,
+				StackTrace = currentException.StackTrace,
 			});
 
 			currentException =
@@ -58,9 +57,9 @@ public abstract class LoggerBase
 	#endregion /GetExceptions
 
 	#region GetParameters
-	protected virtual List<object> GetParameters(List<object> parameters)
+	protected virtual List<object>? GetParameters(List<object?>? parameters)
 	{
-		List<object> returnValue = null;
+		List<object>? returnValue = null;
 
 		if (parameters != null && parameters.Count > 0)
 		{
@@ -79,23 +78,23 @@ public abstract class LoggerBase
 	}
 	#endregion /GetParameters
 
-	protected abstract void LogByFavoriteLibrary(LogModel logModel, Exception exception);
+	protected abstract void LogByFavoriteLibrary(LogModel logModel, Exception? exception);
 }
 
 public abstract class Logger<T> : LoggerBase, ILogger<T> where T : class
 {
 	#region Constructor
-	protected Logger(IHttpContextAccessor httpContextAccessor = null) : base(httpContextAccessor)
+	protected Logger(IHttpContextAccessor? httpContextAccessor = null) : base(httpContextAccessor)
 	{
 	}
 	#endregion /Constructor
 
 	#region Log
 	protected bool Log(string logLevel,
-		string message,
-		Exception exception = null,
-		List<object> parameters = null,
-		string methodName = null)
+		string? message,
+		Exception? exception = null,
+		List<object?>? parameters = null,
+		string? methodName = null)
 	{
 		try
 		{
@@ -118,9 +117,8 @@ public abstract class Logger<T> : LoggerBase, ILogger<T> where T : class
 			var httpRequest =
 				HttpContextAccessor?.HttpContext?.Request;
 
-			var logModel = new LogModel
+			var logModel = new LogModel(logLevel: logLevel)
 			{
-				LogLevel = logLevel,
 				Message = message,
 				Namespace = typeof(T).Namespace,
 				RemoteIP = connection?.RemoteIpAddress?.ToString(),
@@ -129,7 +127,7 @@ public abstract class Logger<T> : LoggerBase, ILogger<T> where T : class
 				UserName = HttpContextAccessor?.HttpContext?.User?.Identity?.Name,
 				RequestPath = httpRequest?.Path,
 				HttpReferrer = httpRequest?.Headers["Referer"],
-				ApplicationName = typeof(T).GetTypeInfo().Assembly.FullName.ToString(),
+				ApplicationName = typeof(T).GetTypeInfo()?.Assembly?.FullName?.ToString(),
 				ClassName = typeof(T).Name,
 				Parameters = parameters,
 				Exceptions = GetExceptions(exception: exception),
@@ -154,8 +152,8 @@ public abstract class Logger<T> : LoggerBase, ILogger<T> where T : class
 	#region LogTrace
 	public virtual bool LogTrace
 		(string message,
-		[CallerMemberName] string methodName = null,
-		List<object> parameters = null)
+		[CallerMemberName] string? methodName = null,
+		List<object?>? parameters = null)
 	{
 		if (string.IsNullOrWhiteSpace(message))
 			return false;
@@ -177,8 +175,8 @@ public abstract class Logger<T> : LoggerBase, ILogger<T> where T : class
 	#region LogDebug
 	public virtual bool LogDebug
 		(string message,
-		[CallerMemberName] string methodName = null,
-		List<object> parameters = null)
+		[CallerMemberName] string? methodName = null,
+		List<object?>? parameters = null)
 	{
 		if (string.IsNullOrWhiteSpace(message))
 			return false;
@@ -200,8 +198,8 @@ public abstract class Logger<T> : LoggerBase, ILogger<T> where T : class
 	#region LogInformation
 	public virtual bool LogInformation
 		(string message,
-		[CallerMemberName] string methodName = null,
-		List<object> parameters = null)
+		[CallerMemberName] string? methodName = null,
+		List<object?>? parameters = null)
 	{
 		if (string.IsNullOrWhiteSpace(message))
 			return false;
@@ -223,8 +221,8 @@ public abstract class Logger<T> : LoggerBase, ILogger<T> where T : class
 	#region LogWarning
 	public virtual bool LogWarning
 		(string message,
-		[CallerMemberName] string methodName = null,
-		List<object> parameters = null)
+		[CallerMemberName] string? methodName = null,
+		List<object?>? parameters = null)
 	{
 		if (string.IsNullOrWhiteSpace(message))
 			return false;
@@ -246,9 +244,9 @@ public abstract class Logger<T> : LoggerBase, ILogger<T> where T : class
 	#region LogError
 	public virtual bool LogError
 		(Exception exception,
-		string message = null,
-		[CallerMemberName] string methodName = null,
-		List<object> parameters = null)
+		string? message = null,
+		[CallerMemberName] string? methodName = null,
+		List<object?>? parameters = null)
 	{
 		if (exception == null)
 			return false;
@@ -270,9 +268,9 @@ public abstract class Logger<T> : LoggerBase, ILogger<T> where T : class
 	#region LogCritical
 	public virtual bool LogCritical
 		(Exception exception,
-		string message = null,
-		[CallerMemberName] string methodName = null,
-		List<object> parameters = null)
+		string? message = null,
+		[CallerMemberName] string? methodName = null,
+		List<object?>? parameters = null)
 	{
 		if (exception == null)
 			return false;
@@ -295,18 +293,18 @@ public abstract class Logger<T> : LoggerBase, ILogger<T> where T : class
 public abstract class Logger : LoggerBase, ILogger
 {
 	#region Constructor
-	protected Logger(IHttpContextAccessor httpContextAccessor = null) : base(httpContextAccessor)
+	protected Logger(IHttpContextAccessor? httpContextAccessor = null) : base(httpContextAccessor)
 	{
 	}
 	#endregion /Constructor
 
 	#region Log
 	protected bool Log(string logLevel,
-		string message,
+		string? message,
 		Type classType,
-		Exception exception = null,
-		List<object> parameters = null,
-		string methodName = null)
+		Exception? exception = null,
+		List<object?>? parameters = null,
+		string? methodName = null)
 	{
 		try
 		{
@@ -329,9 +327,8 @@ public abstract class Logger : LoggerBase, ILogger
 			var httpRequest =
 				HttpContextAccessor?.HttpContext?.Request;
 
-			var logModel = new LogModel
+			var logModel = new LogModel(logLevel: logLevel)
 			{
-				LogLevel = logLevel,
 				Message = message,
 				Namespace = classType?.Namespace,
 				RemoteIP = connection?.RemoteIpAddress?.ToString(),
@@ -340,7 +337,7 @@ public abstract class Logger : LoggerBase, ILogger
 				UserName = HttpContextAccessor?.HttpContext?.User?.Identity?.Name,
 				RequestPath = httpRequest?.Path,
 				HttpReferrer = httpRequest?.Headers["Referer"],
-				ApplicationName = classType?.Assembly.FullName.ToString(),
+				ApplicationName = classType?.Assembly?.FullName?.ToString(),
 				ClassName = classType?.Name,
 				Parameters = parameters,
 				Exceptions = GetExceptions(exception: exception),
@@ -352,7 +349,6 @@ public abstract class Logger : LoggerBase, ILogger
 			// **************************************************
 			Thread.CurrentThread.CurrentCulture = currentCultureInfo;
 			// **************************************************
-
 
 			return true;
 		}
@@ -367,8 +363,8 @@ public abstract class Logger : LoggerBase, ILogger
 	public virtual bool LogTrace
 		(string message,
 		Type classType,
-		[CallerMemberName] string methodName = null,
-		List<object> parameters = null)
+		[CallerMemberName] string? methodName = null,
+		List<object?>? parameters = null)
 	{
 		if (string.IsNullOrWhiteSpace(message))
 			return false;
@@ -392,8 +388,8 @@ public abstract class Logger : LoggerBase, ILogger
 	public virtual bool LogDebug
 		(string message,
 		Type classType,
-		[CallerMemberName] string methodName = null,
-		List<object> parameters = null)
+		[CallerMemberName] string? methodName = null,
+		List<object?>? parameters = null)
 	{
 		if (string.IsNullOrWhiteSpace(message))
 			return false;
@@ -417,8 +413,8 @@ public abstract class Logger : LoggerBase, ILogger
 	public virtual bool LogInformation
 		(string message,
 		Type classType,
-		[CallerMemberName] string methodName = null,
-		List<object> parameters = null)
+		[CallerMemberName] string? methodName = null,
+		List<object?>? parameters = null)
 	{
 		if (string.IsNullOrWhiteSpace(message))
 			return false;
@@ -442,8 +438,8 @@ public abstract class Logger : LoggerBase, ILogger
 	public virtual bool LogWarning
 		(string message,
 		Type classType,
-		[CallerMemberName] string methodName = null,
-		List<object> parameters = null)
+		[CallerMemberName] string? methodName = null,
+		List<object?>? parameters = null)
 	{
 		if (string.IsNullOrWhiteSpace(message))
 			return false;
@@ -467,9 +463,9 @@ public abstract class Logger : LoggerBase, ILogger
 	public virtual bool LogError
 		(Exception exception,
 		Type classType,
-		string message = null,
-		[CallerMemberName] string methodName = null,
-		List<object> parameters = null)
+		string? message = null,
+		[CallerMemberName] string? methodName = null,
+		List<object?>? parameters = null)
 	{
 		if (exception == null)
 			return false;
@@ -493,9 +489,9 @@ public abstract class Logger : LoggerBase, ILogger
 	public virtual bool LogCritical
 		(Exception exception,
 		Type classType,
-		string message = null,
-		[CallerMemberName] string methodName = null,
-		List<object> parameters = null)
+		string? message = null,
+		[CallerMemberName] string? methodName = null,
+		List<object?>? parameters = null)
 	{
 		if (exception == null)
 			return false;

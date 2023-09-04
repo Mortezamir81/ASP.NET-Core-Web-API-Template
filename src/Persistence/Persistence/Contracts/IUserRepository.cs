@@ -23,12 +23,6 @@ public interface IUserRepository
 	Task<UserLogin?> GetUserLoginsAsync(Guid refreshToken, bool includeUser);
 
 
-	Task<LoginViewModel?> LoginAsync(string? username, string hashedPassword);
-
-
-	Task<int?> GetUserRoleAsync(int userId);
-
-
 	Task AddAsync
 		(User entity, CancellationToken cancellationToken = default);
 

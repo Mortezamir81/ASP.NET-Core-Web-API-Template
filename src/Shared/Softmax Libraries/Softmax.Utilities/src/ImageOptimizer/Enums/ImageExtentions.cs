@@ -4,6 +4,7 @@ public enum ImageExtensions : int
 {
 	jpg,
 	png,
+	webp
 }
 
 public static class ImageExtension
@@ -14,6 +15,7 @@ public static class ImageExtension
 		{
 			ImageExtensions.jpg => nameof(ImageExtensions.jpg),
 			ImageExtensions.png => nameof(ImageExtensions.png),
+			ImageExtensions.webp => nameof(ImageExtensions.webp),
 			_ => nameof(ImageExtensions.jpg),
 		};
 	}
@@ -24,6 +26,7 @@ public static class ImageExtension
 		{
 			ImageExtensions.jpg => nameof(ImageExtensions.jpg),
 			ImageExtensions.png => nameof(ImageExtensions.png),
+			ImageExtensions.webp => nameof(ImageExtensions.webp),
 			_ => nameof(ImageExtensions.jpg),
 		};
 	}

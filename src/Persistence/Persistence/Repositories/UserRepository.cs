@@ -129,47 +129,6 @@ public class UserRepository : IUserRepository, IRegisterAsScoped
 	}
 
 
-	public async Task<LoginViewModel?> LoginAsync(string? username, string hashedPassword)
-	{
-		Assert.NotEmpty(obj: username, nameof(username));
-
-		Assert.NotEmpty(obj: username, nameof(hashedPassword));
-
-		//var result =
-		//	await _databaseContext.Users!
-		//		.AsNoTracking()
-		//		.Where(current => current.UserName == username)
-		//		.Where(current => current.PasswordHash == hashedPassword)
-		//		.Select(current => new LoginViewModel(current.UserName, current.ro!.Value, current.UserRole!.Name)
-		//		{
-		//			Id = current.Id,
-		//			SecurityStamp = current.SecurityStamp!,
-		//			IsBanned = current.IsBanned,
-		//		})
-		//		.FirstOrDefaultAsync()
-		//		;
-
-		return null;
-	}
-
-
-	public async Task<int?> GetUserRoleAsync(int userId)
-	{
-		//var roleId =
-		//	await _entities
-		//	.Where(current => current.Id == userId)
-		//	.Select(current => current.RoleId)
-		//	.FirstOrDefaultAsync();
-
-		//if (!roleId.HasValue || roleId == 0)
-		//	return null;
-
-		//return roleId;
-
-		return null;
-	}
-
-
 	public async Task AddAsync
 		(User entity, CancellationToken cancellationToken = default)
 	{

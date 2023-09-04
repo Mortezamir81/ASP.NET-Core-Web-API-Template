@@ -26,7 +26,7 @@ public class LogInputParameterAttribute : ActionFilterAttribute, IRegisterAsScop
 				var actionName =
 					filterContext.RouteData.Values["action"]?.ToString();
 
-				var parameters = new List<object>
+				var parameters = new List<object?>
 				{
 					requestViewModel,
 				};

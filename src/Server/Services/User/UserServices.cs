@@ -62,10 +62,11 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 
 		result.AddSuccessMessage(successMessage);
 
-		_logger.LogWarning(successMessage, parameters: new List<object>
-		{
-			userId
-		});
+		if (_logger.IsWarningEnabled)
+			_logger.LogWarning(successMessage, parameters: new List<object?>
+			{
+				userId
+			});
 
 		return result;
 	}
@@ -115,10 +116,11 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 
 		result.AddSuccessMessage(successMessage);
 
-		_logger.LogWarning(Resources.Messages.SuccessMessages.DeleteSuccessful, parameters: new List<object>
-		{
-			userId
-		});
+		if (_logger.IsWarningEnabled)
+			_logger.LogWarning(Resources.Messages.SuccessMessages.DeleteSuccessful, parameters: new List<object?>
+			{
+				userId
+			});
 
 		return result;
 	}
@@ -391,10 +393,11 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 
 		result.AddSuccessMessage(successMessage);
 
-		_logger.LogWarning(Resources.Messages.SuccessMessages.UpdateSuccessful, parameters: new List<object>
-		{
-			requestViewModel
-		});
+		if (_logger.IsWarningEnabled)
+			_logger.LogWarning(Resources.Messages.SuccessMessages.UpdateSuccessful, parameters: new List<object?>
+			{
+				requestViewModel
+			});
 
 		return result;
 	}
@@ -475,13 +478,14 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 
 		await AddUserLoggedInToCache(foundedUser.Id);
 
-		_logger.LogInformation(Resources.Resource.UserLoginSuccessfulInformation, parameters: new List<object>
-		{
-			new
+		if (_logger.IsWarningEnabled)
+			_logger.LogInformation(Resources.Resource.UserLoginSuccessfulInformation, parameters: new List<object?>
 			{
-				UserName = requestViewModel.UserName,
-			}
-		});
+				new
+				{
+					requestViewModel.UserName,
+				}
+			});
 
 		return result;
 	}
@@ -652,10 +656,11 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 
 		result.AddSuccessMessage(successMessage);
 
-		_logger.LogWarning(Resources.Messages.SuccessMessages.UpdateSuccessful, parameters: new List<object>
-		{
-			requestViewModel
-		});
+		if (_logger.IsWarningEnabled)
+			_logger.LogWarning(Resources.Messages.SuccessMessages.UpdateSuccessful, parameters: new List<object?>
+			{
+				requestViewModel
+			});
 
 		return result;
 	}

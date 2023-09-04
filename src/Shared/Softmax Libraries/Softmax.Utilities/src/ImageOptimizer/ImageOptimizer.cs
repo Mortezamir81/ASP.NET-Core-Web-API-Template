@@ -17,8 +17,7 @@ public class ImageOptimizer : IImageOptimizer
 		if (stream == null)
 			throw new NullReferenceException("imageStream");
 
-		if (optimizeSettings == null)
-			optimizeSettings = new OptimizeSettings();
+		optimizeSettings ??= new OptimizeSettings();
 
 		using var managedStream =
 			new SKManagedStream(stream);
@@ -33,70 +32,30 @@ public class ImageOptimizer : IImageOptimizer
 		var finalQuality = optimizeSettings.Quality ?? _defaultQuality;
 
 		if (!optimizeSettings.Height.HasValue)
-		{
 			optimizeSettings.Height = originalBitmap.Height * finalWidth / originalBitmap.Width;
-		}
 
 		using var resizedBitmap =
 			originalBitmap.Resize(new SKImageInfo(finalWidth, optimizeSettings.Height.Value), SKFilterQuality.Medium);
 
 		using var newImage = SKImage.FromBitmap(resizedBitmap);
 
-		var finalStream = new MemoryStream();
+		using var finalStream = new MemoryStream();
 
-		try
+		var format = optimizeSettings.ImageExtensions switch
 		{
-			switch (optimizeSettings.ImageExtensions)
-			{
-				case ImageExtensions.jpg:
-				{
-					using var skiaData =
-						newImage.Encode(SKEncodedImageFormat.Jpeg, finalQuality);
+			ImageExtensions.jpg => SKEncodedImageFormat.Jpeg,
+			ImageExtensions.png => SKEncodedImageFormat.Png,
+			ImageExtensions.webp => SKEncodedImageFormat.Webp,
+			_ => SKEncodedImageFormat.Jpeg,
+		};
 
-					skiaData.SaveTo(finalStream);
+		using var skiaData =
+			newImage.Encode(format, finalQuality);
 
-					break;
-				}
-
-				case ImageExtensions.png:
-				{
-					using var skiaData =
-						newImage.Encode(SKEncodedImageFormat.Png, finalQuality);
-
-					skiaData.SaveTo(finalStream);
-
-					break;
-				}
-
-				default:
-				{
-					using var skiaData =
-						newImage.Encode(SKEncodedImageFormat.Jpeg, finalQuality);
-
-					skiaData.SaveTo(finalStream);
-
-					break;
-				}
-			}
-
-		}
-		catch
-		{
-			finalStream.Dispose();
-
-			finalStream = null;
-
-			throw;
-		}
+		skiaData.SaveTo(finalStream);
 
 		if (finalStream.Length > stream.Length)
-		{
-			finalStream.Dispose();
-
-			finalStream = null;
-
 			return stream;
-		}
 
 		return finalStream;
 	}

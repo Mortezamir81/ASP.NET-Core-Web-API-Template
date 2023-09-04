@@ -87,11 +87,20 @@ public abstract partial class BaseServicesWithSaveFile
 
 public class SaveImageSetting
 {
+	private OptimizeImage? _optimizeImage;
+
+	public OptimizeImage OptimizeImage
+	{
+		get
+		{
+			return _optimizeImage ??= new OptimizeImage();
+		}
+		set => _optimizeImage = value;
+	}
+
 	public required IFormFile File { get; set; }
 
 	public required string Path { get; set; }
-
-	public OptimizeImage OptimizeImage { get; set; }
 
 	public int Ordering { get; set; } = 10_000;
 
