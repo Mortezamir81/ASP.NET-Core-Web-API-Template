@@ -37,6 +37,9 @@ public static class RegisterMiddlewaresExtentions
 		{
 			OnPrepareResponse = ctx =>
 			{
+				// Cache static files for 30 days
+				ctx.Context.Response.Headers.Append("Cache-Control", "public,max-age=2592000");
+
 				ctx.Context.Response.Headers.Append("Access-Control-Allow-Origin", "*");
 				ctx.Context.Response.Headers.Append("Access-Control-Allow-Headers",
 				  "Origin, X-Requested-With, Content-Type, Accept");

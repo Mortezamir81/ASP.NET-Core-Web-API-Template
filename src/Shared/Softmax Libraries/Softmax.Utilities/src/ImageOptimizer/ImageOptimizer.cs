@@ -39,20 +39,29 @@ public class ImageOptimizer : IImageOptimizer
 
 		using var newImage = SKImage.FromBitmap(resizedBitmap);
 
-		using var finalStream = new MemoryStream();
+		var finalStream = new MemoryStream();
 
-		var format = optimizeSettings.ImageExtensions switch
+		try
 		{
-			ImageExtensions.jpg => SKEncodedImageFormat.Jpeg,
-			ImageExtensions.png => SKEncodedImageFormat.Png,
-			ImageExtensions.webp => SKEncodedImageFormat.Webp,
-			_ => SKEncodedImageFormat.Jpeg,
-		};
+			var format = optimizeSettings.ImageExtensions switch
+			{
+				ImageExtensions.jpg => SKEncodedImageFormat.Jpeg,
+				ImageExtensions.png => SKEncodedImageFormat.Png,
+				ImageExtensions.webp => SKEncodedImageFormat.Webp,
+				_ => SKEncodedImageFormat.Jpeg,
+			};
 
-		using var skiaData =
-			newImage.Encode(format, finalQuality);
+			using var skiaData =
+				newImage.Encode(format, finalQuality);
 
-		skiaData.SaveTo(finalStream);
+			skiaData.SaveTo(finalStream);
+		}
+		catch (Exception)
+		{
+			finalStream?.Dispose();
+
+			throw;
+		}
 
 		if (finalStream.Length > stream.Length)
 			return stream;

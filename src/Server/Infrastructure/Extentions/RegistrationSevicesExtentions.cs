@@ -183,7 +183,8 @@ public static class RegistrationSevicesExtentions
 				builder
 					.AllowAnyOrigin()
 					.AllowAnyMethod()
-					.AllowAnyHeader();
+					.AllowAnyHeader()
+					.WithExposedHeaders("x-pagination");
 			});
 		});
 	}
