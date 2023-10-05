@@ -1,4 +1,4 @@
-﻿namespace Domain.UserManagment;
+﻿namespace Domain;
 
 public class User : IdentityUser<int>, IEntityHasIsSystemic
 {
@@ -15,5 +15,5 @@ public class User : IdentityUser<int>, IEntityHasIsSystemic
 
 	public bool IsSystemic { get; set; }
 
-	public List<UserLogin>? UserLogins { get; set; }
+	public List<UserToken>? UserToken { get; set; }
 }

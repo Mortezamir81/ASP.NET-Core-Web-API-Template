@@ -2,7 +2,7 @@
 
 public interface IUserServices
 {
-	Task<Result> LogoutAsync(string token);
+	Task<Result> LogoutAsync(int userTokenId, int userId);
 
 
 	Task<Result> UserSoftDeleteAsync(int userId);
@@ -25,7 +25,4 @@ public interface IUserServices
 
 	Task<Result> ChangeUserRoleAsync
 		(ChangeUserRoleRequestViewModel changeUserRoleRequestViewModel, int adminId);
-
-
-	Task<Result<LoginResponseViewModel>> RefreshTokenAsync(string token, string? ipAddress);
 }

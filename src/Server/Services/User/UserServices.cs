@@ -10,6 +10,7 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 	[AutoInject] private readonly UserManager<User> _userManager;
 	[AutoInject] private readonly RoleManager<Role> _roleManager;
 	[AutoInject] private readonly IOptions<ApplicationSettings> _options;
+	[AutoInject] private readonly DatabaseContext _databaseContext;
 	#endregion /Fields
 
 	#region Public Methods
@@ -47,11 +48,9 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 
 		foundedUser.IsBanned = !foundedUser.IsBanned;
 
-		await _userManager.UpdateSecurityStampAsync(foundedUser);
+		await _userRepository.DeleteUserTokens(userId: foundedUser.Id);
 
-		await _userRepository.SaveChangesAsync();
-
-		await _cache.RemoveByPrefixAsync($"userId-{foundedUser.Id}");
+		await RemoveUserLoggedInFromCache(userId);
 
 		string successMessage =
 			foundedUser.IsBanned == true
@@ -105,11 +104,10 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 		}
 
 		foundedUser.IsDeleted = true;
-		await _userManager.UpdateSecurityStampAsync(foundedUser);
 
-		await _userRepository.SaveChangesAsync();
+		await _userRepository.DeleteUserTokens(userId: foundedUser.Id);
 
-		await _cache.RemoveByPrefixAsync($"userId-{foundedUser.Id}");
+		await RemoveUserLoggedInFromCache(foundedUser.Id);
 
 		string successMessage = string.Format
 			(Resources.Messages.SuccessMessages.DeleteUserSuccessful);
@@ -127,140 +125,18 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 
 
 	/// <summary>
-	/// Generate a new access token by refresh token
+	/// Remove user token in database
 	/// </summary>
-	/// <param name="refreshToken"></param>
-	/// <param name="ipAddress"></param>
-	/// <returns>Success or Failed Result</returns>
-	public async Task<Result<LoginResponseViewModel>>
-		RefreshTokenAsync(string refreshToken, string? ipAddress)
-	{
-		var result =
-			 new Result<LoginResponseViewModel>();
-
-		if (!Guid.TryParse(refreshToken, out var inputRefreshToken))
-		{
-			string errorMessage = string.Format
-				(Resources.Messages.ErrorMessages.InvalidRefreshToken);
-
-			result.AddErrorMessage(errorMessage);
-
-			return result;
-		}
-
-		var userLogin =
-		  await _userRepository.GetUserLoginsAsync
-			(refreshToken: inputRefreshToken, includeUser: true);
-
-		if (userLogin == null || userLogin.IsExpired)
-		{
-			string errorMessage = string.Format
-				(Resources.Messages.ErrorMessages.InvalidRefreshToken);
-
-			result.AddErrorMessage(errorMessage);
-
-			return result;
-		}
-
-		if (userLogin.User == null)
-		{
-			string errorMessage = string.Format
-				(Resources.Messages.ErrorMessages.InvalidRefreshToken);
-
-			result.AddErrorMessage(errorMessage);
-
-			return result;
-		}
-
-		if (userLogin.User.IsBanned)
-		{
-			string errorMessage = string.Format
-				(Resources.Messages.ErrorMessages.UserBanned);
-
-			result.AddErrorMessage(errorMessage);
-
-			return result;
-		}
-
-		var newRefreshToken = Guid.NewGuid();
-
-		userLogin.RefreshToken = newRefreshToken;
-		userLogin.CreatedByIp = ipAddress;
-
-		await _userRepository.SaveChangesAsync();
-
-		var claimsIdentity =
-			await CreateClaimsIdentity(user: userLogin.User);
-
-		var tokenResult =
-			CreateAccessToken(claimsIdentity: claimsIdentity);
-
-		var response =
-			new LoginResponseViewModel()
-			{
-				Token = tokenResult.token,
-				UserName = userLogin!.User?.UserName,
-				RefreshToken = newRefreshToken,
-				ExpiresIn = tokenResult.expiresIn,
-			};
-
-		result.Value = response;
-
-		string successMessage = string.Format
-			(Resources.Messages.SuccessMessages.RefreshTokenSuccessfull);
-
-		result.AddSuccessMessage(successMessage);
-
-		await AddUserLoggedInToCache(userLogin.User!.Id);
-
-		_logger.LogInformation(Resources.Resource.UserRefreshTokenSuccessfulInformation, parameters: new List<object?>
-		{
-			userLogin.User?.UserName,
-		});
-
-		return result;
-	}
-
-
-	/// <summary>
-	/// Remove user refresh token in database
-	/// </summary>
-	/// <param name="refreshToken"></param>
-	/// <returns>Success or Failed Result</returns>
-	public async Task<Result> LogoutAsync(string refreshToken)
+	public async Task<Result> LogoutAsync(int userTokenId, int userId)
 	{
 		var result = new Result();
 
-		if (!Guid.TryParse(refreshToken, out var inputRefreshToken))
-		{
-			string errorMessage = string.Format
-				(Resources.Messages.ErrorMessages.InvalidRefreshToken);
+		await _userRepository.DeleteUserToken(userTokenId);
 
-			result.AddErrorMessage(errorMessage);
-
-			return result;
-		}
-
-		var userLogin =
-		  await _userRepository.GetUserLoginsAsync
-			(refreshToken: inputRefreshToken, includeUser: false);
-
-		if (userLogin == null)
-		{
-			string errorMessage = string.Format
-				(Resources.Messages.ErrorMessages.UserNotFound);
-
-			result.AddErrorMessage(errorMessage, MessageCode.HttpNotFoundError);
-
-			return result;
-		}
-
-		_userRepository.DeleteUserLogin(userLogin);
-
-		await _userRepository.SaveChangesAsync();
+		await RemoveUserLoggedInFromCache(userId);
 
 		string successMessage = string.Format
-			(Resources.Messages.SuccessMessages.RefreshTokenRevoked);
+			(Resources.Messages.SuccessMessages.LogoutSuccessful);
 
 		result.AddSuccessMessage(successMessage);
 
@@ -382,11 +258,9 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 		user.UserName = requestViewModel.UserName;
 		user.FullName = requestViewModel.FullName;
 
-		await _userRepository.SaveChangesAsync();
+		await _userRepository.DeleteUserTokens(userId: user.Id);
 
-		await _userManager.UpdateSecurityStampAsync(user);
-
-		await _cache.RemoveByPrefixAsync($"userId-{user.Id}");
+		await RemoveUserLoggedInFromCache(user.Id);
 
 		string successMessage = string.Format
 			(Resources.Messages.SuccessMessages.UpdateSuccessful);
@@ -451,14 +325,23 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 			return result;
 		}
 
-		var refreshToken =
-			await AddRefreshTokenToDB(userId: foundedUser.Id, ipAddress: ipAddress);
+		var tokenExpiredTime =
+			Domain.SeedWork.Utilities.DateTimeOffsetNow
+			.AddDays(_options.Value.JwtSettings?.TokenExpiresTime ?? 30);
+
+		var userTokenId =
+			await InitializeAccessTokenInDb(userId: foundedUser.Id,
+			token: "-",
+			expireIn: tokenExpiredTime,
+			ip: ipAddress);
 
 		var claimsIdentity =
-			await CreateClaimsIdentity(user: foundedUser);
+			await CreateClaimsIdentity(user: foundedUser, userTokenId: userTokenId);
 
-		var tokenResult =
-			CreateAccessToken(claimsIdentity: claimsIdentity);
+		var accessToken =
+			CreateAccessToken(claimsIdentity: claimsIdentity, expireIn: tokenExpiredTime);
+
+		await UpdateAccessTokenInDB(id: userTokenId, token: accessToken);
 
 		string successMessage = string.Format
 			(Resources.Messages.SuccessMessages.LoginSuccessful);
@@ -468,10 +351,8 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 		var response =
 			new LoginResponseViewModel()
 			{
-				Token = tokenResult.token,
+				Token = accessToken,
 				UserName = foundedUser.UserName,
-				RefreshToken = refreshToken,
-				ExpiresIn = tokenResult.expiresIn,
 			};
 
 		result.Value = response;
@@ -647,9 +528,9 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 			return result;
 		}
 
-		await _userManager.UpdateSecurityStampAsync(foundedUser);
+		await _userRepository.DeleteUserTokens(userId: foundedUser.Id);
 
-		await _cache.RemoveByPrefixAsync($"userId-{foundedUser.Id}");
+		await RemoveUserLoggedInFromCache(foundedUser.Id);
 
 		string successMessage = string.Format
 			(Resources.Messages.SuccessMessages.UpdateSuccessful);
@@ -670,59 +551,60 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 	/// <summary>
 	/// Generate new refresh token
 	/// </summary>
-	/// <param name="ipAddress"></param>
-	/// <returns>Success or Failed Result</returns>
-	private UserLogin GenerateRefreshToken(string? ipAddress)
+	private string CreateAccessToken(ClaimsIdentity claimsIdentity, DateTimeOffset expireIn)
 	{
-		return new UserLogin(refreshToken: Guid.NewGuid())
-		{
-			Expires = Domain.SeedWork.Utilities.DateTimeOffsetNow.AddDays(30),
-			Created = Domain.SeedWork.Utilities.DateTimeOffsetNow,
-			CreatedByIp = ipAddress
-		};
-	}
-
-	private (long expiresIn, string token) CreateAccessToken(ClaimsIdentity claimsIdentity)
-	{
-		var expiredTime =
-			Domain.SeedWork.Utilities.DateTimeOffsetNow.AddMinutes(_options.Value.JwtSettings?.TokenExpiresTime ?? 15);
-
 		var accessToken =
 			_tokenServices.GenerateJwtToken
 				(securityKey: _options.Value.JwtSettings!.SecretKeyForToken,
 				claimsIdentity: claimsIdentity,
-				dateTime: expiredTime);
+				dateTime: expireIn);
 
-		var expiresIn =
-			(long) TimeSpan.FromMinutes(_options.Value.JwtSettings?.TokenExpiresTime ?? 15).TotalSeconds;
-
-		return (expiresIn: expiresIn, token: accessToken);
+		return accessToken;
 	}
+
 
 	private async Task<User?> GetUserByName(string name)
 	{
 		return await _userManager.FindByNameAsync(name);
 	}
 
+
 	private async Task<bool> CheckPasswordValid(string password, User user)
 	{
 		return await _userManager.CheckPasswordAsync(user: user, password: password);
 	}
 
-	private async Task<Guid> AddRefreshTokenToDB(int userId, string? ipAddress)
+
+	private async Task<int> InitializeAccessTokenInDb
+		(int userId, string token, DateTimeOffset expireIn, string? ip)
 	{
-		var refreshToken = GenerateRefreshToken(ipAddress);
+		var userToken = new UserToken
+		{
+			AccessToken = token,
+			ExpireDate = expireIn,
+			CreatedByIp = ip,
+			UserId = userId,
+		};
 
-		refreshToken.UserId = userId;
-
-		await _userRepository.AddUserLoginAsync(refreshToken);
+		await _userRepository.AddUserTokenAsync(userToken);
 
 		await _userRepository.SaveChangesAsync();
 
-		return refreshToken.RefreshToken;
+		return userToken.Id;
 	}
 
-	private async Task<ClaimsIdentity> CreateClaimsIdentity(User user)
+
+	private async Task<int> UpdateAccessTokenInDB(int id, string token)
+	{
+		var rowUpdatedCount = await _databaseContext.UserAccessTokens!
+			.Where(current => current.Id == id)
+			.ExecuteUpdateAsync(current => current.SetProperty(current => current.AccessToken, token));
+
+		return rowUpdatedCount;
+	}
+
+
+	private async Task<ClaimsIdentity> CreateClaimsIdentity(User user, int userTokenId)
 	{
 		var userRoles =
 			await _userManager.GetRolesAsync(user);
@@ -732,6 +614,7 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 			new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()!),
 			new Claim(ClaimTypes.Name, user.UserName!),
 			new Claim(ClaimTypes.Email, user.Email!),
+			new Claim(Constants.Authentication.UserTokenId, userTokenId.ToString()),
 			new Claim(nameof(User.SecurityStamp), user.SecurityStamp!),
 		};
 
@@ -745,10 +628,17 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 		return claimIdentity;
 	}
 
+
 	private async Task AddUserLoggedInToCache(int userId)
 	{
 		await _cache.TrySetAsync
-			($"userId-{userId}-loggedin", true, TimeSpan.FromHours(1));
+			($"user-Id-{userId}-logged-in", true, TimeSpan.FromHours(_options.Value.JwtSettings.UserTimeInCache));
+	}
+
+
+	private async Task RemoveUserLoggedInFromCache(int userId)
+	{
+		await _cache.RemoveByPrefixAsync($"user-Id-{userId}");
 	}
 	#endregion /Private Methods
 }

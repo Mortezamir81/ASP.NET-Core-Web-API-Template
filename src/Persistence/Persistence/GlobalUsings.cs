@@ -1,4 +1,4 @@
-﻿global using Domain.UserManagment;
+﻿global using Domain;
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.EntityFrameworkCore.Metadata.Builders;
 global using Softmax.Abstraction.DICommon;
@@ -7,4 +7,3 @@ global using System;
 global using System.Linq;
 global using System.Threading;
 global using System.Threading.Tasks;
-global using ViewModels.General;

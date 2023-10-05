@@ -40,31 +40,6 @@ public partial class UsersController : BaseController
 
 		return serviceResult.ApiResult();
 	}
-
-	/// <summary>
-	/// Get a new token by refresh token
-	/// </summary>
-	[HttpPost("RefreshToken/{refreshToken?}")]
-	public async Task<ActionResult<Result<LoginResponseViewModel>>> RefreshToken(string refreshToken)
-	{
-		if (string.IsNullOrWhiteSpace(refreshToken))
-		{
-			var result =
-				new Result<LoginResponseViewModel>();
-
-			string errorMessage = string.Format
-				(Resources.Messages.ErrorMessages.MostNotBeNull, nameof(refreshToken));
-
-			result.AddErrorMessage(errorMessage);
-
-			return result.ApiResult();
-		}
-
-		var serviceResult =
-			await _userServices.RefreshTokenAsync(token: refreshToken, ipAddress: GetIPAddress());
-
-		return serviceResult.ApiResult();
-	}
 	#endregion /HttpPost
 
 	#region HttpPut
@@ -137,25 +112,21 @@ public partial class UsersController : BaseController
 	}
 
 	/// <summary>
-	/// Logout user by refreshToken
+	/// Logout user
 	/// </summary>
-	[HttpDelete("Logout/{refreshToken?}")]
-	public async Task<ActionResult<Result>> LogoutToken(string refreshToken)
+	[HttpDelete("Logout")]
+	public async Task<ActionResult<Result>> LogoutToken()
 	{
-		if (string.IsNullOrWhiteSpace(refreshToken))
-		{
-			var result = new Result();
+		var userId = User.GetUserId();
 
-			string errorMessage = string.Format
-				(Resources.Messages.ErrorMessages.MostNotBeNull, nameof(refreshToken));
+		if (!userId.HasValue)
+			return Ok();
 
-			result.AddErrorMessage(errorMessage);
-
-			return result.ApiResult();
-		}
+		var userTokenId =
+			User.Claims.FirstOrDefault(c => c.Type == Constants.Authentication.UserTokenId)?.Value;
 
 		var serviceResult = await
-			_userServices.LogoutAsync(refreshToken);
+			_userServices.LogoutAsync(userTokenId: int.Parse(userTokenId!), userId: userId.Value);
 
 		return serviceResult.ApiResult();
 	}

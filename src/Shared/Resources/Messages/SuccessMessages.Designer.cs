@@ -313,6 +313,15 @@ namespace Resources.Messages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The logout was successful.
+        /// </summary>
+        public static string LogoutSuccessful {
+            get {
+                return ResourceManager.GetString("LogoutSuccessful", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The notification was sent successfully.
         /// </summary>
         public static string NotificationSentSuccessful {

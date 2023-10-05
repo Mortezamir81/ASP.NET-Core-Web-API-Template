@@ -84,45 +84,48 @@ public static class CustomJwtAuthentication
 					},
 					OnTokenValidated = async context =>
 					{
+						var userTokenIdRaw =
+							context.Principal?.Claims.FirstOrDefault
+							(c => c.Type == Constants.Authentication.UserTokenId)?.Value;
+
+						var userId =
+							context.Principal?.GetUserId();
+
+						if (!userId.HasValue ||
+							string.IsNullOrWhiteSpace(userTokenIdRaw) ||
+							!int.TryParse(userTokenIdRaw, out var userTokenId))
+						{
+							context.Fail(nameof(HttpStatusCode.Unauthorized));
+							return;
+						}
+
 						var cache =
 							context.HttpContext.RequestServices.GetRequiredService<IEasyCachingProvider>();
+
+						var userInCache =
+							await cache.GetAsync<bool>($"user-Id-{userId}-logged-in");
+
+						if (userInCache.HasValue)
+							return;
 
 						var databaseContext =
 							context.HttpContext.RequestServices.GetRequiredService<DatabaseContext>();
 
-						var userId =
-							context.Principal?.Claims.FirstOrDefault
-								(current => current.Type == ClaimTypes.NameIdentifier)?.Value;
+						var userToken =
+							await databaseContext.UserAccessTokens!
+							.FirstOrDefaultAsync(current => current.Id == userTokenId);
 
-						var securityStamp =
-							context.Principal?.Claims.FirstOrDefault
-								(current => current.Type == nameof(User.SecurityStamp))?.Value;
+						var accessToken =
+							context.SecurityToken as JwtSecurityToken;
 
-						if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(securityStamp))
+						if (userToken == null || userToken.AccessToken != accessToken?.RawData)
 						{
 							context.Fail(nameof(HttpStatusCode.Unauthorized));
-
 							return;
 						}
 
-						var userInCache =
-							await cache.GetAsync<bool>($"userId-{userId}-loggedin");
-
-						if (!userInCache.HasValue)
-						{
-							bool isExistSecurityStamp =
-								await databaseContext.Users!
-								.Where(current => current.Id.ToString() == userId)
-								.Where(current => current.SecurityStamp == securityStamp)
-								.AnyAsync();
-
-							if (isExistSecurityStamp == false)
-							{
-								context.Fail(nameof(HttpStatusCode.Unauthorized));
-
-								return;
-							}
-						}
+						await cache.TrySetAsync
+							($"user-Id-{userId}-logged-in", true, TimeSpan.FromHours(jwtSettings.UserTimeInCache));
 
 						await Task.CompletedTask;
 					},

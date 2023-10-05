@@ -8,19 +8,19 @@ public interface IUserRepository
 	Task<bool> CheckEmailExist(string? email);
 
 
-	void DeleteUserLogin(UserLogin userLogin);
+	Task DeleteUserToken(int userTokenId);
 
 
-	Task AddUserLoginAsync(UserLogin userLogin);
+	Task DeleteUserTokens(int userId);
+
+
+	Task AddUserTokenAsync(UserToken userToken);
 
 
 	Task<bool> CheckUserNameExist(string? username);
 
 
 	Task<User?> GetUserById(int userId, bool isTracking);
-
-
-	Task<UserLogin?> GetUserLoginsAsync(Guid refreshToken, bool includeUser);
 
 
 	Task AddAsync

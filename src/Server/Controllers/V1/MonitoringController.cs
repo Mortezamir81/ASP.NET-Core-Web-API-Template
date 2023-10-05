@@ -5,9 +5,10 @@ namespace Server.Controllers.V1;
 /// <summary>
 /// Monitoring the resource usage in application
 /// </summary>
-public class MonitoringController : BaseController
+public partial class MonitoringController : BaseController
 {
 	#region Fields
+	[AutoInject] private readonly IEasyCachingProvider _cache;
 	#endregion /Fields
 
 	#region Constractor
@@ -28,6 +29,20 @@ public class MonitoringController : BaseController
 			currentProcess.WorkingSet64 / (1024 * 1024);
 
 		return Ok($"{physicalMemoryUsageInMB} MB");
+	}
+	#endregion /HttpGet
+
+	#region HttpDelete
+	/// <summary>
+	/// Remove all caches
+	/// </summary>
+	[HttpDelete("Caches")]
+	[Authorize(Roles = $"{Constants.Role.SystemAdmin}")]
+	public async Task<ActionResult> RemoveAllCaches()
+	{
+		await _cache.RemoveByPrefixAsync($"user-Id");
+
+		return Ok();
 	}
 	#endregion /HttpGet
 }

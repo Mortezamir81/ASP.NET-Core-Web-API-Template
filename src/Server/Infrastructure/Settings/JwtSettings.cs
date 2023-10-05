@@ -6,6 +6,8 @@ public class JwtSettings
 	{
 	}
 
+	public int UserTimeInCache { get; set; }
+
 	public required string SecretKeyForToken { get; set; }
 
 	public required int TokenExpiresTime { get; set; }

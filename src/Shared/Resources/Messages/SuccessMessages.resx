@@ -201,6 +201,9 @@
   <data name="LoginSuccessful" xml:space="preserve">
     <value>The login was successful</value>
   </data>
+  <data name="LogoutSuccessful" xml:space="preserve">
+    <value>The logout was successful</value>
+  </data>
   <data name="NotificationSentSuccessful" xml:space="preserve">
     <value>The notification was sent successfully</value>
   </data>

@@ -22,11 +22,20 @@ public class UserRepository : IUserRepository, IRegisterAsScoped
 	#endregion /Constractor
 
 	#region Methods
-	public void DeleteUserLogin(UserLogin? userLogin)
+	public async Task DeleteUserToken(int userTokenId)
 	{
-		Assert.NotNull(obj: userLogin, nameof(userLogin));
+		await _databaseContext.UserAccessTokens!
+			.Where(current => current.Id == userTokenId)
+			.ExecuteDeleteAsync();
+	}
 
-		_databaseContext.Remove(userLogin!);
+
+	public async Task DeleteUserTokens(int userId)
+	{
+		if (_databaseContext.UserAccessTokens != null)
+			await _databaseContext.UserAccessTokens
+				.Where(current => current.UserId == userId)
+				.ExecuteDeleteAsync();
 	}
 
 
@@ -57,9 +66,9 @@ public class UserRepository : IUserRepository, IRegisterAsScoped
 	}
 
 
-	public async Task AddUserLoginAsync(UserLogin userLogin)
+	public async Task AddUserTokenAsync(UserToken userLogin)
 	{
-		await _databaseContext.UserLogins!.AddAsync(userLogin);
+		await _databaseContext.UserAccessTokens!.AddAsync(userLogin);
 	}
 
 
@@ -102,30 +111,6 @@ public class UserRepository : IUserRepository, IRegisterAsScoped
 		}
 
 		return user;
-	}
-
-
-	public async Task<UserLogin?> GetUserLoginsAsync(Guid refreshToken, bool includeUser)
-	{
-		UserLogin? userLogin = null;
-
-		if (includeUser)
-		{
-			userLogin =
-				await _databaseContext.UserLogins!
-					.Include(current => current.User)
-					.Where(current => current.RefreshToken == refreshToken)
-					.FirstOrDefaultAsync();
-		}
-		else
-		{
-			userLogin =
-				await _databaseContext.UserLogins!
-					.Where(current => current.RefreshToken == refreshToken)
-					.FirstOrDefaultAsync();
-		}
-
-		return userLogin;
 	}
 
 

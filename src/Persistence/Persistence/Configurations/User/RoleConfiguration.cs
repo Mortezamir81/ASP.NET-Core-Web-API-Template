@@ -1,4 +1,4 @@
-﻿namespace Persistence.Configurations.UserManagment;
+﻿namespace Persistence.Configurations;
 
 internal class RoleConfiguration : IEntityTypeConfiguration<Role>
 {

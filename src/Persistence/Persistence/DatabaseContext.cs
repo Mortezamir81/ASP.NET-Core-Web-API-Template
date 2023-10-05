@@ -7,12 +7,11 @@ public class DatabaseContext : IdentityDbContext<User, Role, int>
 	#region Constractor
 	public DatabaseContext(DbContextOptions dbContextOptions) : base(dbContextOptions)
 	{
-		Database.Migrate();
 	}
 	#endregion /Constractor
 
 	#region Properties
-	public DbSet<UserLogin>? UserLogins { get; set; }
+	public DbSet<UserToken>? UserAccessTokens { get; set; }
 	#endregion /Properties
 
 	#region Methods

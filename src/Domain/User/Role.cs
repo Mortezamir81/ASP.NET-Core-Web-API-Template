@@ -1,4 +1,4 @@
-﻿namespace Domain.UserManagment;
+﻿namespace Domain;
 
 public class Role : IdentityRole<int>
 {
