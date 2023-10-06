@@ -1,4 +1,7 @@
-﻿namespace Infrastructure.Extentions;
+﻿using Hangfire;
+using Infrastructure.Hangfire;
+
+namespace Infrastructure.Extentions;
 
 public static class RegisterMiddlewaresExtentions
 {
@@ -41,6 +44,7 @@ public static class RegisterMiddlewaresExtentions
 				ctx.Context.Response.Headers.Append("Cache-Control", "public,max-age=2592000");
 
 				ctx.Context.Response.Headers.Append("Access-Control-Allow-Origin", "*");
+
 				ctx.Context.Response.Headers.Append("Access-Control-Allow-Headers",
 				  "Origin, X-Requested-With, Content-Type, Accept");
 			},
@@ -52,6 +56,20 @@ public static class RegisterMiddlewaresExtentions
 		app.UseAuthentication();
 		app.UseAuthorization();
 
+		if (app.Environment.IsProduction())
+		{
+			app.UseHangfireDashboard("/hangfire", new DashboardOptions
+			{
+				Authorization = new[] { new AuthorizationHangfireFilter() }
+			});
+		}
+		else
+		{
+			app.UseHangfireDashboard();
+		}
+
 		app.MapControllers();
+
+		app.MapHangfireDashboard();
 	}
 }

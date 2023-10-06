@@ -1,7 +1,9 @@
 ﻿using EFCoreSecondLevelCacheInterceptor;
+using Hangfire;
 using Infrastructure.Utilities;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Softmax.Mail.Extentions;
 
 namespace Infrastructure.Extentions;
 
@@ -14,6 +16,8 @@ public static class RegistrationSevicesExtentions
 		{
 			throw new ArgumentNullException(nameof(applicationSettings));
 		}
+
+		services.AddCustomHangfire();
 
 		services.Configure<ApplicationSettings>
 			(configuration.GetSection(ApplicationSettings.KeyName));
@@ -40,11 +44,17 @@ public static class RegistrationSevicesExtentions
 
 		services.AddCustomController();
 
+		services.AddSofmaxMailServices(configuration);
+
 		services.AddRequestBodySizeLimit(applicationSettings.RequestBodyLimitSize);
 
 		services.AddCustomJwtAuthentication(applicationSettings.JwtSettings);
 
 		services.AddCustomSwaggerGen(configuration);
+
+		services.AddScoped<EmailTemplateService>();
+		services.AddScoped<HttpContextService>();
+		services.AddScoped<EmailSenderWithSchedule>();
 	}
 
 	public static void AddAutoDetectedServices(this IServiceCollection services)
@@ -269,5 +279,15 @@ public static class RegistrationSevicesExtentions
 		})
 		.AddEntityFrameworkStores<DatabaseContext>()
 		.AddDefaultTokenProviders();
+	}
+
+
+	public static void AddCustomHangfire(this IServiceCollection services)
+	{
+		// Add Hangfire services.
+		services.AddHangfire(options => options.UseInMemoryStorage());
+
+		// Add the processing server as IHostedService
+		services.AddHangfireServer();
 	}
 }

@@ -19,4 +19,6 @@ public class ApplicationSettings
 	public int RequestBodyLimitSize { get; set; } = 30_000_000;
 
 	public bool EnableSwagger { get; set; } = false;
+
+	public string ClientUrl { get; set; } = string.Empty;
 }

@@ -23,6 +23,10 @@ public interface IUserServices
 		LoginAsync(LoginRequestViewModel loginRequestViewModel, string? ipAddress);
 
 
+	Task<Result> ForgotPasswordAsync
+		(ForgotPasswordRequestViewModel requestViewModel, string? siteUrl, string? userIpAddress);
+
+
 	Task<Result> ChangeUserRoleAsync
 		(ChangeUserRoleRequestViewModel changeUserRoleRequestViewModel, int adminId);
 }

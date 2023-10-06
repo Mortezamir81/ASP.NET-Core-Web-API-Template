@@ -7,6 +7,7 @@ public partial class UsersController : BaseController
 {
 	#region Fields
 	[AutoInject] private readonly IUserServices _userServices;
+	[AutoInject] private readonly HttpContextService _httpContextService;
 	#endregion /Fields
 
 	#region HttpGet
@@ -21,8 +22,11 @@ public partial class UsersController : BaseController
 	public virtual async Task<ActionResult<Result<LoginResponseViewModel>>>
 		LoginAsync([FromBody] LoginRequestViewModel requestViewModel)
 	{
+		var userIP =
+			_httpContextService.GetRemoteIpAddress();
+
 		var serviceResult =
-			await _userServices.LoginAsync(requestViewModel, ipAddress: GetIPAddress());
+			await _userServices.LoginAsync(requestViewModel, ipAddress: userIP);
 
 		return serviceResult.ApiResult();
 	}
@@ -37,6 +41,27 @@ public partial class UsersController : BaseController
 	{
 		var serviceResult =
 			await _userServices.RegisterAsync(registerRequestViewModel: registerRequestViewModel);
+
+		return serviceResult.ApiResult();
+	}
+
+
+	/// <summary>
+	/// Forgot password
+	/// </summary>
+	[HttpPost("ForgotPassword")]
+	public async Task<ActionResult<Result>>
+		ForgotPassword(ForgotPasswordRequestViewModel requestViewModel)
+	{
+		var userIP =
+			_httpContextService.GetRemoteIpAddress();
+
+		var siteUrl =
+			_httpContextService.GetClientHostUrl();
+
+		var serviceResult =
+			await _userServices.ForgotPasswordAsync
+			(requestViewModel: requestViewModel, siteUrl: siteUrl, userIpAddress: userIP);
 
 		return serviceResult.ApiResult();
 	}
@@ -131,21 +156,4 @@ public partial class UsersController : BaseController
 		return serviceResult.ApiResult();
 	}
 	#endregion /HttpDelete
-
-	#region Methods
-	[NonAction]
-	private string? GetIPAddress()
-	{
-		var requestHeaders = Request?.Headers;
-
-		if (requestHeaders != null && requestHeaders.ContainsKey("X-Forwarded-For"))
-		{
-			return Request?.Headers["X-Forwarded-For"];
-		}
-		else
-		{
-			return HttpContext?.Connection?.RemoteIpAddress?.MapToIPv4().ToString();
-		}
-	}
-	#endregion /Methods
 }

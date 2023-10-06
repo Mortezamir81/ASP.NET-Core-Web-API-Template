@@ -367,6 +367,15 @@ namespace Resources.Messages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Password recovery email has been sent to you..
+        /// </summary>
+        public static string ResetPasswordEmailSent {
+            get {
+                return ResourceManager.GetString("ResetPasswordEmailSent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The update was successful.
         /// </summary>
         public static string UpdateSuccessful {

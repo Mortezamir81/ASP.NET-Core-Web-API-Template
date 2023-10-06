@@ -56,6 +56,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Softmax.Abstractions", "src
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Softmax.Utilities", "src\Shared\Softmax Libraries\Softmax.Utilities\Softmax.Utilities.csproj", "{2E78C96C-DBB0-42FC-8F0D-1AA73C063A98}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Softmax.Mail", "src\Shared\Softmax Libraries\Softmax.Mail\Softmax.Mail.csproj", "{51EFF976-B521-42CD-B5C5-32058E99D96E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -126,6 +128,10 @@ Global
 		{2E78C96C-DBB0-42FC-8F0D-1AA73C063A98}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2E78C96C-DBB0-42FC-8F0D-1AA73C063A98}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2E78C96C-DBB0-42FC-8F0D-1AA73C063A98}.Release|Any CPU.Build.0 = Release|Any CPU
+		{51EFF976-B521-42CD-B5C5-32058E99D96E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{51EFF976-B521-42CD-B5C5-32058E99D96E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{51EFF976-B521-42CD-B5C5-32058E99D96E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{51EFF976-B521-42CD-B5C5-32058E99D96E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -154,6 +160,7 @@ Global
 		{FA721213-829E-401D-AF93-98B19F8D0617} = {04D72E17-5497-485F-AFF5-7DE03DA4AB73}
 		{A24F0471-EF2C-4B7C-A078-23B9F2CD0D96} = {6A79570C-92F6-4234-BED4-0D52C3911A10}
 		{2E78C96C-DBB0-42FC-8F0D-1AA73C063A98} = {6A79570C-92F6-4234-BED4-0D52C3911A10}
+		{51EFF976-B521-42CD-B5C5-32058E99D96E} = {6A79570C-92F6-4234-BED4-0D52C3911A10}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {14A6BE61-0F64-4153-A0EC-07447291B81B}

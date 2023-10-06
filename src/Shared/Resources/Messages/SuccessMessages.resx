@@ -219,6 +219,9 @@
   <data name="RegisterSuccessful" xml:space="preserve">
     <value>The register was successful</value>
   </data>
+  <data name="ResetPasswordEmailSent" xml:space="preserve">
+    <value>Password recovery email has been sent to you.</value>
+  </data>
   <data name="UpdateSuccessful" xml:space="preserve">
     <value>The update was successful</value>
   </data>

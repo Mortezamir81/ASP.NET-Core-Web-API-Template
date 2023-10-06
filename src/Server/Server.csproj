@@ -16,17 +16,20 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
-    <PackageReference Include="Bit.SourceGenerators" Version="5.4.0" />
-    <PackageReference Include="DNTCommon.Web.Core" Version="3.5.2" />
-    <PackageReference Include="EasyCaching.InMemory" Version="1.9.0" />
+    <PackageReference Include="Bit.SourceGenerators" Version="5.6.1" />
+    <PackageReference Include="DNTCommon.Web.Core" Version="3.5.4" />
+    <PackageReference Include="EasyCaching.InMemory" Version="1.9.1" />
     <PackageReference Include="EFCoreSecondLevelCacheInterceptor" Version="3.9.2" />
-    <PackageReference Include="Gridify" Version="2.9.1" />
-    <PackageReference Include="Gridify.EntityFramework" Version="2.9.1" />
-    <PackageReference Include="HtmlSanitizer" Version="8.0.692" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.9" />
+    <PackageReference Include="Gridify" Version="2.11.1" />
+    <PackageReference Include="Gridify.EntityFramework" Version="2.11.1" />
+    <PackageReference Include="Hangfire.AspNetCore" Version="1.8.5" />
+    <PackageReference Include="Hangfire.Core" Version="1.8.5" />
+    <PackageReference Include="Hangfire.InMemory" Version="0.5.1" />
+    <PackageReference Include="HtmlSanitizer" Version="8.0.723" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.11" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="5.1.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.9">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.11">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -35,10 +38,9 @@
     <PackageReference Include="Stax.SwaggerAuthorization" Version="1.0.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.5.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="7.0.8" />
-    <PackageReference Include="Swashbuckle.AspNetCore.Filters.Abstractions" Version="7.0.8" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="7.0.11" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Filters.Abstractions" Version="7.0.11" />
     <PackageReference Include="Swashbuckle.AspNetCore.SchemaBuilder" Version="1.6.0" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.32.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -53,6 +55,7 @@
     <ProjectReference Include="..\Shared\Softmax Libraries\Softmax.Abstractions\Softmax.Abstractions.csproj" />
     <ProjectReference Include="..\Shared\Softmax Libraries\Softmax.Logging.NLog\Dtat.Logging.NLogAdapter.csproj" />
     <ProjectReference Include="..\Shared\Softmax Libraries\Softmax.Logging\Dtat.Logging.csproj" />
+    <ProjectReference Include="..\Shared\Softmax Libraries\Softmax.Mail\Softmax.Mail.csproj" />
     <ProjectReference Include="..\Shared\Softmax Libraries\Softmax.Result\Softmax.Result.csproj" />
     <ProjectReference Include="..\Shared\Softmax Libraries\Softmax.Swagger\Softmax.Swagger.csproj" />
     <ProjectReference Include="..\Shared\Softmax Libraries\Softmax.Utilities\Softmax.Utilities.csproj" />

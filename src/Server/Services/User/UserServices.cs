@@ -1,4 +1,6 @@
-﻿namespace Services;
+﻿using System.Web;
+
+namespace Services;
 
 public partial class UserServices : BaseServices, IUserServices, IRegisterAsScoped
 {
@@ -11,6 +13,8 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 	[AutoInject] private readonly RoleManager<Role> _roleManager;
 	[AutoInject] private readonly IOptions<ApplicationSettings> _options;
 	[AutoInject] private readonly DatabaseContext _databaseContext;
+	[AutoInject] private readonly EmailSenderWithSchedule _emailSenderWithSchedule;
+	[AutoInject] private readonly EmailTemplateService _emailTemplateService;
 	#endregion /Fields
 
 	#region Public Methods
@@ -542,6 +546,77 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 			{
 				requestViewModel
 			});
+
+		return result;
+	}
+
+
+	/// <summary>
+	/// Forgot user password
+	/// </summary>
+	/// <param name="requestViewModel"></param>
+	/// <param name="siteUrl"></param>
+	/// <param name="userIpAddress"></param>
+	/// <returns>Success Result</returns>
+	public async Task<Result> ForgotPasswordAsync
+		(ForgotPasswordRequestViewModel requestViewModel, string? siteUrl, string? userIpAddress)
+	{
+		var result =
+			new Result();
+
+		string successMessage = string.Format
+			(Resources.Messages.SuccessMessages.ResetPasswordEmailSent);
+
+		var foundedUser =
+			await _userManager.FindByEmailAsync(requestViewModel.Email!);
+
+		if (foundedUser == null)
+		{
+			result.AddSuccessMessage(successMessage);
+
+			return result;
+		}
+
+		var isEmailConfirmed =
+			await _userManager.IsEmailConfirmedAsync(foundedUser);
+
+		if (!isEmailConfirmed)
+		{
+			result.AddSuccessMessage(successMessage);
+
+			return result;
+		}
+
+		var resetPasswordToken =
+			await _userManager.GeneratePasswordResetTokenAsync(foundedUser);
+
+		var baseUri =
+			_options.Value.IdentitySettings.ResetPasswordBaseUrl;
+
+		var queryStringData =
+			$"email={HttpUtility.UrlEncode(requestViewModel.Email)}&token={HttpUtility.UrlEncode(resetPasswordToken)}";
+
+		var finalUri =
+			Infrastructure.Utilities.UriHelper.CombineUri(baseUri: baseUri!, query: queryStringData);
+
+		var body =
+			await
+			_emailTemplateService
+			.GetContentForResettingPasswordAsync();
+
+		if (string.IsNullOrWhiteSpace(value: body))
+			throw new ArgumentNullException(nameof(body));
+
+		body = body
+			.Replace(oldValue: "{{USER_IP}}", newValue: userIpAddress)
+			.Replace(oldValue: "{{SITE_URL}}", newValue: siteUrl)
+			.Replace(oldValue: "{{EMAIL_ADDRESS}}", newValue: requestViewModel.Email)
+			.Replace(oldValue: "{{VERIFICATION_URL}}", newValue: finalUri);
+
+		_emailSenderWithSchedule.SendWithSchedule
+			(to: requestViewModel.Email!, subject: "Reset Password", body: body);
+
+		result.AddSuccessMessage(successMessage);
 
 		return result;
 	}
