@@ -29,7 +29,7 @@ public static class RegistrationSevicesExtentions
 
 		services.AddCustomIdentity(applicationSettings!.IdentitySettings);
 
-		services.AddCustomCORS();
+		services.AddCustomCORS(applicationSettings.CorsSettings);
 
 		services.AddCustomLogger();
 
@@ -186,17 +186,59 @@ public static class RegistrationSevicesExtentions
 	}
 
 
-	public static void AddCustomCORS(this IServiceCollection services)
+	public static void AddCustomCORS(this IServiceCollection services, CorsSettings? corsSettings)
 	{
+		Assert.NotEmpty(obj: corsSettings, name: nameof(corsSettings));
+
+		if (corsSettings!.Enable == false)
+			return;
+
 		services.AddCors(options =>
 		{
 			options.AddPolicy("DevCorsPolicy", builder =>
 			{
-				builder
-					.AllowAnyOrigin()
-					.AllowAnyMethod()
-					.AllowAnyHeader()
-					.WithExposedHeaders("x-pagination");
+				//Origins
+				if (string.IsNullOrWhiteSpace(corsSettings.AllowOrigins))
+				{
+					builder.AllowAnyOrigin();
+				}
+				else
+				{
+					var acceptOriginSplited =
+						corsSettings.AllowOrigins.Split(';');
+
+					builder
+					.WithOrigins(acceptOriginSplited)
+					.AllowCredentials();
+				}
+
+				//Methods
+				if (string.IsNullOrWhiteSpace(corsSettings.AllowMethods))
+				{
+					builder.AllowAnyMethod();
+				}
+				else
+				{
+					var acceptOriginSplited =
+						corsSettings.AllowMethods.Split(';');
+
+					builder.WithMethods(acceptOriginSplited);
+				}
+
+				//Headers
+				if (string.IsNullOrWhiteSpace(corsSettings.AllowHeaders))
+				{
+					builder.AllowAnyHeader();
+				}
+				else
+				{
+					var acceptOriginSplited =
+						corsSettings.AllowHeaders.Split(';');
+
+					builder.WithHeaders(acceptOriginSplited);
+				}
+
+				builder.WithExposedHeaders("x-pagination");
 			});
 		});
 	}

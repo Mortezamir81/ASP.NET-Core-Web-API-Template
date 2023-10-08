@@ -36,7 +36,10 @@ public static class RegisterMiddlewaresExtentions
 			});
 		}
 
-		app.UseCors("DevCorsPolicy");
+		if (applicationSettings.CorsSettings.Enable)
+		{
+			app.UseCors("DevCorsPolicy");
+		}
 
 		app.UseHttpsRedirection();
 
@@ -50,9 +53,8 @@ public static class RegisterMiddlewaresExtentions
 				ctx.Context.Response.Headers.Append("Access-Control-Allow-Origin", "*");
 
 				ctx.Context.Response.Headers.Append("Access-Control-Allow-Headers",
-				  "Origin, X-Requested-With, Content-Type, Accept");
+					"Origin, X-Requested-With, Content-Type, Accept");
 			},
-
 		});
 
 		app.UseRouting();

@@ -7,6 +7,8 @@ public class ApplicationSettings
 	public ApplicationSettings() : base()
 	{
 		DatabaseSetting = new DatabaseSetting();
+
+		CorsSettings = new CorsSettings();
 	}
 
 	public required JwtSettings JwtSettings { get; set; }
@@ -15,6 +17,7 @@ public class ApplicationSettings
 
 	public DatabaseSetting DatabaseSetting { get; init; }
 
+	public CorsSettings CorsSettings { get; init; }
 
 	public int RequestBodyLimitSize { get; set; } = 30_000_000;
 
