@@ -6,7 +6,7 @@ internal class UserLoginConfiguration : IEntityTypeConfiguration<UserToken>
 	{
 		//********************
 		builder.HasIndex
-			(current => current.AccessToken)
+			(current => current.AccessTokenHash)
 				.IsUnique();
 		//********************
 	}

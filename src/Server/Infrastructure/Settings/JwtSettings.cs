@@ -10,7 +10,9 @@ public class JwtSettings
 
 	public required string SecretKeyForToken { get; set; }
 
-	public required int TokenExpiresTime { get; set; }
+	public int AccessTokenExpiresPerHour { get; set; }
+
+	public int RefreshTokenExpiresPerDay { get; set; }
 
 	public required string SecretKeyForEncryptionToken { get; set; }
 }

@@ -1,4 +1,5 @@
-﻿using System.Web;
+﻿using Infrastructure.Utilities;
+using System.Web;
 
 namespace Services;
 
@@ -329,23 +330,37 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 			return result;
 		}
 
-		var tokenExpiredTime =
+		var accessTokenExpiredTime =
 			Domain.SeedWork.Utilities.DateTimeOffsetNow
-			.AddDays(_options.Value.JwtSettings?.TokenExpiresTime ?? 30);
+			.AddHours(_options.Value.JwtSettings?.AccessTokenExpiresPerHour ?? 1);
+
+		var refreshTokenExpiredTime =
+			Domain.SeedWork.Utilities.DateTimeOffsetNow
+			.AddDays(_options.Value.JwtSettings?.RefreshTokenExpiresPerDay ?? 30);
+
+		var refreshToken = CreateRefreshToken();
+
+		var refreshTokenHash =
+			SecuriyHelper.ToSha256(refreshToken);
 
 		var userTokenId =
-			await InitializeAccessTokenInDb(userId: foundedUser.Id,
-			token: "-",
-			expireIn: tokenExpiredTime,
+			await InitializeTokenInDb(userId: foundedUser.Id,
+			tokenHash: "-",
+			refreshTokenHash: refreshTokenHash,
+			accessTokenExpireIn: accessTokenExpiredTime,
+			refreshTokenExpireIn: refreshTokenExpiredTime,
 			ip: ipAddress);
 
 		var claimsIdentity =
 			await CreateClaimsIdentity(user: foundedUser, userTokenId: userTokenId);
 
 		var accessToken =
-			CreateAccessToken(claimsIdentity: claimsIdentity, expireIn: tokenExpiredTime);
+			CreateAccessToken(claimsIdentity: claimsIdentity, expireIn: accessTokenExpiredTime);
 
-		await UpdateAccessTokenInDB(id: userTokenId, token: accessToken);
+		var accessTokenHash =
+			SecuriyHelper.ToSha256(accessToken);
+
+		await UpdateAccessTokenInDB(id: userTokenId, tokenHash: accessTokenHash);
 
 		string successMessage = string.Format
 			(Resources.Messages.SuccessMessages.LoginSuccessful);
@@ -356,6 +371,7 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 			new LoginResponseViewModel()
 			{
 				Token = accessToken,
+				RefreshToken = refreshToken,
 				UserName = foundedUser.UserName,
 			};
 
@@ -422,6 +438,105 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 			(Resources.Messages.SuccessMessages.RegisterSuccessful);
 
 		result.AddSuccessMessage(successMessage);
+
+		return result;
+	}
+
+
+	/// <summary>
+	/// Refresh token
+	/// </summary>
+	/// <param name="requestedRefreshToken"></param>
+	/// <param name="ipAddress"></param>
+	/// <returns>Success or Failed Result</returns>
+	public async Task<Result<LoginResponseViewModel>>
+		RefreshTokenAsync(string requestedRefreshToken, string? ipAddress)
+	{
+		var result =
+			new Result<LoginResponseViewModel>();
+
+		var foundedUser =
+			await GetUserByRefreshToken(refreshToken: requestedRefreshToken);
+
+		if (foundedUser == null)
+		{
+			string errorMessage = string.Format
+				(Resources.Messages.ErrorMessages.UserNotFound);
+
+			result.AddErrorMessage(errorMessage);
+
+			return result;
+		}
+
+		if (foundedUser.IsBanned)
+		{
+			string errorMessage = string.Format
+				(Resources.Messages.ErrorMessages.UserBanned);
+
+			result.AddErrorMessage(errorMessage);
+
+			return result;
+		}
+
+		var accessTokenExpiredTime =
+			Domain.SeedWork.Utilities.DateTimeOffsetNow
+			.AddHours(_options.Value.JwtSettings?.AccessTokenExpiresPerHour ?? 1);
+
+		var refreshTokenExpiredTime =
+			Domain.SeedWork.Utilities.DateTimeOffsetNow
+			.AddDays(_options.Value.JwtSettings?.RefreshTokenExpiresPerDay ?? 30);
+
+		var refreshToken = CreateRefreshToken();
+
+		var refreshTokenHash =
+			SecuriyHelper.ToSha256(refreshToken);
+
+		var userTokenId =
+			await InitializeTokenInDb(userId: foundedUser.Id,
+			tokenHash: "-",
+			refreshTokenHash: refreshTokenHash,
+			accessTokenExpireIn: accessTokenExpiredTime,
+			refreshTokenExpireIn: refreshTokenExpiredTime,
+			ip: ipAddress);
+
+		var claimsIdentity =
+			await CreateClaimsIdentity(user: foundedUser, userTokenId: userTokenId);
+
+		var accessToken =
+			CreateAccessToken(claimsIdentity: claimsIdentity, expireIn: accessTokenExpiredTime);
+
+		var accessTokenHash =
+			SecuriyHelper.ToSha256(accessToken);
+
+		await UpdateAccessTokenInDB(id: userTokenId, tokenHash: accessTokenHash);
+
+		await DeleteUserTokenByRefreshToken(requestedRefreshToken);
+
+		string successMessage = string.Format
+			(Resources.Messages.SuccessMessages.LoginSuccessful);
+
+		result.AddSuccessMessage(successMessage);
+
+		var response =
+			new LoginResponseViewModel()
+			{
+				Token = accessToken,
+				RefreshToken = refreshToken,
+				UserName = foundedUser.UserName,
+			};
+
+		result.Value = response;
+
+		await RemoveUserLoggedInFromCache(foundedUser.Id);
+
+		if (_logger.IsWarningEnabled)
+			_logger.LogInformation(Resources.Resource.UserLoginSuccessfulInformation, parameters: new List<object?>
+			{
+				new
+				{
+					requestedRefreshToken,
+				}
+			});
 
 		return result;
 	}
@@ -638,9 +753,24 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 	}
 
 
+	private string CreateRefreshToken()
+	{
+		return Guid.NewGuid().ToString();
+	}
+
+
 	private async Task<User?> GetUserByName(string name)
 	{
 		return await _userManager.FindByNameAsync(name);
+	}
+
+
+	private async Task<User?> GetUserByRefreshToken(string refreshToken)
+	{
+		return await _databaseContext.UserAccessTokens!
+			.Where(current => current.RefreshTokenHash == SecuriyHelper.ToSha256(refreshToken))
+			.Select(current => current.User)
+			.FirstOrDefaultAsync();
 	}
 
 
@@ -650,15 +780,17 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 	}
 
 
-	private async Task<int> InitializeAccessTokenInDb
-		(int userId, string token, DateTimeOffset expireIn, string? ip)
+	private async Task<int> InitializeTokenInDb
+		(int userId, string tokenHash, string refreshTokenHash, DateTimeOffset accessTokenExpireIn, DateTimeOffset refreshTokenExpireIn, string? ip)
 	{
 		var userToken = new UserToken
 		{
-			AccessToken = token,
-			ExpireDate = expireIn,
+			AccessTokenHash = tokenHash,
+			AccessTokenExpireDate = accessTokenExpireIn,
+			RefreshTokenExpireDate = refreshTokenExpireIn,
 			CreatedByIp = ip,
 			UserId = userId,
+			RefreshTokenHash = refreshTokenHash,
 		};
 
 		await _userRepository.AddUserTokenAsync(userToken);
@@ -669,11 +801,11 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 	}
 
 
-	private async Task<int> UpdateAccessTokenInDB(int id, string token)
+	private async Task<int> UpdateAccessTokenInDB(int id, string tokenHash)
 	{
 		var rowUpdatedCount = await _databaseContext.UserAccessTokens!
 			.Where(current => current.Id == id)
-			.ExecuteUpdateAsync(current => current.SetProperty(current => current.AccessToken, token));
+			.ExecuteUpdateAsync(current => current.SetProperty(current => current.AccessTokenHash, tokenHash));
 
 		return rowUpdatedCount;
 	}
@@ -714,6 +846,14 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 	private async Task RemoveUserLoggedInFromCache(int userId)
 	{
 		await _cache.RemoveByPrefixAsync($"user-Id-{userId}");
+	}
+
+
+	public async Task DeleteUserTokenByRefreshToken(string refreshToken)
+	{
+		await _databaseContext.UserAccessTokens!
+			.Where(current => current.RefreshTokenHash == SecuriyHelper.ToSha256(refreshToken))
+			.ExecuteDeleteAsync();
 	}
 	#endregion /Private Methods
 }

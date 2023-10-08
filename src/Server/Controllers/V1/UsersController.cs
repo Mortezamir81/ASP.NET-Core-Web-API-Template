@@ -47,7 +47,24 @@ public partial class UsersController : BaseController
 
 
 	/// <summary>
-	/// Forgot password
+	/// Refresh Token
+	/// </summary>
+	[HttpPost("RefreshToken")]
+	public async Task<ActionResult<LoginResponseViewModel>>
+		RegisterAccount(string refreshToken)
+	{
+		var userIP =
+			_httpContextService.GetRemoteIpAddress();
+
+		var serviceResult =
+			await _userServices.RefreshTokenAsync(requestedRefreshToken: refreshToken, userIP);
+
+		return serviceResult.ApiResult();
+	}
+
+
+	/// <summary>
+	/// Send forgot password email
 	/// </summary>
 	[HttpPost("ForgotPassword")]
 	public async Task<ActionResult<Result>>

@@ -1,6 +1,7 @@
 ﻿using EFCoreSecondLevelCacheInterceptor;
 using Hangfire;
 using Infrastructure.Utilities;
+using Infrastructure.Validator;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Softmax.Mail.Extentions;
@@ -55,6 +56,7 @@ public static class RegistrationSevicesExtentions
 		services.AddScoped<EmailTemplateService>();
 		services.AddScoped<HttpContextService>();
 		services.AddScoped<EmailSenderWithSchedule>();
+		services.AddScoped<ITokenValidator, TokenValidator>();
 	}
 
 	public static void AddAutoDetectedServices(this IServiceCollection services)

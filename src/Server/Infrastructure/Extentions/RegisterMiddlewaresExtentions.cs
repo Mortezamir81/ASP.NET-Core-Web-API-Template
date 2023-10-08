@@ -15,6 +15,8 @@ public static class RegisterMiddlewaresExtentions
 		if (app.Environment.IsProduction())
 		{
 			app.UseGlobalExceptionMiddleware();
+
+			app.UseHsts();
 		}
 		else
 		{
@@ -35,6 +37,8 @@ public static class RegisterMiddlewaresExtentions
 		}
 
 		app.UseCors("DevCorsPolicy");
+
+		app.UseHttpsRedirection();
 
 		app.UseStaticFiles(new StaticFileOptions()
 		{

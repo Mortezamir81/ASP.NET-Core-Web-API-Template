@@ -29,4 +29,7 @@ public interface IUserServices
 
 	Task<Result> ChangeUserRoleAsync
 		(ChangeUserRoleRequestViewModel changeUserRoleRequestViewModel, int adminId);
+
+
+	Task<Result<LoginResponseViewModel>> RefreshTokenAsync(string requestedRefreshToken, string? ipAddress);
 }

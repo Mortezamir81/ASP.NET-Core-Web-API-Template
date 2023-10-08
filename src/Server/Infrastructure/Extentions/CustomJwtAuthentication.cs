@@ -1,4 +1,6 @@
-﻿namespace Infrastructure.Extentions;
+﻿using Infrastructure.Validator;
+
+namespace Infrastructure.Extentions;
 
 public static class CustomJwtAuthentication
 {
@@ -84,50 +86,10 @@ public static class CustomJwtAuthentication
 					},
 					OnTokenValidated = async context =>
 					{
-						var userTokenIdRaw =
-							context.Principal?.Claims.FirstOrDefault
-							(c => c.Type == Constants.Authentication.UserTokenId)?.Value;
+						var tokenValidator =
+							context.HttpContext.RequestServices.GetRequiredService<ITokenValidator>();
 
-						var userId =
-							context.Principal?.GetUserId();
-
-						if (!userId.HasValue ||
-							string.IsNullOrWhiteSpace(userTokenIdRaw) ||
-							!int.TryParse(userTokenIdRaw, out var userTokenId))
-						{
-							context.Fail(nameof(HttpStatusCode.Unauthorized));
-							return;
-						}
-
-						var cache =
-							context.HttpContext.RequestServices.GetRequiredService<IEasyCachingProvider>();
-
-						var userInCache =
-							await cache.GetAsync<bool>($"user-Id-{userId}-logged-in");
-
-						if (userInCache.HasValue)
-							return;
-
-						var databaseContext =
-							context.HttpContext.RequestServices.GetRequiredService<DatabaseContext>();
-
-						var userToken =
-							await databaseContext.UserAccessTokens!
-							.FirstOrDefaultAsync(current => current.Id == userTokenId);
-
-						var accessToken =
-							context.SecurityToken as JwtSecurityToken;
-
-						if (userToken == null || userToken.AccessToken != accessToken?.RawData)
-						{
-							context.Fail(nameof(HttpStatusCode.Unauthorized));
-							return;
-						}
-
-						await cache.TrySetAsync
-							($"user-Id-{userId}-logged-in", true, TimeSpan.FromHours(jwtSettings.UserTimeInCache));
-
-						await Task.CompletedTask;
+						await tokenValidator.ExecuteAsync(context, jwtSettings);
 					},
 					OnChallenge = async context =>
 					{
