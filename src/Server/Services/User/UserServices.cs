@@ -735,6 +735,67 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 
 		return result;
 	}
+
+
+	/// <summary>
+	/// reset user password
+	/// </summary>
+	/// <param name="requestViewModel"></param>
+	/// <param name="email"></param>
+	/// <param name="token"></param>
+	/// <returns>Success Result</returns>
+	public async Task<Result> ResetPasswordAsync
+		(ResetPasswordRequestViewModel requestViewModel, string email, string token)
+	{
+		var result =
+			new Result();
+
+		var foundedUser =
+			await _userManager.FindByEmailAsync(email);
+
+		if (foundedUser == null)
+		{
+			var errorMessage =
+				string.Format(Resources.Messages.ErrorMessages.AccessDenied);
+
+			result.AddErrorMessage(errorMessage);
+
+			return result;
+		}
+
+		var isEmailConfirmed =
+			await _userManager.IsEmailConfirmedAsync(foundedUser);
+
+		if (!isEmailConfirmed)
+		{
+			var errorMessage =
+				string.Format(Resources.Messages.ErrorMessages.AccessDenied);
+
+			result.AddErrorMessage(errorMessage);
+
+			return result;
+		}
+
+		var resetPasswordResult =
+			await _userManager.ResetPasswordAsync(foundedUser, token, requestViewModel.Password!);
+
+		if (!resetPasswordResult.Succeeded)
+		{
+			foreach (var error in resetPasswordResult.Errors)
+			{
+				result.AddErrorMessage(error.Description);
+
+				return result;
+			}
+		}
+
+		string successMessage = string.Format
+			(Resources.Messages.SuccessMessages.UpdateSuccessful);
+
+		result.AddSuccessMessage(successMessage);
+
+		return result;
+	}
 	#endregion /Public Methods
 
 	#region Private Methods

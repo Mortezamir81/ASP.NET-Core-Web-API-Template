@@ -3,8 +3,13 @@
 public class SwaggerConfigureOptions : IConfigureOptions<SwaggerGenOptions>
 {
 	private readonly IApiVersionDescriptionProvider _provider;
+	private readonly SwaggerSettings _swaggerSettings;
 
-	public SwaggerConfigureOptions(IApiVersionDescriptionProvider provider) => _provider = provider;
+	public SwaggerConfigureOptions(IApiVersionDescriptionProvider provider, IOptions<SwaggerSettings> swaggerSettings)
+	{
+		_provider = provider;
+		_swaggerSettings = swaggerSettings.Value;
+	}
 
 	public void Configure(SwaggerGenOptions options)
 	{
@@ -12,8 +17,9 @@ public class SwaggerConfigureOptions : IConfigureOptions<SwaggerGenOptions>
 		{
 			options.SwaggerDoc(desc.GroupName, new Microsoft.OpenApi.Models.OpenApiInfo
 			{
-				Title = "My Test API",
+				Title = _swaggerSettings.Title,
 				Version = desc.ApiVersion.ToString(),
+				Description = _swaggerSettings.Description,
 			});
 		}
 	}

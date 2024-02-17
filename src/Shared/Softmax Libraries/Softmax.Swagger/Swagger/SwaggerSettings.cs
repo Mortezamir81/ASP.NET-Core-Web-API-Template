@@ -9,6 +9,12 @@ public class SwaggerSettings
 	public bool EnableDefaultActionDescription { get; set; }
 
 	public bool EnableAuthroizationResponsesAndIcon { get; set; }
+
+	public string? SchemaIdSelector { get; set; }
+
+	public string? Title { get; set; } = "Swagger API";
+
+	public string? Description { get; set; }
 }
 
 public class CustomSwaggerUiOptions

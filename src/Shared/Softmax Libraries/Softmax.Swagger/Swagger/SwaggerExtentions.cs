@@ -4,8 +4,14 @@ public static class SwaggerExtentions
 {
 	public static void AddCustomSwaggerGen(this IServiceCollection services, IConfiguration configuration)
 	{
+		services.Configure<SwaggerSettings>
+			(configuration.GetSection("SwaggerSettings"));
+
 		var swaggerSettings = new SwaggerSettings();
-		configuration.GetSection("SwaggerSettings").Bind(swaggerSettings);
+
+		configuration
+			.GetSection("SwaggerSettings")
+			.Bind(swaggerSettings);
 
 		services.AddHttpContextAccessor();
 
@@ -16,6 +22,33 @@ public static class SwaggerExtentions
 		services.AddSwaggerGen(options =>
 		{
 			options.EnableAnnotations();
+
+			if (!string.IsNullOrWhiteSpace(swaggerSettings.SchemaIdSelector))
+			{
+				switch (swaggerSettings.SchemaIdSelector.ToLower())
+				{
+					case "name":
+					{
+						options.SchemaGeneratorOptions = new SchemaGeneratorOptions
+						{
+							SchemaIdSelector = type => type.Name,
+						};
+
+						break;
+					}
+					case "fullname":
+					{
+						options.SchemaGeneratorOptions = new SchemaGeneratorOptions
+						{
+							SchemaIdSelector = type => type.FullName,
+						};
+
+						break;
+					}
+					default:
+						break;
+				}
+			}
 
 			#region Include XML Docs
 			if (swaggerSettings.EnableXmlDocs)

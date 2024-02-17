@@ -27,6 +27,10 @@ public interface IUserServices
 		(ForgotPasswordRequestViewModel requestViewModel, string? siteUrl, string? userIpAddress);
 
 
+	Task<Result> ResetPasswordAsync
+		(ResetPasswordRequestViewModel requestViewModel, string email, string token);
+
+
 	Task<Result> ChangeUserRoleAsync
 		(ChangeUserRoleRequestViewModel changeUserRoleRequestViewModel, int adminId);
 

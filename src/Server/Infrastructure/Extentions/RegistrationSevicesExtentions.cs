@@ -3,8 +3,10 @@ using Hangfire;
 using Infrastructure.Utilities;
 using Infrastructure.Validator;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Softmax.Mail.Extentions;
+using System.IO.Compression;
 
 namespace Infrastructure.Extentions;
 
@@ -53,6 +55,8 @@ public static class RegistrationSevicesExtentions
 
 		services.AddCustomSwaggerGen(configuration);
 
+		services.AddCustomResponseCompression(applicationSettings);
+
 		services.AddScoped<EmailTemplateService>();
 		services.AddScoped<HttpContextService>();
 		services.AddScoped<EmailSenderWithSchedule>();
@@ -80,6 +84,33 @@ public static class RegistrationSevicesExtentions
 		.AsImplementedInterfaces()
 		.AsSelf()
 		.WithSingletonLifetime());
+	}
+
+
+	public static void AddCustomResponseCompression(this IServiceCollection services, ApplicationSettings settings)
+	{
+		if (!settings.EnableResponseCompression)
+		{
+			return;
+		}
+
+		services.Configure<BrotliCompressionProviderOptions>(options =>
+		{
+			options.Level = CompressionLevel.Optimal;
+		});
+
+		services.Configure<GzipCompressionProviderOptions>(options =>
+		{
+			options.Level = CompressionLevel.Optimal;
+		});
+
+		services.AddResponseCompression(options =>
+		{
+			options.EnableForHttps = true;
+			options.Providers.Add<BrotliCompressionProvider>();
+			options.Providers.Add<GzipCompressionProvider>();
+			options.MimeTypes = ResponseCompressionDefaults.MimeTypes;
+		});
 	}
 
 

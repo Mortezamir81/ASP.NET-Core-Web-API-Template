@@ -74,6 +74,11 @@ public static class RegisterMiddlewaresExtentions
 			app.UseHangfireDashboard();
 		}
 
+		if (applicationSettings.EnableResponseCompression)
+		{
+			app.UseResponseCompression();
+		}
+
 		app.MapControllers();
 
 		app.MapHangfireDashboard();

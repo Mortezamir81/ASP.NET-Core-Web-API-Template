@@ -24,4 +24,6 @@ public class ApplicationSettings
 	public bool EnableSwagger { get; set; } = false;
 
 	public string ClientUrl { get; set; } = string.Empty;
+
+	public bool EnableResponseCompression { get; set; }
 }

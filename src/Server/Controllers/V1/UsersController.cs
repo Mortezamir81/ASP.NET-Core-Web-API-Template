@@ -1,4 +1,6 @@
-﻿namespace Server.Controllers.V1;
+﻿using System.Web;
+
+namespace Server.Controllers.V1;
 
 /// <summary>
 /// User Managment and Authentication or Authorization
@@ -132,6 +134,27 @@ public partial class UsersController : BaseController
 
 		var serviceResult =
 			await _userServices.UpdateUserByAdminAsync(viewModel: requestViewModel, adminId: adminId);
+
+		return serviceResult.ApiResult();
+	}
+
+
+	/// <summary>
+	/// Reset user password
+	/// </summary>
+	[LogInputParameter(InputLogLevel.Warning)]
+	[HttpPut("ResetPassword")]
+	public async Task<ActionResult>
+		ResetPasswordAsync(ResetPasswordRequestViewModel requestViewModel, [FromQuery] string email, [FromQuery] string token)
+	{
+		var decodedEmail =
+			HttpUtility.UrlDecode(email);
+
+		var decodedToken =
+			HttpUtility.UrlDecode(token);
+
+		var serviceResult =
+			await _userServices.ResetPasswordAsync(requestViewModel: requestViewModel, email: decodedEmail, token: decodedToken);
 
 		return serviceResult.ApiResult();
 	}
