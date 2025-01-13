@@ -2,7 +2,7 @@
 
 namespace Infrastructure.Utilities;
 
-public class SecuriyHelper
+public class SecurityHelper
 {
 	public static string ToSha256(string? input)
 	{

@@ -1,6 +1,8 @@
-﻿namespace Softmax.Swagger;
+﻿using Swashbuckle.AspNetCore.Filters;
 
-public static class SwaggerExtentions
+namespace Softmax.Swagger;
+
+public static class SwaggerExtensions
 {
 	public static void AddCustomSwaggerGen(this IServiceCollection services, IConfiguration configuration)
 	{
@@ -78,14 +80,17 @@ public static class SwaggerExtentions
 			options.OperationFilter<NotFoundResponsesOperationFilter>();
 
 			//Add (Lock icon) to actions that need authorization and add responses
-			if (swaggerSettings.EnableAuthroizationResponsesAndIcon)
+			if (swaggerSettings.EnableAuthorizationResponsesAndIcon)
 				options.OperationFilter<AuthorizeOperationFilter>(true, "bearerAuth");
 
-			//options.OperationFilter<FileUploadFilter>();
+			options.OperationFilter<SetDefaultValueForVersionHeader>();
+
+			options.ExampleFilters();
+
 			#endregion /Filters
 
 			#region Add OAuth Authentication
-			if (swaggerSettings.EnableAuthroizationResponsesAndIcon)
+			if (swaggerSettings.EnableAuthorizationResponsesAndIcon)
 			{
 				options.AddSecurityDefinition("bearerAuth", new OpenApiSecurityScheme
 				{
@@ -145,7 +150,9 @@ public static class SwaggerExtentions
 
 			foreach (var desc in apiVersionDescriptionProvider.ApiVersionDescriptions)
 			{
-				options.SwaggerEndpoint($"../swagger/{desc.GroupName}/swagger.json", $"V{desc.ApiVersion.MajorVersion}");
+				var version = $"V{desc.ApiVersion.MajorVersion}.{desc.ApiVersion.MinorVersion}";
+
+				options.SwaggerEndpoint($"../swagger/{desc.GroupName}/swagger.json", version);
 			}
 		});
 	}

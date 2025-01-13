@@ -40,7 +40,7 @@ public class TokenValidator : ITokenValidator
 		var accessToken =
 			context.SecurityToken as JwtSecurityToken;
 
-		if (userToken == null || userToken.AccessTokenHash != SecuriyHelper.ToSha256(accessToken?.RawData))
+		if (userToken == null || userToken.AccessTokenHash != SecurityHelper.ToSha256(accessToken?.RawData))
 		{
 			context.Fail(nameof(HttpStatusCode.Unauthorized));
 			return;

@@ -1,11 +1,12 @@
 ﻿using SkiaSharp;
+using System.IO;
 
 namespace Softmax.Utilities.Image;
 
 public class ImageOptimizer : IImageOptimizer
 {
-	private readonly int _defaultWidth = 1920;
-	private readonly int _defaultQuality = 75;
+	private readonly static int _defaultWidth = 1920;
+	private readonly static int _defaultQuality = 80;
 
 	public ImageOptimizer()
 	{
@@ -19,10 +20,7 @@ public class ImageOptimizer : IImageOptimizer
 
 		optimizeSettings ??= new OptimizeSettings();
 
-		using var managedStream =
-			new SKManagedStream(stream);
-
-		using var originalBitmap = SKBitmap.Decode(managedStream);
+		using var originalBitmap = SKBitmap.Decode(stream);
 
 		var finalWidth =
 			optimizeSettings.Width < originalBitmap.Width ?
@@ -34,8 +32,9 @@ public class ImageOptimizer : IImageOptimizer
 		if (!optimizeSettings.Height.HasValue)
 			optimizeSettings.Height = originalBitmap.Height * finalWidth / originalBitmap.Width;
 
-		using var resizedBitmap =
-			originalBitmap.Resize(new SKImageInfo(finalWidth, optimizeSettings.Height.Value), SKFilterQuality.Medium);
+		using var resizedBitmap = originalBitmap.Resize(
+			new SKImageInfo(finalWidth, optimizeSettings.Height.Value), SKSamplingOptions.Default
+		);
 
 		using var newImage = SKImage.FromBitmap(resizedBitmap);
 
@@ -59,12 +58,14 @@ public class ImageOptimizer : IImageOptimizer
 		catch (Exception)
 		{
 			finalStream?.Dispose();
-
 			throw;
 		}
 
-		if (finalStream.Length > stream.Length)
+		if (finalStream.Length >= stream.Length)
+		{
+			finalStream?.Dispose();
 			return stream;
+		}
 
 		return finalStream;
 	}

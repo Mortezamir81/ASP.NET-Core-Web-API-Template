@@ -11,10 +11,10 @@ public class BadRequestResponsesOperationFilter : IOperationFilter
 
 	public void Apply(OpenApiOperation operation, OperationFilterContext context)
 	{
-		var badRequsetResult = new Result<object>();
+		var badRequestResult = new Result<object>();
 
-		badRequsetResult.AddErrorMessage
-			(nameof(MessageCode.HttpBadRequestCode), messageCode: MessageCode.HttpBadRequestCode);
+		badRequestResult.AddErrorMessage
+			(message: nameof(MessageCode.HttpBadRequestCode), MessageCode.HttpBadRequestCode);
 
 		var badRequestResponse =
 			new Dictionary<string, OpenApiMediaType>
@@ -23,7 +23,7 @@ public class BadRequestResponsesOperationFilter : IOperationFilter
 						"application/json",
 						new OpenApiMediaType
 						{
-							Example = _objectBuilder.Build(badRequsetResult)
+							Example = _objectBuilder.Build(badRequestResult)
 						}
 					}
 			};

@@ -6,6 +6,11 @@ namespace Softmax.Results;
 
 public static class ResultExtensions
 {
+	public readonly static JsonSerializerOptions _serializerOptions = new JsonSerializerOptions
+	{
+		PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+	};
+
 	static ResultExtensions()
 	{
 	}
@@ -31,8 +36,10 @@ public static class ResultExtensions
 				break;
 
 			case (int) MessageCode.HttpServerError:
-				objectResult = new ObjectResult(result);
-				objectResult.StatusCode = (int) MessageCode.HttpServerError;
+				objectResult = new ObjectResult(result)
+				{
+					StatusCode = (int) MessageCode.HttpServerError
+				};
 				break;
 		}
 
@@ -69,16 +76,15 @@ public static class ResultExtensions
 				break;
 
 			case (int) MessageCode.HttpServerError:
-				objectResult = new ObjectResult(normalResult);
-				objectResult.StatusCode = (int) MessageCode.HttpServerError;
+				objectResult = new ObjectResult(normalResult)
+				{
+					StatusCode = (int) MessageCode.HttpServerError
+				};
 				break;
 		}
 
-		keyValuePairs.Add
-			("X-Pagination", JsonSerializer.Serialize(result.Pagination, new JsonSerializerOptions
-			{
-				PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-			}));
+		keyValuePairs
+			.Append("X-Pagination", JsonSerializer.Serialize(result.Pagination, _serializerOptions));
 
 		return objectResult;
 	}

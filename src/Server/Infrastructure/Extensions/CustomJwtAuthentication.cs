@@ -1,6 +1,6 @@
 ﻿using Infrastructure.Validator;
 
-namespace Infrastructure.Extentions;
+namespace Infrastructure.Extensions;
 
 public static class CustomJwtAuthentication
 {

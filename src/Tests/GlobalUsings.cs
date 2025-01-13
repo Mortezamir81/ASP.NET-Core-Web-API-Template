@@ -1,7 +1,7 @@
 global using AutoMapper;
 global using Domain;
 global using EasyCaching.Core;
-global using Infrastructure.Extentions;
+global using Infrastructure.Extensions;
 global using Infrastructure.Settings;
 global using Microsoft.AspNetCore.Identity;
 global using Microsoft.Extensions.Configuration;

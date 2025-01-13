@@ -2,15 +2,15 @@
 
 namespace Infrastructure.Utilities;
 
-public class RecursiveEntityUtilites<TEntityKey> : IRecursiveEntityUtilites<TEntityKey>
+public class RecursiveEntityUtilities<TEntityKey> : IRecursiveEntityUtilities<TEntityKey>
 {
 	private readonly DatabaseContext _databaseContext;
 
-	public RecursiveEntityUtilites(DatabaseContext databaseContext)
+	public RecursiveEntityUtilities(DatabaseContext databaseContext)
 	{
 		_databaseContext = databaseContext;
 
-		EntityPath = new List<TEntityKey>();
+		EntityPath = [];
 	}
 
 	public List<TEntityKey> EntityPath { get; set; }

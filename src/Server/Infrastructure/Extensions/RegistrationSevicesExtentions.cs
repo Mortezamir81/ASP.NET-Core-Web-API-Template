@@ -1,4 +1,5 @@
-﻿using EFCoreSecondLevelCacheInterceptor;
+﻿using Asp.Versioning;
+using EFCoreSecondLevelCacheInterceptor;
 using Hangfire;
 using Infrastructure.Utilities;
 using Infrastructure.Validator;
@@ -6,26 +7,24 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Softmax.Mail.Extentions;
+using Swashbuckle.AspNetCore.Filters;
 using System.IO.Compression;
 
-namespace Infrastructure.Extentions;
+namespace Infrastructure.Extensions;
 
 public static class RegistrationSevicesExtentions
 {
 	public static void RegisterServices
 		(this IServiceCollection services, IConfiguration configuration, ApplicationSettings? applicationSettings)
 	{
-		if (applicationSettings == null)
-		{
-			throw new ArgumentNullException(nameof(applicationSettings));
-		}
+		ArgumentNullException.ThrowIfNull(applicationSettings);
 
+		services.AddDNTCommonWeb();
+		
 		services.AddCustomHangfire();
 
 		services.Configure<ApplicationSettings>
 			(configuration.GetSection(ApplicationSettings.KeyName));
-
-		services.AddMemoryCacheService();
 
 		services.AddCustomDbContext(applicationSettings!.DatabaseSetting);
 
@@ -52,6 +51,8 @@ public static class RegistrationSevicesExtentions
 		services.AddRequestBodySizeLimit(applicationSettings.RequestBodyLimitSize);
 
 		services.AddCustomJwtAuthentication(applicationSettings.JwtSettings);
+
+		services.AddSwaggerExamplesFromAssemblyOf<Program>();
 
 		services.AddCustomSwaggerGen(configuration);
 
@@ -114,11 +115,11 @@ public static class RegistrationSevicesExtentions
 	}
 
 
-	public static void AddRecursiveEntityUtilites(this IServiceCollection services)
+	public static void AddRecursiveEntityUtilities(this IServiceCollection services)
 	{
 		services.AddTransient
-			(serviceType: typeof(IRecursiveEntityUtilites<>),
-				implementationType: typeof(RecursiveEntityUtilites<>));
+			(serviceType: typeof(IRecursiveEntityUtilities<>),
+				implementationType: typeof(RecursiveEntityUtilities<>));
 	}
 
 
@@ -128,8 +129,9 @@ public static class RegistrationSevicesExtentions
 		{
 			options
 				.UseMemoryCacheProvider()
-				.DisableLogging(false)
+				.ConfigureLogging(false)
 				.UseCacheKeyPrefix("EF_")
+				.UseDbCallsIfCachingProviderIsDown(TimeSpan.FromMinutes(1))
 				.SkipCachingCommands(commandText => commandText.Contains("NEWID()", StringComparison.InvariantCultureIgnoreCase))
 				.SkipCachingResults(result => result.Value == null || (result.Value is EFTableRows rows && rows.RowsCount == 0));
 
@@ -289,11 +291,13 @@ public static class RegistrationSevicesExtentions
 		services.AddApiVersioning(options =>
 		{
 			options.AssumeDefaultVersionWhenUnspecified = true;
-			options.DefaultApiVersion = new ApiVersion(majorVersion: 1, minorVersion: 0);
+			options.DefaultApiVersion = new Asp.Versioning.ApiVersion(majorVersion: 1, minorVersion: 0);
 			options.ReportApiVersions = true;
-		});
-
-		services.AddVersionedApiExplorer(options =>
+			options.ApiVersionReader = ApiVersionReader.Combine(
+				new HeaderApiVersionReader("X-Version"),
+				new MediaTypeApiVersionReader("ver"));
+		})
+		.AddApiExplorer(options =>
 		{
 			options.GroupNameFormat = "'v'VVV";
 			options.SubstituteApiVersionInUrl = true;

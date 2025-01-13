@@ -24,7 +24,7 @@ public abstract partial class BaseServicesWithSaveFile
 				});
 
 		var saveFileResult =
-			await _fileManager.SaveStreamWithRandomeNameAsync
+			await _fileManager.SaveStreamWithRandomNameAsync
 				(stream: optimizedImage,
 				fileExtension: GetExtension(fileName: saveFileSetting.File.FileName,
 					imageExtension: saveFileSetting.OptimizeImage.ImageExtensions),
@@ -53,7 +53,7 @@ public abstract partial class BaseServicesWithSaveFile
 	protected async Task<ApplicationFile> SaveFileAsync(SaveFileSetting saveFileSetting)
 	{
 		var saveFileResult =
-			await _fileManager.SaveFileWithRandomeNameAsync
+			await _fileManager.SaveFileWithRandomNameAsync
 				(file: saveFileSetting.File,
 				root: saveFileSetting.WebRoot,
 				path: saveFileSetting.Path,
@@ -80,7 +80,7 @@ public abstract partial class BaseServicesWithSaveFile
 	private string GetExtension(string fileName, ImageExtensions? imageExtension)
 	{
 		return imageExtension.ToFixedString() ??
-				_fileManager.GetFileExtention(fileName) ??
+				_fileManager.GetFileExtension(fileName) ??
 				ImageExtensions.jpg.ToFixedString();
 	}
 }

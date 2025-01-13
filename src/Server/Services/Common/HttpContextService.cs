@@ -10,17 +10,13 @@ public partial class HttpContextService : object
 	#region Methods
 
 	#region GetHttpReferer()
-	public string? GetHttpReferer()
+	public string? GetHttpReferrer()
 	{
 		if (_httpContextAccessor.HttpContext is null)
-		{
 			return null;
-		}
 
 		if (_httpContextAccessor.HttpContext.Request is null)
-		{
 			return null;
-		}
 
 		// using Microsoft.AspNetCore.Http;
 		var typedHeaders =
@@ -70,18 +66,14 @@ public partial class HttpContextService : object
 	public string? GetCurrentHostName()
 	{
 		if (_httpContextAccessor.HttpContext is null)
-		{
 			return null;
-		}
 
 		if (_httpContextAccessor.HttpContext.Request is null)
-		{
 			return null;
-		}
 
 		var result =
-			_httpContextAccessor
-			.HttpContext.Request.Host.Value.ToLower();
+			_httpContextAccessor?
+			.HttpContext?.Request?.Host.Value?.ToLower();
 
 		return result;
 	}
@@ -94,14 +86,10 @@ public partial class HttpContextService : object
 	public string? GetCurrentHostProtocol()
 	{
 		if (_httpContextAccessor.HttpContext is null)
-		{
 			return null;
-		}
 
 		if (_httpContextAccessor.HttpContext.Request is null)
-		{
 			return null;
-		}
 
 		var result =
 			_httpContextAccessor
@@ -121,17 +109,13 @@ public partial class HttpContextService : object
 			GetCurrentHostName();
 
 		if (currentHostName is null)
-		{
 			return null;
-		}
 
 		var currentHostProtocol =
 			GetCurrentHostProtocol();
 
 		if (currentHostProtocol is null)
-		{
 			return null;
-		}
 
 		var result =
 			$"{currentHostProtocol}://{currentHostName}";

@@ -36,9 +36,9 @@ var app =
 
 #region Middlewares
 //******************************
-await app.IntializeDatabaseAsync();
+await app.InitializeDatabaseAsync();
 
-app.RegisterMiddlewares(applicationSettings: applicationSettings);
+app.RegisterMiddleware(applicationSettings: applicationSettings);
 //******************************
 #endregion /Middlewares
 

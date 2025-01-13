@@ -13,4 +13,6 @@ public class UserToken : BaseEntity<int>
 	public required string RefreshTokenHash { get; set; }
 
 	public string? CreatedByIp { get; set; }
+
+	public bool IsRevoked { get; set; }
 }

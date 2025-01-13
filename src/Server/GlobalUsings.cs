@@ -6,7 +6,7 @@ global using EasyCaching.Core;
 global using Infrastructure;
 global using Infrastructure.Attributes;
 global using Infrastructure.Enums;
-global using Infrastructure.Extentions;
+global using Infrastructure.Extensions;
 global using Infrastructure.Middlewares;
 global using Infrastructure.Settings;
 global using Microsoft.AspNetCore.Authentication.JwtBearer;

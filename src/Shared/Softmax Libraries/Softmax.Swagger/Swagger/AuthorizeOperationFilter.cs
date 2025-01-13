@@ -1,4 +1,6 @@
-﻿namespace Softmax.Swagger;
+﻿using Microsoft.AspNetCore.Mvc.Filters;
+
+namespace Softmax.Swagger;
 
 public class AuthorizeOperationFilter : IOperationFilter
 {
@@ -31,12 +33,17 @@ public class AuthorizeOperationFilter : IOperationFilter
 			.OfType<AuthorizeAttribute>()
 			.Any();
 
+		var hasAuthorizeApi = context.MethodInfo
+			.GetCustomAttributes(true)
+			.OfType<IAsyncAuthorizationFilter>()
+			.Any();
+
 		var hasOptionalAuthorize = context.MethodInfo
 			.GetCustomAttributes(true)
 			.OfType<Softmax.Swagger.Attributes.OptionalAuthorizeAttribute>()
 			.Any();
 
-		if (!hasAuthorize && !hasOptionalAuthorize)
+		if (!hasAuthorize && !hasOptionalAuthorize && !hasAuthorizeApi)
 			return;
 
 		if (_includeUnauthorizedAndForbiddenResponses)
@@ -45,7 +52,7 @@ public class AuthorizeOperationFilter : IOperationFilter
 			var unauthorizedResult = new Result();
 
 			unauthorizedResult.AddErrorMessage
-				(message: "Unauthorized", messageCode: MessageCode.HttpUnauthorizeError);
+				(message: nameof(MessageCode.HttpUnauthorizeError), MessageCode.HttpUnauthorizeError);
 
 			var unauthorizedResponse =
 				new Dictionary<string, OpenApiMediaType>
@@ -70,7 +77,7 @@ public class AuthorizeOperationFilter : IOperationFilter
 			var forbiddenResult = new Result();
 
 			forbiddenResult.AddErrorMessage
-				(message: "Forbidden", messageCode: MessageCode.HttpForbidenError);
+				(message: nameof(MessageCode.HttpForbidenError), MessageCode.HttpForbidenError);
 
 			var forbiddenResponse =
 				new Dictionary<string, OpenApiMediaType>
@@ -92,8 +99,8 @@ public class AuthorizeOperationFilter : IOperationFilter
 			#endregion /Forbidden Response
 		}
 
-		operation.Security = new List<OpenApiSecurityRequirement>()
-		{
+		operation.Security =
+		[
 			new OpenApiSecurityRequirement
 			{
 				{
@@ -105,9 +112,9 @@ public class AuthorizeOperationFilter : IOperationFilter
 							Id = _schemeName
 						}
 					},
-					new string[] {}
+					Array.Empty<string>()
 				}
 			}
-		};
+		];
 	}
 }

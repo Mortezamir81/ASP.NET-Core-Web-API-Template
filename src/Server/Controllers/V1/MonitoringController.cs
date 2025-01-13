@@ -16,7 +16,7 @@ public partial class MonitoringController : BaseController
 
 	#region HttpGet
 	/// <summary>
-	/// Get momeory information from current process
+	/// Get memory information from current process
 	/// </summary>
 	[HttpGet("GetMemoryUsage")]
 	[Authorize(Roles = $"{Constants.Role.SystemAdmin}")]

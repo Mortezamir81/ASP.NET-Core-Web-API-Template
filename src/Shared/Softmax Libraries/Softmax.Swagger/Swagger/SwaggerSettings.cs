@@ -8,7 +8,7 @@ public class SwaggerSettings
 
 	public bool EnableDefaultActionDescription { get; set; }
 
-	public bool EnableAuthroizationResponsesAndIcon { get; set; }
+	public bool EnableAuthorizationResponsesAndIcon { get; set; }
 
 	public string? SchemaIdSelector { get; set; }
 

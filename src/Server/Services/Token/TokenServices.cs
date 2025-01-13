@@ -12,7 +12,7 @@ public class TokenServices : ITokenServices, IRegisterAsScoped
 		Assert.NotEmpty(securityKey, nameof(securityKey));
 
 		var signingCredentional =
-			GenerateSigningCredentional(securityKey!);
+			GenerateSigningCredential(securityKey!);
 
 		var tokenDescriptor =
 			GenerateTokenDescriptor(claimsIdentity, dateTime.UtcDateTime, signingCredentional);
@@ -30,7 +30,7 @@ public class TokenServices : ITokenServices, IRegisterAsScoped
 	#endregion /MainMethods
 
 	#region SubMethods
-	private SigningCredentials GenerateSigningCredentional(string securityKey)
+	private SigningCredentials GenerateSigningCredential(string securityKey)
 	{
 		byte[] key =
 			Encoding.ASCII.GetBytes(securityKey);
@@ -41,15 +41,15 @@ public class TokenServices : ITokenServices, IRegisterAsScoped
 		var securityAlgorithm =
 			SecurityAlgorithms.HmacSha256Signature;
 
-		var signingCredentional =
+		var signingCredential =
 			new SigningCredentials(key: symmetricSecurityKey, algorithm: securityAlgorithm);
 
-		return signingCredentional;
+		return signingCredential;
 	}
 
 
 	private SecurityTokenDescriptor GenerateTokenDescriptor
-		(ClaimsIdentity claimsIdentity, DateTime dateTime, SigningCredentials signingCredentional)
+		(ClaimsIdentity claimsIdentity, DateTime dateTime, SigningCredentials signingCredential)
 	{
 		var tokenDescriptor =
 			new SecurityTokenDescriptor()
@@ -60,7 +60,7 @@ public class TokenServices : ITokenServices, IRegisterAsScoped
 				//Audience = "",
 
 				Expires = dateTime,
-				SigningCredentials = signingCredentional,
+				SigningCredentials = signingCredential,
 			};
 
 		return tokenDescriptor;

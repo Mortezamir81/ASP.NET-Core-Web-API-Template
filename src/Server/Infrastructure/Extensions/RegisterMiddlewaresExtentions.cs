@@ -1,16 +1,14 @@
 ﻿using Hangfire;
 using Infrastructure.Hangfire;
 
-namespace Infrastructure.Extentions;
+namespace Infrastructure.Extensions;
 
-public static class RegisterMiddlewaresExtentions
+public static class RegisterMiddlewareExtensions
 {
-	public static void RegisterMiddlewares(this WebApplication app, ApplicationSettings? applicationSettings)
+	public static void RegisterMiddleware
+		(this WebApplication app, ApplicationSettings? applicationSettings)
 	{
-		if (applicationSettings == null)
-		{
-			throw new ArgumentNullException(nameof(applicationSettings));
-		}
+		ArgumentNullException.ThrowIfNull(applicationSettings);
 
 		if (app.Environment.IsProduction())
 		{
@@ -28,11 +26,11 @@ public static class RegisterMiddlewaresExtentions
 			app.UseSwaggerBasicAuthorization();
 			app.UseCustomSwaggerAndUI(uiOptions: new CustomSwaggerUiOptions
 			{
-				CustomJsPathes = new List<string>
-				{
+				CustomJsPathes =
+				[
 					"/js/swagger/sort.js",
 					"/js/swagger/swagger-utils.js"
-				}
+				]
 			});
 		}
 
@@ -62,22 +60,23 @@ public static class RegisterMiddlewaresExtentions
 		app.UseAuthentication();
 		app.UseAuthorization();
 
-		if (app.Environment.IsProduction())
+		if (applicationSettings.EnableHangfire)
 		{
-			app.UseHangfireDashboard("/hangfire", new DashboardOptions
+			if (app.Environment.IsProduction())
 			{
-				Authorization = new[] { new AuthorizationHangfireFilter() }
-			});
-		}
-		else
-		{
-			app.UseHangfireDashboard();
+				app.UseHangfireDashboard("/hangfire", new DashboardOptions
+				{
+					Authorization = [new AuthorizationHangfireFilter()]
+				});
+			}
+			else
+			{
+				app.UseHangfireDashboard();
+			}
 		}
 
 		if (applicationSettings.EnableResponseCompression)
-		{
 			app.UseResponseCompression();
-		}
 
 		app.MapControllers();
 

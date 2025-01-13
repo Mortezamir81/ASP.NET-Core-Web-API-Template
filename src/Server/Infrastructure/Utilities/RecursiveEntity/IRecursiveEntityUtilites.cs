@@ -2,7 +2,7 @@
 
 namespace Infrastructure.Utilities;
 
-public interface IRecursiveEntityUtilites<TEntityKey>
+public interface IRecursiveEntityUtilities<TEntityKey>
 {
 	public List<TEntityKey> EntityPath { get; set; }
 

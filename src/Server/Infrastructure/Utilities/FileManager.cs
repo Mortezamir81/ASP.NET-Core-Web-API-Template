@@ -20,7 +20,7 @@ public class FileManager : IFileManager, IRegisterAsSingleton
 		(IFormFile file, string path, string fileName, bool includeRootPath = false, string? root = null)
 	{
 		var fileExtension =
-				GetFileExtention(file.FileName);
+				GetFileExtension(file.FileName);
 
 		if (string.IsNullOrWhiteSpace(fileExtension))
 		{
@@ -78,11 +78,11 @@ public class FileManager : IFileManager, IRegisterAsSingleton
 	}
 
 
-	public async Task<SaveFileResult> SaveFileWithRandomeNameAsync
+	public async Task<SaveFileResult> SaveFileWithRandomNameAsync
 		(IFormFile file, string path, bool includeRootPath = false, string? root = null)
 	{
 		var fileExtension =
-			GetFileExtention(file.FileName);
+			GetFileExtension(file.FileName);
 
 		if (string.IsNullOrWhiteSpace(fileExtension))
 		{
@@ -140,7 +140,7 @@ public class FileManager : IFileManager, IRegisterAsSingleton
 	}
 
 
-	public async Task<SaveFileResult> SaveStreamWithRandomeNameAsync
+	public async Task<SaveFileResult> SaveStreamWithRandomNameAsync
 		(Stream stream, string fileExtension, string path, bool includeRootPath = false, string? root = null)
 	{
 		string newFileName =
@@ -227,7 +227,7 @@ public class FileManager : IFileManager, IRegisterAsSingleton
 	}
 
 
-	public string? GetFileExtention(string fileName)
+	public string? GetFileExtension(string fileName)
 	{
 		var fileExtension =
 			Path.GetExtension

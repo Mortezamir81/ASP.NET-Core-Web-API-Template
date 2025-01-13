@@ -6,16 +6,16 @@ public interface IFileManager
 		(IFormFile file, string path, string fileName, bool includeWebRootPath = false, string? root = null);
 
 
-	Task<SaveFileResult> SaveFileWithRandomeNameAsync
+	Task<SaveFileResult> SaveFileWithRandomNameAsync
 		(IFormFile file, string path, bool includeWebRootPath = false, string? root = null);
 
 
-	Task<SaveFileResult> SaveStreamWithRandomeNameAsync
+	Task<SaveFileResult> SaveStreamWithRandomNameAsync
 		(Stream stream, string fileExtension, string path, bool includeWebRootPath = false, string? root = null);
 
 
 	bool DeleteFile(string? path, bool includeWebRootPath = false, string? root = null);
 
 
-	public string? GetFileExtention(string fileName);
+	public string? GetFileExtension(string fileName);
 }

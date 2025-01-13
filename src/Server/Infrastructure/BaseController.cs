@@ -3,7 +3,7 @@
 [ApiController]
 [ApiVersion("1")]
 [Produces("application/json")]
-[Route("api/v{version:apiVersion}/[controller]")]
+[Route("api/[controller]")]
 public class BaseController : ControllerBase
 {
 	public BaseController() : base()
@@ -30,7 +30,7 @@ public class BaseController : ControllerBase
 
 
 	[NonAction]
-	protected int GetRequierdUserId()
+	protected int GetRequiredUserId()
 	{
 		if (User?.Identity?.IsAuthenticated == false)
 			throw new Exception("The user is not authenticated!");

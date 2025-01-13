@@ -1,8 +1,8 @@
-﻿namespace Infrastructure.Extentions;
+﻿namespace Infrastructure.Extensions;
 
 public static class InitializeDatabase
 {
-	public static async Task IntializeDatabaseAsync(this IApplicationBuilder app)
+	public static async Task InitializeDatabaseAsync(this IApplicationBuilder app)
 	{
 		using var scope = app.ApplicationServices.CreateScope();
 

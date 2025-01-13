@@ -341,7 +341,7 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 		var refreshToken = CreateRefreshToken();
 
 		var refreshTokenHash =
-			SecuriyHelper.ToSha256(refreshToken);
+			SecurityHelper.ToSha256(refreshToken);
 
 		var userTokenId =
 			await InitializeTokenInDb(userId: foundedUser.Id,
@@ -358,7 +358,7 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 			CreateAccessToken(claimsIdentity: claimsIdentity, expireIn: accessTokenExpiredTime);
 
 		var accessTokenHash =
-			SecuriyHelper.ToSha256(accessToken);
+			SecurityHelper.ToSha256(accessToken);
 
 		await UpdateAccessTokenInDB(id: userTokenId, tokenHash: accessTokenHash);
 
@@ -455,8 +455,10 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 		var result =
 			new Result<LoginResponseViewModel>();
 
-		var foundedUser =
+		var foundedToken =
 			await GetUserByRefreshToken(refreshToken: requestedRefreshToken);
+
+		var foundedUser = foundedToken?.User;
 
 		if (foundedUser == null)
 		{
@@ -489,7 +491,10 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 		var refreshToken = CreateRefreshToken();
 
 		var refreshTokenHash =
-			SecuriyHelper.ToSha256(refreshToken);
+			SecurityHelper.ToSha256(refreshToken);
+
+		if(foundedToken is not null)
+			foundedToken.IsRevoked = true;
 
 		var userTokenId =
 			await InitializeTokenInDb(userId: foundedUser.Id,
@@ -506,11 +511,9 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 			CreateAccessToken(claimsIdentity: claimsIdentity, expireIn: accessTokenExpiredTime);
 
 		var accessTokenHash =
-			SecuriyHelper.ToSha256(accessToken);
+			SecurityHelper.ToSha256(accessToken);
 
 		await UpdateAccessTokenInDB(id: userTokenId, tokenHash: accessTokenHash);
-
-		await DeleteUserTokenByRefreshToken(requestedRefreshToken);
 
 		string successMessage = string.Format
 			(Resources.Messages.SuccessMessages.LoginSuccessful);
@@ -530,13 +533,13 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 		await RemoveUserLoggedInFromCache(foundedUser.Id);
 
 		if (_logger.IsWarningEnabled)
-			_logger.LogInformation(Resources.Resource.UserLoginSuccessfulInformation, parameters: new List<object?>
-			{
+			_logger.LogInformation(Resources.Resource.UserLoginSuccessfulInformation, parameters:
+			[
 				new
 				{
 					requestedRefreshToken,
 				}
-			});
+			]);
 
 		return result;
 	}
@@ -826,11 +829,12 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 	}
 
 
-	private async Task<User?> GetUserByRefreshToken(string refreshToken)
+	private async Task<UserToken?> GetUserByRefreshToken(string refreshToken)
 	{
-		return await _databaseContext.UserAccessTokens!
-			.Where(current => current.RefreshTokenHash == SecuriyHelper.ToSha256(refreshToken))
-			.Select(current => current.User)
+		return await 
+			_databaseContext.UserAccessTokens!
+			.Include(current => current.User)
+			.Where(current => current.RefreshTokenHash == SecurityHelper.ToSha256(refreshToken))
 			.FirstOrDefaultAsync();
 	}
 
@@ -913,7 +917,7 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 	public async Task DeleteUserTokenByRefreshToken(string refreshToken)
 	{
 		await _databaseContext.UserAccessTokens!
-			.Where(current => current.RefreshTokenHash == SecuriyHelper.ToSha256(refreshToken))
+			.Where(current => current.RefreshTokenHash == SecurityHelper.ToSha256(refreshToken))
 			.ExecuteDeleteAsync();
 	}
 	#endregion /Private Methods

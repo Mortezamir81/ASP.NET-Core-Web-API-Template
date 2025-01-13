@@ -3,7 +3,7 @@
 namespace Server.Controllers.V1;
 
 /// <summary>
-/// User Managment and Authentication or Authorization
+/// User Management and Authentication or Authorization
 /// </summary>
 public partial class UsersController : BaseController
 {
@@ -96,7 +96,7 @@ public partial class UsersController : BaseController
 	public async Task<ActionResult<Result>>
 		ChangeUserRoleAsync([FromBody] ChangeUserRoleRequestViewModel requestViewModel)
 	{
-		var adminId = GetRequierdUserId();
+		var adminId = GetRequiredUserId();
 
 		var serviceResult =
 			await _userServices.ChangeUserRoleAsync(requestViewModel, adminId: adminId);
@@ -122,7 +122,7 @@ public partial class UsersController : BaseController
 
 
 	/// <summary>
-	/// Update user informations by admin (by userId)
+	/// Update user information by admin (by userId)
 	/// </summary>
 	[LogInputParameter(InputLogLevel.Warning)]
 	[Authorize(Roles = $"{Constants.Role.SystemAdmin},{Constants.Role.Admin}")]
@@ -130,7 +130,7 @@ public partial class UsersController : BaseController
 	public async Task<ActionResult>
 		UpdateUserByAdminAsync(UpdateUserByAdminRequestViewModel requestViewModel)
 	{
-		var adminId = GetRequierdUserId();
+		var adminId = GetRequiredUserId();
 
 		var serviceResult =
 			await _userServices.UpdateUserByAdminAsync(viewModel: requestViewModel, adminId: adminId);

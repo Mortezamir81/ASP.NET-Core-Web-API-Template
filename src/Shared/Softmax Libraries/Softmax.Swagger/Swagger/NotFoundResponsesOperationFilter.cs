@@ -11,10 +11,10 @@ public class NotFoundResponsesOperationFilter : IOperationFilter
 
 	public void Apply(OpenApiOperation operation, OperationFilterContext context)
 	{
-		var badRequsetResult = new Result<object>();
+		var badRequestResult = new Result<object>();
 
-		badRequsetResult.AddErrorMessage
-			(nameof(MessageCode.HttpNotFoundError), messageCode: MessageCode.HttpNotFoundError);
+		badRequestResult.AddErrorMessage
+			(message: nameof(MessageCode.HttpNotFoundError), MessageCode.HttpNotFoundError);
 
 		var badRequestResponse =
 			new Dictionary<string, OpenApiMediaType>
@@ -23,7 +23,7 @@ public class NotFoundResponsesOperationFilter : IOperationFilter
 						"application/json",
 						new OpenApiMediaType
 						{
-							Example = _objectBuilder.Build(badRequsetResult)
+							Example = _objectBuilder.Build(badRequestResult)
 						}
 					}
 			};
