@@ -1,4 +1,5 @@
 ﻿using Infrastructure.Utilities;
+using Microsoft.IdentityModel.JsonWebTokens;
 
 namespace Infrastructure.Validator;
 
@@ -38,9 +39,9 @@ public class TokenValidator : ITokenValidator
 			.FirstOrDefaultAsync(current => current.Id == userTokenId);
 
 		var accessToken =
-			context.SecurityToken as JwtSecurityToken;
+			context.SecurityToken as JsonWebToken;
 
-		if (userToken == null || userToken.AccessTokenHash != SecurityHelper.ToSha256(accessToken?.RawData))
+		if (userToken == null || userToken.AccessTokenHash != SecurityHelper.ToSha256(accessToken?.EncodedToken))
 		{
 			context.Fail(nameof(HttpStatusCode.Unauthorized));
 			return;
