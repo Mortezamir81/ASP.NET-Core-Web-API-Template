@@ -46,7 +46,7 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 			var errorMessage = string.Format
 				(Resources.Messages.ErrorMessages.AccessDenied);
 
-			result.AddErrorMessage(errorMessage, MessageCode.HttpForbidenError);
+			result.AddErrorMessage(errorMessage, MessageCode.HttpForbiddenError);
 
 			return result;
 		}
@@ -103,7 +103,7 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 			string errorMessage = string.Format
 				(Resources.Messages.ErrorMessages.AccessDenied);
 
-			result.AddErrorMessage(errorMessage, MessageCode.HttpForbidenError);
+			result.AddErrorMessage(errorMessage, MessageCode.HttpForbiddenError);
 
 			return result;
 		}
@@ -209,7 +209,7 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 				string errorMessage = string.Format
 					(Resources.Messages.ErrorMessages.AccessDeniedForUpdateThisUser);
 
-				result.AddErrorMessage(errorMessage, MessageCode.HttpForbidenError);
+				result.AddErrorMessage(errorMessage, MessageCode.HttpForbiddenError);
 
 				return result;
 			}
@@ -219,7 +219,7 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 				string errorMessage = string.Format
 					(Resources.Messages.ErrorMessages.AccessDeniedForUpdateThisUser);
 
-				result.AddErrorMessage(errorMessage, MessageCode.HttpForbidenError);
+				result.AddErrorMessage(errorMessage, MessageCode.HttpForbiddenError);
 
 				return result;
 			}
@@ -426,7 +426,7 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 
 		if (!identityRoleResult.Succeeded)
 		{
-			foreach (var error in identityUserResult.Errors)
+			foreach (var error in identityRoleResult.Errors)
 			{
 				result.AddErrorMessage(error.Description);
 			}
@@ -607,7 +607,7 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 			var errorMessage = string.Format
 				(Resources.Messages.ErrorMessages.AccessDeniedForChangeRole);
 
-			result.AddErrorMessage(errorMessage, MessageCode.HttpForbidenError);
+			result.AddErrorMessage(errorMessage, MessageCode.HttpForbiddenError);
 
 			return result;
 		}
@@ -617,7 +617,7 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 			var errorMessage = string.Format
 				(Resources.Messages.ErrorMessages.AccessDeniedForChangeRole);
 
-			result.AddErrorMessage(errorMessage, MessageCode.HttpForbidenError);
+			result.AddErrorMessage(errorMessage, MessageCode.HttpForbiddenError);
 
 			return result;
 		}
@@ -627,7 +627,7 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 			var errorMessage = string.Format
 				(Resources.Messages.ErrorMessages.AccessDeniedForChangeRole);
 
-			result.AddErrorMessage(errorMessage, MessageCode.HttpForbidenError);
+			result.AddErrorMessage(errorMessage, MessageCode.HttpForbiddenError);
 
 			return result;
 		}
