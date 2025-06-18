@@ -426,6 +426,7 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 
         if (!identityRoleResult.Succeeded)
         {
+            // تغییر دادم
             foreach (var error in identityRoleResult.Errors)
             {
                 result.AddErrorMessage(error.Description);
