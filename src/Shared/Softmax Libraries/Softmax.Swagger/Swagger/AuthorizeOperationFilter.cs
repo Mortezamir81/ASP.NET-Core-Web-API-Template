@@ -77,7 +77,7 @@ public class AuthorizeOperationFilter : IOperationFilter
 			var forbiddenResult = new Result();
 
 			forbiddenResult.AddErrorMessage
-				(message: nameof(MessageCode.HttpForbidenError), MessageCode.HttpForbidenError);
+				(message: nameof(MessageCode.HttpForbiddenError), MessageCode.HttpForbiddenError);
 
 			var forbiddenResponse =
 				new Dictionary<string, OpenApiMediaType>

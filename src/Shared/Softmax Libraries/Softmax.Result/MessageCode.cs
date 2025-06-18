@@ -7,5 +7,5 @@ public enum MessageCode : int
 	HttpServerError = 500,
 	HttpNotFoundError = 404,
 	HttpUnauthorizeError = 401,
-	HttpForbidenError = 403,
+	HttpForbiddenError = 403,
 }
