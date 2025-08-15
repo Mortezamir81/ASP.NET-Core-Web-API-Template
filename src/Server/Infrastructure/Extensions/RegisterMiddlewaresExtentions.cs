@@ -10,6 +10,8 @@ public static class RegisterMiddlewareExtensions
 	{
 		ArgumentNullException.ThrowIfNull(applicationSettings);
 
+		app.UseForwardedHeaders();
+
 		if (app.Environment.IsProduction())
 		{
 			app.UseGlobalExceptionMiddleware();

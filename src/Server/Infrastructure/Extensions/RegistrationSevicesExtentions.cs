@@ -4,6 +4,7 @@ using Hangfire;
 using Infrastructure.Utilities;
 using Infrastructure.Validator;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Softmax.Mail.Extentions;
@@ -18,6 +19,12 @@ public static class RegistrationSevicesExtentions
 		(this IServiceCollection services, IConfiguration configuration, ApplicationSettings? applicationSettings)
 	{
 		ArgumentNullException.ThrowIfNull(applicationSettings);
+
+		services.Configure<ForwardedHeadersOptions>(options =>
+		{
+			options.ForwardedHeaders =
+				ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+		});
 
 		services.AddDNTCommonWeb();
 		

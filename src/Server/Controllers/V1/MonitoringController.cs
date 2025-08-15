@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using EFCoreSecondLevelCacheInterceptor;
+using System.Diagnostics;
 
 namespace Server.Controllers.V1;
 
@@ -9,6 +10,7 @@ public partial class MonitoringController : BaseController
 {
 	#region Fields
 	[AutoInject] private readonly IEasyCachingProvider _cache;
+	[AutoInject] private readonly IEFCacheServiceProvider _efCacheServiceProvider;
 	#endregion /Fields
 
 	#region Constractor
@@ -40,6 +42,8 @@ public partial class MonitoringController : BaseController
 	[Authorize(Roles = $"{Constants.Role.SystemAdmin}")]
 	public async Task<ActionResult> RemoveAllCaches()
 	{
+		_efCacheServiceProvider.ClearAllCachedEntries();
+
 		await _cache.RemoveByPrefixAsync($"user-Id");
 
 		return Ok();

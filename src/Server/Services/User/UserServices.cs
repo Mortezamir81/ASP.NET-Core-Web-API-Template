@@ -53,6 +53,8 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 
 		foundedUser.IsBanned = !foundedUser.IsBanned;
 
+		await _databaseContext.SaveChangesAsync();
+
 		await _userRepository.DeleteUserTokens(userId: foundedUser.Id);
 
 		await RemoveUserLoggedInFromCache(userId);
@@ -262,6 +264,8 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 		user.Email = requestViewModel.Email;
 		user.UserName = requestViewModel.UserName;
 		user.FullName = requestViewModel.FullName;
+
+		await _databaseContext.SaveChangesAsync();
 
 		await _userRepository.DeleteUserTokens(userId: user.Id);
 

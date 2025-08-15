@@ -17,7 +17,9 @@ const initLoginForm = () => {
 
     overrideSwaggerAuthorizeEvent(swagger);
     overrideSwaggerLogoutEvent(swagger);
-    tryAuthorizeWithLocalData(swagger);
+    setTimeout(() => {
+        tryAuthorizeWithLocalData(swagger);
+    }, 100);
     showLoginUI(swagger);
 }
 
@@ -35,14 +37,27 @@ const tryAuthorizeWithLocalData = (swagger) => {
 
 const overrideSwaggerAuthorizeEvent = (swagger) => {
     const originalAuthorize = swagger.authActions.authorize;
-    swagger.authActions.authorize = async (args) => {
-        const result = await originalAuthorize(args);
+    swagger.authActions.authorize = function (args) {
+        console.log('Authorization args:', args);
+        console.log(arguments);
+
+        const result = originalAuthorize.apply(this, arguments);
+        console.log('Authorization result:', result);
+        console.log('Result type:', typeof result);
 
         if (!getCookie(ACCESS_TOKEN_COOKIE_NAME)) {
-            setCookie(ACCESS_TOKEN_COOKIE_NAME, result.payload.bearerAuth.value, accessTokenExpiresIn);
+            const token = args?.bearerAuth?.value;
+            if (token) {
+                console.log('Setting token in cookie:', token);
+                setCookie(ACCESS_TOKEN_COOKIE_NAME, token, accessTokenExpiresIn);
+            } else {
+                console.warn('Token not found in args');
+            }
         }
 
-        reloadPage(swagger);
+        // Reload با تاخیر
+        setTimeout(() => reloadPage(swagger), 100);
+
         return result;
     };
 }
@@ -145,8 +160,8 @@ const createLoginUI = function (swagger, rootDiv) {
 }
 
 const login = async (swagger, userName, password) => {
-    const response = await fetch('/api/v1/users/login', {
-        headers: { "Content-Type": "application/json; charset=utf-8" },
+    const response = await fetch('/api/users/login', {
+        headers: { "Content-Type": "application/json; charset=utf-8", "X-Version": "1.0" },
         method: 'POST',
         body: JSON.stringify({ "userName": userName, "password": password })
     })
