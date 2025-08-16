@@ -30,6 +30,7 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Pluralize.NET" Version="1.0.2" />
     <PackageReference Include="Scrutor" Version="6.1.0" />
+    <PackageReference Include="Softmax.Result" Version="1.0.0" />
     <PackageReference Include="Softmax.ZarinPal" Version="1.1.0" />
     <PackageReference Include="Stax.SwaggerAuthorization" Version="1.0.1" />
   </ItemGroup>
@@ -45,7 +46,6 @@
     <ProjectReference Include="..\Shared\Shared\Shared.csproj" />
     <ProjectReference Include="..\Shared\Softmax Libraries\Softmax.Abstractions\Softmax.Abstractions.csproj" />
     <ProjectReference Include="..\Shared\Softmax Libraries\Softmax.Mail\Softmax.Mail.csproj" />
-    <ProjectReference Include="..\Shared\Softmax Libraries\Softmax.Result\Softmax.Result.csproj" />
     <ProjectReference Include="..\Shared\Softmax Libraries\Softmax.Swagger\Softmax.Swagger.csproj" />
     <ProjectReference Include="..\Shared\Softmax Libraries\Softmax.Utilities\Softmax.Utilities.csproj" />
   </ItemGroup>

@@ -25,7 +25,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Server\Server.csproj" />
-    <ProjectReference Include="..\Shared\Softmax Libraries\Softmax.Result\Softmax.Result.csproj" />
     <ProjectReference Include="..\Shared\Softmax Libraries\Softmax.Utilities\Softmax.Utilities.csproj" />
   </ItemGroup>
 
