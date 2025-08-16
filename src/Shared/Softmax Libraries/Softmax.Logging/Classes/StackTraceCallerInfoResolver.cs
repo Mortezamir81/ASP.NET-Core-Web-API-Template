@@ -65,10 +65,7 @@ public class SmartStackTraceResolver : ICallerInfoResolver
 				// Found the user code!
 				return new CallerInfo
 				{
-					ClassName = declaringType.Name,
 					MethodName = method.Name,
-					FilePath = frame.GetFileName(), // Requires PDB files
-					LineNumber = frame.GetFileLineNumber() // Requires PDB files
 				};
 			}
 		}
@@ -87,20 +84,18 @@ public class SmartStackTraceResolver : ICallerInfoResolver
 /// </summary>
 public record CallerInfo
 {
-	public string? ClassName { get; init; }
 	public string? MethodName { get; init; }
 	public string? FilePath { get; init; }
 	public int LineNumber { get; init; }
 
 	public static readonly CallerInfo Empty = new()
 	{
-		ClassName = "N/A",
 		MethodName = "N/A",
 		FilePath = "N/A",
 		LineNumber = 0
 	};
 
-	public override string ToString() => $"{ClassName}.{MethodName} ({FilePath}:{LineNumber})";
+	public override string ToString() => $"{MethodName} ({FilePath}:{LineNumber})";
 }
 
 /// <summary>
