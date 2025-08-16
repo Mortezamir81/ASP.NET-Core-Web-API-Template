@@ -283,6 +283,14 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 	public async Task<Result<LoginResponseViewModel>>
 		LoginAsync(LoginRequestViewModel requestViewModel, string? ipAddress)
 	{
+		_logger.LogWarning("UserLoginSuccessful", new { requestViewModel.UserName, Pass = "Hi", Age = 25 });
+		_logger.LogWarning("UserLoginSuccessful {Username}", requestViewModel.UserName);
+		_logger.LogWarning("UserLoginSuccessful {Username} {Password}", requestViewModel.UserName, "Pass");
+
+
+		_logger.LogCritical(new Exception("Hi", new InvalidOperationException("Invalid")), "UserLoginFaild {Username} {Password}", requestViewModel.UserName, "Pass");
+		_logger.LogCritical(new Exception("Hi", new InvalidOperationException("Invalid")), "UserLoginFaild", new { requestViewModel.UserName, Pass = "Hi", Age = 25 });
+
 		var result =
 			new Result<LoginResponseViewModel>();
 
@@ -517,8 +525,7 @@ public partial class UserServices : BaseServices, IUserServices, IRegisterAsScop
 
 		await RemoveUserLoggedInFromCache(foundedUser.Id);
 
-		if (_logger.IsWarningEnabled)
-			_logger.LogInformation(Resources.Resource.UserLoginSuccessfulInformation, new { userId = foundedUser.Id });
+		_logger.LogInformation(Resources.Resource.UserLoginSuccessfulInformation, new { userId = foundedUser.Id });
 
 		return result;
 	}

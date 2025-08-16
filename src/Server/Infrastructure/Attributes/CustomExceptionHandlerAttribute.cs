@@ -1,4 +1,6 @@
-﻿namespace Infrastructure.Attributes;
+﻿using Dtat.Logging;
+
+namespace Infrastructure.Attributes;
 
 public class CustomExceptionHandlerAttribute : ActionFilterAttribute
 {
@@ -17,10 +19,10 @@ public class CustomExceptionHandlerAttribute : ActionFilterAttribute
 				context.RouteData.Values["action"]?.ToString();
 
 			_logger.LogCritical
-				(exception: context.Exception,
-					classType: context.Controller.GetType(),
+				(ex: context.Exception,
+					type: context.Controller.GetType(),
 					message: context.Exception.Message,
-					new { ActionName = actionName, Handler = "CustomExceptionHandler" });
+					arg1: new { ActionName = actionName, Handler = "CustomExceptionHandler" });
 
 			var result = new Result();
 

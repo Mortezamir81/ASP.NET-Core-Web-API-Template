@@ -4,78 +4,26 @@ namespace Dtat.Logging;
 
 public interface ILogger<T> where T : class
 {
-	bool IsTraceEnabled { get; }
-	bool IsDebugEnabled { get; }
-	bool IsInformationEnabled { get; }
-	bool IsWarningEnabled { get; }
-	bool IsErrorEnabled { get; }
-	bool IsCriticalEnabled { get; }
+	bool IsEnabled(LogLevel logLevel);
 
-	void LogTrace(
-		string message,
-		params object?[] args);
+	void Log(LogLevel logLevel, Exception? exception, string? message);
 
-	void LogDebug(
-		string message,
-		params object?[] args);
+	void Log<T1>(LogLevel logLevel, Exception? exception, string? message, T1 parameter);
 
-	void LogInformation(
-		string message,
-		params object?[] args);
+	void Log<T1, T2>(LogLevel logLevel, Exception? exception, string? message, T1 parameter1, T2 parameter2);
 
-	void LogWarning(
-		string message,
-		params object?[] args);
-
-	void LogError(
-		Exception exception,
-		string message,
-		params object?[] args);
-
-	void LogCritical(
-		Exception exception,
-		string message,
-		params object?[] args);
+	void Log(LogLevel logLevel, Exception? exception, string? message, params object?[] args);
 }
 
 public interface ILogger
 {
-	bool IsTraceEnabled { get; }
-	bool IsDebugEnabled { get; }
-	bool IsInformationEnabled { get; }
-	bool IsWarningEnabled { get; }
-	bool IsErrorEnabled { get; }
-	bool IsCriticalEnabled { get; }
+	bool IsEnabled(LogLevel logLevel); 
 
-	void LogTrace(
-		Type classType,
-		string message,
-		params object?[] args);
+	void Log(Type type, LogLevel logLevel, Exception? exception, string? message);
 
-	void LogDebug(
-		Type classType,
-		string message,
-		params object?[] args);
+	void Log<T1>(Type type, LogLevel logLevel, Exception? exception, string? message, T1 parameter);
 
-	void LogInformation(
-		Type classType,
-		string message,
-		params object?[] args);
+	void Log<T1, T2>(Type type, LogLevel logLevel, Exception? exception, string? message, T1 parameter1, T2 parameter2);
 
-	void LogWarning(
-		Type classType,
-		string message,
-		params object?[] args);
-
-	void LogError(
-		Exception exception,
-		Type classType,
-		string message,
-		params object?[] args);
-
-	void LogCritical(
-		Exception exception,
-		Type classType,
-		string message,
-		params object?[] args);
+	void Log(Type type, LogLevel logLevel, Exception? exception, string? message, params object?[] args);
 }

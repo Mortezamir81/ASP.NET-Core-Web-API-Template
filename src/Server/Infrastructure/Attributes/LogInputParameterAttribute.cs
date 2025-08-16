@@ -36,22 +36,22 @@ public class LogInputParameterAttribute : ActionFilterAttribute, IRegisterAsScop
 					case InputLogLevel.Debug:
 						logger?.LogDebug
 							(message: Resources.Resource.InputPropertiesInfo,
-								args: new { parameters },
-								classType: filterContext.Controller.GetType());
+								arg1: new { parameters },
+								type: filterContext.Controller.GetType());
 						break;
 
 					case InputLogLevel.Information:
 						logger?.LogInformation
 							(message: Resources.Resource.InputPropertiesInfo,
-								args: new { parameters },
-								classType: filterContext.Controller.GetType());
+								arg1: new { parameters },
+								type: filterContext.Controller.GetType());
 						break;
 
 					case InputLogLevel.Warning:
 						logger?.LogWarning
 							(message: Resources.Resource.InputPropertiesInfo,
-								args: new { parameters },
-								classType: filterContext.Controller.GetType());
+								arg1: new { parameters },
+								type: filterContext.Controller.GetType());
 						break;
 				}
 			}
