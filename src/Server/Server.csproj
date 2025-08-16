@@ -17,21 +17,19 @@
   <ItemGroup>
     <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.0" />
     <PackageReference Include="AutoMapper" Version="15.0.1" />
-    <PackageReference Include="Bit.SourceGenerators" Version="9.3.0" />
+    <PackageReference Include="Bit.SourceGenerators" Version="9.11.3" />
     <PackageReference Include="DNTCommon.Web.Core" Version="8.4.0" />
     <PackageReference Include="EasyCaching.InMemory" Version="1.9.2" />
-    <PackageReference Include="EFCoreSecondLevelCacheInterceptor" Version="5.0.0" />
-    <PackageReference Include="EFCoreSecondLevelCacheInterceptor.MemoryCache" Version="5.0.0" />
-    <PackageReference Include="Gridify" Version="2.16.0" />
-    <PackageReference Include="Gridify.EntityFramework" Version="2.16.0" />
-    <PackageReference Include="Hangfire.AspNetCore" Version="1.8.17" />
-    <PackageReference Include="Hangfire.Core" Version="1.8.17" />
+    <PackageReference Include="EFCoreSecondLevelCacheInterceptor" Version="5.3.1" />
+    <PackageReference Include="EFCoreSecondLevelCacheInterceptor.MemoryCache" Version="5.3.1" />
+    <PackageReference Include="Gridify.EntityFramework" Version="2.16.3" />
+    <PackageReference Include="Hangfire.AspNetCore" Version="1.8.21" />
     <PackageReference Include="Hangfire.InMemory" Version="1.0.0" />
-    <PackageReference Include="HtmlSanitizer" Version="8.1.870" />
+    <PackageReference Include="HtmlSanitizer" Version="9.0.886" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.8" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.1.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Pluralize.NET" Version="1.0.2" />
-    <PackageReference Include="Scrutor" Version="6.0.0" />
+    <PackageReference Include="Scrutor" Version="6.1.0" />
     <PackageReference Include="Softmax.ZarinPal" Version="1.1.0" />
     <PackageReference Include="Stax.SwaggerAuthorization" Version="1.0.1" />
   </ItemGroup>

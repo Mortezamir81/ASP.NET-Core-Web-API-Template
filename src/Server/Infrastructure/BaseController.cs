@@ -1,4 +1,6 @@
-﻿namespace Infrastructure;
+﻿using Asp.Versioning;
+
+namespace Infrastructure;
 
 [ApiController]
 [ApiVersion("1")]
