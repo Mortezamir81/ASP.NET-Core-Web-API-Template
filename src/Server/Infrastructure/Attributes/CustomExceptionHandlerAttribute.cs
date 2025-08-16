@@ -18,8 +18,9 @@ public class CustomExceptionHandlerAttribute : ActionFilterAttribute
 
 			_logger.LogCritical
 				(exception: context.Exception,
+					classType: context.Controller.GetType(),
 					message: context.Exception.Message,
-					methodName: actionName, classType: context.Controller.GetType());
+					new { ActionName = actionName, Handler = "CustomExceptionHandler" });
 
 			var result = new Result();
 

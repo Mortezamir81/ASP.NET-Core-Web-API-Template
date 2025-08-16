@@ -5,12 +5,12 @@ namespace Dtat.Logging;
 
 public class LogModel : object
 {
-	public LogModel(string logLevel) : base()
+	public LogModel(LogLevel logLevel) : base()
 	{
 		LogLevel = logLevel;
 	}
 
-	public string LogLevel { get; set; }
+	public LogLevel LogLevel { get; set; }
 
 	public string? ApplicationName { get; set; }
 
@@ -39,17 +39,50 @@ public class LogModel : object
 
 	public string? Message { get; set; }
 
-	public List<object?>? Parameters { get; set; }
+	public object?[]? Parameters { get; set; }
 
 	public List<ExceptionModel>? Exceptions { get; set; }
 
 
 	public override string ToString()
 	{
-		var json =
-			JsonSerializer.Serialize(this);
+		// Provide a simple, fast, and safe summary for debugging purposes.
+		return $"[{LogLevel}] {Message}";
+	}
 
-		return json;
+	public void Reset(LogLevel logLevel)
+	{
+		LogLevel = logLevel;
+		ApplicationName = null;
+		Namespace = null;
+		ClassName = null;
+		MethodName = null;
+		LocalIP = null;
+		LocalPort = null;
+		RemoteIP = null;
+		UserName = null;
+		RequestPath = null;
+		HttpReferrer = null;
+		Message = null;
+		Parameters = null;
+		Exceptions?.Clear();
+	}
+
+	public void Clear()
+	{
+		ApplicationName = null;
+		Namespace = null;
+		ClassName = null;
+		MethodName = null;
+		LocalIP = null;
+		LocalPort = null;
+		RemoteIP = null;
+		UserName = null;
+		RequestPath = null;
+		HttpReferrer = null;
+		Message = null;
+		Parameters = null;
+		Exceptions = null;
 	}
 }
 

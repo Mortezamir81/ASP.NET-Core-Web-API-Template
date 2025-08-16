@@ -31,10 +31,7 @@ public partial class EmailSenderWithSchedule
 		}
 		catch (Exception e)
 		{
-			_logger.LogCritical(exception: e, message: e.Message, parameters: new List<object?>
-			{
-				to, subject, body
-			});
+			_logger.LogCritical(exception: e, message: e.Message, new { to, subject, body });
 
 			throw;
 		}

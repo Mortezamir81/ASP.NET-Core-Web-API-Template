@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.ObjectPool;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -10,14 +11,23 @@ namespace Dtat.Logging;
 
 public abstract class LoggerBase
 {
+	protected static readonly ThreadLocal<CultureInfo> _englishCulture = new(() => new CultureInfo("en-US"));
+	private static readonly ObjectPool<LogModel> _logModelPool =
+		new DefaultObjectPool<LogModel>(new LogModelPooledObjectPolicy());
+
 	#region Constructor
-	protected LoggerBase(IHttpContextAccessor? httpContextAccessor = null) : base()
+	protected LoggerBase(
+		IHttpContextAccessor? httpContextAccessor = null,
+		ICallerInfoResolver? callerInfoResolver = null,
+		StackTraceResolverOptions? stackTraceResolverOptions = null) : base()
 	{
 		HttpContextAccessor = httpContextAccessor;
+		CallerInfoResolver = callerInfoResolver ?? new SmartStackTraceResolver(stackTraceResolverOptions ?? new StackTraceResolverOptions());
 	}
 	#endregion /Constructor
 
 	#region Properties
+	protected ICallerInfoResolver CallerInfoResolver { get; }
 	public IHttpContextAccessor? HttpContextAccessor { get; }
 	public bool IsTraceEnabled { get; set; } = false;
 	public bool IsDebugEnabled { get; set; } = false;
@@ -34,21 +44,24 @@ public abstract class LoggerBase
 			return null;
 
 		var exceptions = new List<ExceptionModel>();
-
-		Exception? currentException = exception;
-
-		int index = 1;
+		var currentException = exception;
+		var index = 1;
+		var messageBuilder = new System.Text.StringBuilder();
 
 		while (currentException != null)
 		{
-			exceptions.Add(new ExceptionModel(message: $"{currentException.Message} - (Message Level: {index})")
+			messageBuilder.Clear();
+			messageBuilder.Append(currentException.Message);
+			messageBuilder.Append(" - (Message Level: ");
+			messageBuilder.Append(index);
+			messageBuilder.Append(')');
+
+			exceptions.Add(new ExceptionModel(messageBuilder.ToString())
 			{
 				StackTrace = currentException.StackTrace,
 			});
 
-			currentException =
-				currentException.InnerException;
-
+			currentException = currentException.InnerException;
 			index++;
 		}
 
@@ -56,27 +69,73 @@ public abstract class LoggerBase
 	}
 	#endregion /GetExceptions
 
-	#region GetParameters
-	protected virtual List<object>? GetParameters(List<object?>? parameters)
+	#region Log
+	protected void Log(
+			LogLevel logLevel,
+			Type classType,
+			string? message,
+			Exception? exception,
+			string? methodName,
+			object?[]? args)
 	{
-		List<object>? returnValue = null;
+		LogModel? logModel = null;
+		CultureInfo? originalCulture = null;
 
-		if (parameters != null && parameters.Count > 0)
+		try
 		{
-			returnValue = new List<object>();
-
-			parameters.ForEach(current =>
+			if (!Thread.CurrentThread.CurrentCulture.Name.Equals("en-US", StringComparison.OrdinalIgnoreCase))
 			{
-				if (current != null)
-				{
-					returnValue.Add(current);
-				}
-			});
-		}
+				originalCulture = Thread.CurrentThread.CurrentCulture;
+				Thread.CurrentThread.CurrentCulture = _englishCulture.Value!;
+			}
 
-		return returnValue;
+			var context = HttpContextAccessor?.HttpContext;
+			logModel = _logModelPool.Get();
+			logModel.Reset(logLevel);
+
+			logModel.Message = message; // Storing the template
+			logModel.Parameters = args; // Storing the args array
+			logModel.Namespace = classType.Namespace;
+			logModel.ClassName = classType.Name;
+			logModel.ApplicationName = classType.Assembly?.FullName;
+			logModel.MethodName = methodName;
+			logModel.Exceptions = GetExceptions(exception);
+
+			if (context != null)
+			{
+				var connection = context.Connection;
+				var httpRequest = context.Request;
+
+				logModel.RemoteIP = connection?.RemoteIpAddress?.ToString();
+				logModel.LocalIP = connection?.LocalIpAddress?.ToString();
+				logModel.LocalPort = connection?.LocalPort.ToString();
+				logModel.UserName = context.User?.Identity?.Name;
+				logModel.RequestPath = httpRequest?.Path.Value;
+				logModel.HttpReferrer = httpRequest?.Headers["Referer"].ToString();
+			}
+
+			LogByFavoriteLibrary(logModel, exception);
+		}
+		catch(Exception ex)
+		{
+#if DEBUG
+			System.Diagnostics.Debug.WriteLine($"[Dtat.Logging Internal Error]: {ex}");
+#endif
+		}
+		finally
+		{
+			if (originalCulture != null)
+			{
+				Thread.CurrentThread.CurrentCulture = originalCulture;
+			}
+
+			if (logModel != null)
+			{
+				_logModelPool.Return(logModel);
+			}
+		}
 	}
-	#endregion /GetParameters
+	#endregion
 
 	protected abstract void LogByFavoriteLibrary(LogModel logModel, Exception? exception);
 }
@@ -84,430 +143,153 @@ public abstract class LoggerBase
 public abstract class Logger<T> : LoggerBase, ILogger<T> where T : class
 {
 	#region Constructor
-	protected Logger(IHttpContextAccessor? httpContextAccessor = null) : base(httpContextAccessor)
+	protected Logger(
+			IHttpContextAccessor? httpContextAccessor = null,
+			ICallerInfoResolver? callerInfoResolver = null,
+			StackTraceResolverOptions? stackTraceResolverOptions = null) : base(httpContextAccessor, callerInfoResolver, stackTraceResolverOptions)
 	{
 	}
 	#endregion /Constructor
 
 	#region Log
-	protected bool Log(string logLevel,
-		string? message,
-		Exception? exception = null,
-		List<object?>? parameters = null,
-		string? methodName = null)
+	private void Log(
+			LogLevel logLevel,
+			Exception? exception,
+			string message,
+			params object?[]? args)
 	{
-		try
-		{
-			// **************************************************
-			string currentCultureName =
-				Thread.CurrentThread.CurrentCulture.Name;
+		// Use the resolver to get caller info
+		// The number 2 is passed to skip Log() and LogInformation() frames
+		var callerInfo = CallerInfoResolver.Resolve(skipFrames: 2);
 
-			var newCultureInfo =
-				new CultureInfo(name: "en-US");
-
-			var currentCultureInfo =
-				new CultureInfo(currentCultureName);
-
-			Thread.CurrentThread.CurrentCulture = newCultureInfo;
-			// **************************************************
-
-			var connection =
-				HttpContextAccessor?.HttpContext?.Connection;
-
-			var httpRequest =
-				HttpContextAccessor?.HttpContext?.Request;
-
-			var logModel = new LogModel(logLevel: logLevel)
-			{
-				Message = message,
-				Namespace = typeof(T).Namespace,
-				RemoteIP = connection?.RemoteIpAddress?.ToString(),
-				LocalIP = connection?.LocalIpAddress?.ToString(),
-				LocalPort = connection?.LocalPort.ToString(),
-				UserName = HttpContextAccessor?.HttpContext?.User?.Identity?.Name,
-				RequestPath = httpRequest?.Path,
-				HttpReferrer = httpRequest?.Headers["Referer"],
-				ApplicationName = typeof(T).GetTypeInfo()?.Assembly?.FullName?.ToString(),
-				ClassName = typeof(T).Name,
-				Parameters = parameters,
-				Exceptions = GetExceptions(exception: exception),
-				MethodName = methodName,
-			};
-
-			LogByFavoriteLibrary(logModel: logModel, exception: exception);
-
-			// **************************************************
-			Thread.CurrentThread.CurrentCulture = currentCultureInfo;
-			// **************************************************
-
-			return true;
-		}
-		catch
-		{
-			return false;
-		}
+		base.Log(
+			logLevel: logLevel,
+			classType: typeof(T),
+			message: message,
+			exception: exception,
+			methodName: callerInfo?.MethodName,
+			args: args
+		);
 	}
 	#endregion /Log
 
-	#region LogTrace
-	public virtual bool LogTrace
-		(string message,
-		[CallerMemberName] string? methodName = null,
-		List<object?>? parameters = null)
+	public virtual void LogTrace(string message, params object?[] args)
 	{
-		if (string.IsNullOrWhiteSpace(message))
-			return false;
-
 		if (!IsTraceEnabled)
-			return false;
-
-		bool result =
-			Log(methodName: methodName,
-				logLevel: nameof(LogLevel.Trace),
-				message: message,
-				exception: null,
-				parameters: parameters);
-
-		return result;
+			return;
+		Log(LogLevel.Trace, null, message, args);
 	}
-	#endregion /LogTrace
 
-	#region LogDebug
-	public virtual bool LogDebug
-		(string message,
-		[CallerMemberName] string? methodName = null,
-		List<object?>? parameters = null)
+	public virtual void LogDebug(string message, params object?[] args)
 	{
-		if (string.IsNullOrWhiteSpace(message))
-			return false;
-
 		if (!IsDebugEnabled)
-			return false;
-
-		bool result =
-			Log(methodName: methodName,
-				logLevel: nameof(LogLevel.Debug),
-				message: message,
-				exception: null,
-				parameters: parameters);
-
-		return result;
+			return;
+		Log(LogLevel.Debug, null, message, args);
 	}
-	#endregion /LogDebug
 
-	#region LogInformation
-	public virtual bool LogInformation
-		(string message,
-		[CallerMemberName] string? methodName = null,
-		List<object?>? parameters = null)
+	public virtual void LogInformation(string message, params object?[] args)
 	{
-		if (string.IsNullOrWhiteSpace(message))
-			return false;
-
 		if (!IsInformationEnabled)
-			return false;
-
-		bool result =
-			Log(methodName: methodName,
-				logLevel: nameof(LogLevel.Information),
-				message: message,
-				exception: null,
-				parameters: parameters);
-
-		return result;
+			return;
+		Log(LogLevel.Information, null, message, args);
 	}
-	#endregion /LogInformation
 
-	#region LogWarning
-	public virtual bool LogWarning
-		(string message,
-		[CallerMemberName] string? methodName = null,
-		List<object?>? parameters = null)
+	public virtual void LogWarning(string message, params object?[] args)
 	{
-		if (string.IsNullOrWhiteSpace(message))
-			return false;
-
 		if (!IsWarningEnabled)
-			return false;
-
-		bool result =
-			Log(methodName: methodName,
-				logLevel: nameof(LogLevel.Warning),
-				message: message,
-				exception: null,
-				parameters: parameters);
-
-		return result;
+			return;
+		Log(LogLevel.Warning, null, message, args);
 	}
-	#endregion /LogWarning
 
-	#region LogError
-	public virtual bool LogError
-		(Exception exception,
-		string? message = null,
-		[CallerMemberName] string? methodName = null,
-		List<object?>? parameters = null)
+	public virtual void LogError(Exception exception, string message, params object?[] args)
 	{
-		if (exception == null)
-			return false;
-
 		if (!IsErrorEnabled)
-			return false;
-
-		bool result =
-			Log(methodName: methodName,
-				logLevel: nameof(LogLevel.Error),
-				message: message,
-				exception: exception,
-				parameters: parameters);
-
-		return result;
+			return;
+		Log(LogLevel.Error, exception, message, args);
 	}
-	#endregion /LogError
 
-	#region LogCritical
-	public virtual bool LogCritical
-		(Exception exception,
-		string? message = null,
-		[CallerMemberName] string? methodName = null,
-		List<object?>? parameters = null)
+	public virtual void LogCritical(Exception exception, string message, params object?[] args)
 	{
-		if (exception == null)
-			return false;
-
 		if (!IsCriticalEnabled)
-			return false;
-
-		bool result =
-			Log(methodName: methodName,
-				logLevel: nameof(LogLevel.Critical),
-				message: message,
-				exception: exception,
-				parameters: parameters);
-
-		return result;
+			return;
+		Log(LogLevel.Critical, exception, message, args);
 	}
-	#endregion /LogCritical
 }
 
 public abstract class Logger : LoggerBase, ILogger
 {
 	#region Constructor
-	protected Logger(IHttpContextAccessor? httpContextAccessor = null) : base(httpContextAccessor)
+	protected Logger(
+			IHttpContextAccessor? httpContextAccessor = null,
+			ICallerInfoResolver? callerInfoResolver = null,
+			StackTraceResolverOptions? stackTraceResolverOptions = null) : base(httpContextAccessor, callerInfoResolver, stackTraceResolverOptions)
 	{
 	}
 	#endregion /Constructor
 
 	#region Log
-	protected bool Log(string logLevel,
-		string? message,
-		Type classType,
-		Exception? exception = null,
-		List<object?>? parameters = null,
-		string? methodName = null)
+	private void Log(
+			LogLevel logLevel,
+			Type classType,
+			Exception? exception,
+			string message,
+			params object?[]? args)
 	{
-		try
-		{
-			// **************************************************
-			string currentCultureName =
-				Thread.CurrentThread.CurrentCulture.Name;
+		// Use the resolver to get caller info.
+		// We pass skipFrames: 2 to bypass the public Log method (e.g., LogInformation)
+		// and this private Log method itself.
+		var callerInfo = CallerInfoResolver.Resolve(skipFrames: 2);
 
-			var newCultureInfo =
-				new CultureInfo(name: "en-US");
-
-			var currentCultureInfo =
-				new CultureInfo(currentCultureName);
-
-			Thread.CurrentThread.CurrentCulture = newCultureInfo;
-			// **************************************************
-
-			var connection =
-				HttpContextAccessor?.HttpContext?.Connection;
-
-			var httpRequest =
-				HttpContextAccessor?.HttpContext?.Request;
-
-			var logModel = new LogModel(logLevel: logLevel)
-			{
-				Message = message,
-				Namespace = classType?.Namespace,
-				RemoteIP = connection?.RemoteIpAddress?.ToString(),
-				LocalIP = connection?.LocalIpAddress?.ToString(),
-				LocalPort = connection?.LocalPort.ToString(),
-				UserName = HttpContextAccessor?.HttpContext?.User?.Identity?.Name,
-				RequestPath = httpRequest?.Path,
-				HttpReferrer = httpRequest?.Headers["Referer"],
-				ApplicationName = classType?.Assembly?.FullName?.ToString(),
-				ClassName = classType?.Name,
-				Parameters = parameters,
-				Exceptions = GetExceptions(exception: exception),
-				MethodName = methodName,
-			};
-
-			LogByFavoriteLibrary(logModel: logModel, exception: exception);
-
-			// **************************************************
-			Thread.CurrentThread.CurrentCulture = currentCultureInfo;
-			// **************************************************
-
-			return true;
-		}
-		catch
-		{
-			return false;
-		}
+		base.Log(
+			logLevel: logLevel,
+			classType: classType,
+			message: message,
+			exception: exception,
+			methodName: callerInfo?.MethodName,
+			args: args
+		);
 	}
 	#endregion /Log
 
-	#region LogTrace
-	public virtual bool LogTrace
-		(string message,
-		Type classType,
-		[CallerMemberName] string? methodName = null,
-		List<object?>? parameters = null)
+	public virtual void LogTrace(Type classType, string message, params object?[] args)
 	{
-		if (string.IsNullOrWhiteSpace(message))
-			return false;
-
 		if (!IsTraceEnabled)
-			return false;
-
-		bool result =
-			Log(methodName: methodName,
-				logLevel: nameof(LogLevel.Trace),
-				classType: classType,
-				message: message,
-				exception: null,
-				parameters: parameters);
-
-		return result;
+			return;
+		Log(LogLevel.Trace, classType, null, message, args);
 	}
-	#endregion /LogTrace
 
-	#region LogDebug
-	public virtual bool LogDebug
-		(string message,
-		Type classType,
-		[CallerMemberName] string? methodName = null,
-		List<object?>? parameters = null)
+	public virtual void LogDebug(Type classType, string message, params object?[] args)
 	{
-		if (string.IsNullOrWhiteSpace(message))
-			return false;
-
 		if (!IsDebugEnabled)
-			return false;
-
-		bool result =
-			Log(methodName: methodName,
-				logLevel: nameof(LogLevel.Debug),
-				message: message,
-				classType: classType,
-				exception: null,
-				parameters: parameters);
-
-		return result;
+			return;
+		Log(LogLevel.Debug, classType, null, message, args);
 	}
-	#endregion /LogDebug
 
-	#region LogInformation
-	public virtual bool LogInformation
-		(string message,
-		Type classType,
-		[CallerMemberName] string? methodName = null,
-		List<object?>? parameters = null)
+	public virtual void LogInformation(Type classType, string message, params object?[] args)
 	{
-		if (string.IsNullOrWhiteSpace(message))
-			return false;
-
 		if (!IsInformationEnabled)
-			return false;
-
-		bool result =
-			Log(methodName: methodName,
-				logLevel: nameof(LogLevel.Information),
-				message: message,
-				classType: classType,
-				exception: null,
-				parameters: parameters);
-
-		return result;
+			return;
+		Log(LogLevel.Information, classType, null, message, args);
 	}
-	#endregion /LogInformation
 
-	#region LogWarning
-	public virtual bool LogWarning
-		(string message,
-		Type classType,
-		[CallerMemberName] string? methodName = null,
-		List<object?>? parameters = null)
+	public virtual void LogWarning(Type classType, string message, params object?[] args)
 	{
-		if (string.IsNullOrWhiteSpace(message))
-			return false;
-
 		if (!IsWarningEnabled)
-			return false;
-
-		bool result =
-			Log(methodName: methodName,
-				logLevel: nameof(LogLevel.Warning),
-				message: message,
-				classType: classType,
-				exception: null,
-				parameters: parameters);
-
-		return result;
+			return;
+		Log(LogLevel.Warning, classType, null, message, args);
 	}
-	#endregion /LogWarning
 
-	#region LogError
-	public virtual bool LogError
-		(Exception exception,
-		Type classType,
-		string? message = null,
-		[CallerMemberName] string? methodName = null,
-		List<object?>? parameters = null)
+	public virtual void LogError(Exception exception, Type classType, string message, params object?[] args)
 	{
-		if (exception == null)
-			return false;
-
 		if (!IsErrorEnabled)
-			return false;
-
-		bool result =
-			Log(methodName: methodName,
-				logLevel: nameof(LogLevel.Error),
-				message: message,
-				classType: classType,
-				exception: exception,
-				parameters: parameters);
-
-		return result;
+			return;
+		Log(LogLevel.Error, classType, exception, message, args);
 	}
-	#endregion /LogError
 
-	#region LogCritical
-	public virtual bool LogCritical
-		(Exception exception,
-		Type classType,
-		string? message = null,
-		[CallerMemberName] string? methodName = null,
-		List<object?>? parameters = null)
+	public virtual void LogCritical(Exception exception, Type classType, string message, params object?[] args)
 	{
-		if (exception == null)
-			return false;
-
 		if (!IsCriticalEnabled)
-			return false;
-
-		bool result =
-			Log(methodName: methodName,
-				logLevel: nameof(LogLevel.Critical),
-				message: message,
-				classType: classType,
-				exception: exception,
-				parameters: parameters);
-
-		return result;
+			return;
+		Log(LogLevel.Critical, classType, exception, message, args);
 	}
-	#endregion /LogCritical
 }

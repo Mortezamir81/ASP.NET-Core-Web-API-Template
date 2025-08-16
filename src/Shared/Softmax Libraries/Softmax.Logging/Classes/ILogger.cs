@@ -1,93 +1,81 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
 namespace Dtat.Logging;
 
 public interface ILogger<T> where T : class
 {
-	bool IsTraceEnabled { get; set; }
-	bool IsDebugEnabled { get; set; }
-	bool IsInformationEnabled { get; set; }
-	bool IsErrorEnabled { get; set; }
-	bool IsCriticalEnabled { get; set; }
-	bool IsWarningEnabled { get; set; }
+	bool IsTraceEnabled { get; }
+	bool IsDebugEnabled { get; }
+	bool IsInformationEnabled { get; }
+	bool IsWarningEnabled { get; }
+	bool IsErrorEnabled { get; }
+	bool IsCriticalEnabled { get; }
 
-	bool LogTrace
-		(string message,
-			[CallerMemberName] string? methodName = null,
-			List<object?>? parameters = null);
+	void LogTrace(
+		string message,
+		params object?[] args);
 
-	bool LogDebug
-		(string message,
-			[CallerMemberName] string? methodName = null,
-			List<object?>? parameters = null);
+	void LogDebug(
+		string message,
+		params object?[] args);
 
-	bool LogInformation
-		(string message,
-			[CallerMemberName] string? methodName = null,
-			List<object?>? parameters = null);
+	void LogInformation(
+		string message,
+		params object?[] args);
 
-	bool LogWarning
-		(string message,
-			[CallerMemberName] string? methodName = null,
-			List<object?>? parameters = null);
+	void LogWarning(
+		string message,
+		params object?[] args);
 
-	bool LogError
-		(Exception exception,
-		string? message = null,
-			[CallerMemberName] string? methodName = null,
-			List<object?>? parameters = null);
+	void LogError(
+		Exception exception,
+		string message,
+		params object?[] args);
 
-	bool LogCritical
-		(Exception exception,
-		string? message = null,
-			[CallerMemberName] string? methodName = null,
-			List<object?>? parameters = null);
+	void LogCritical(
+		Exception exception,
+		string message,
+		params object?[] args);
 }
 
 public interface ILogger
 {
-	bool IsTraceEnabled { get; set; }
-	bool IsDebugEnabled { get; set; }
-	bool IsInformationEnabled { get; set; }
-	bool IsErrorEnabled { get; set; }
-	bool IsCriticalEnabled { get; set; }
-	bool IsWarningEnabled { get; set; }
+	bool IsTraceEnabled { get; }
+	bool IsDebugEnabled { get; }
+	bool IsInformationEnabled { get; }
+	bool IsWarningEnabled { get; }
+	bool IsErrorEnabled { get; }
+	bool IsCriticalEnabled { get; }
 
-	bool LogTrace
-		(string message,
+	void LogTrace(
 		Type classType,
-		[CallerMemberName] string? methodName = null,
-		List<object?>? parameters = null);
+		string message,
+		params object?[] args);
 
-	bool LogDebug
-		(string message,
+	void LogDebug(
 		Type classType,
-		[CallerMemberName] string? methodName = null,
-		List<object?>? parameters = null);
+		string message,
+		params object?[] args);
 
-	bool LogInformation
-		(string message,
+	void LogInformation(
 		Type classType,
-		[CallerMemberName] string? methodName = null,
-		List<object?>? parameters = null);
+		string message,
+		params object?[] args);
 
-	bool LogWarning
-		(string message,
+	void LogWarning(
 		Type classType,
-		[CallerMemberName] string? methodName = null,
-		List<object?>? parameters = null);
+		string message,
+		params object?[] args);
 
-	bool LogError
-		(Exception exception,
+	void LogError(
+		Exception exception,
 		Type classType,
-		string? message = null, [CallerMemberName] string? methodName = null,
-		List<object?>? parameters = null);
+		string message,
+		params object?[] args);
 
-	bool LogCritical
-		(Exception exception,
+	void LogCritical(
+		Exception exception,
 		Type classType,
-		string? message = null, [CallerMemberName] string? methodName = null,
-		List<object?>? parameters = null);
+		string message,
+		params object?[] args);
 }
