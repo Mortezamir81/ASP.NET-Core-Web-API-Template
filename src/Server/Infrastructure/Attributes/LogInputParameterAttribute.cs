@@ -26,9 +26,10 @@ public class LogInputParameterAttribute : ActionFilterAttribute, IRegisterAsScop
 				var actionName =
 					filterContext.RouteData.Values["action"]?.ToString();
 
-				var parameters = new List<object?>
+				var parameters = new
 				{
-					requestViewModel,
+					Data = requestViewModel,
+					ActionName = actionName
 				};
 
 				switch (_inputLogLevel)
@@ -36,21 +37,21 @@ public class LogInputParameterAttribute : ActionFilterAttribute, IRegisterAsScop
 					case InputLogLevel.Debug:
 						logger?.LogDebug
 							(message: Resources.Resource.InputPropertiesInfo,
-								arg1: new { parameters },
+								arg1: parameters,
 								type: filterContext.Controller.GetType());
 						break;
 
 					case InputLogLevel.Information:
 						logger?.LogInformation
 							(message: Resources.Resource.InputPropertiesInfo,
-								arg1: new { parameters },
+								arg1: parameters,
 								type: filterContext.Controller.GetType());
 						break;
 
 					case InputLogLevel.Warning:
 						logger?.LogWarning
 							(message: Resources.Resource.InputPropertiesInfo,
-								arg1: new { parameters },
+								arg1: parameters,
 								type: filterContext.Controller.GetType());
 						break;
 				}
