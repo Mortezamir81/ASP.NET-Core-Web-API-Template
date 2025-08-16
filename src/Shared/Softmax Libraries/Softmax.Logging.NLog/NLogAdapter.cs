@@ -34,10 +34,20 @@ public class NLogAdapter<T> : Logger<T> where T : class
 			var parameterObject = logModel.Parameters[0];
 			if (parameterObject != null)
 			{
-				var properties = ObjectDestructurer.Destructure(parameterObject);
-				foreach (var property in properties)
+				var type = parameterObject.GetType();
+
+				if (!ObjectDestructurer.IsSimpleType(type))
 				{
-					logEvent.Properties[property.Key] = property.Value;
+					var properties = ObjectDestructurer.Destructure(parameterObject);
+					foreach (var property in properties)
+					{
+						logEvent.Properties[property.Key] = property.Value;
+					}
+				}
+				else
+				{
+					// If it's a simple type, just add it as a single property.
+					logEvent.Properties["ParameterValue"] = parameterObject;
 				}
 			}
 		}
@@ -104,13 +114,24 @@ public class NLogAdapter : Logger
 			var parameterObject = logModel.Parameters[0];
 			if (parameterObject != null)
 			{
-				var properties = ObjectDestructurer.Destructure(parameterObject);
-				foreach (var property in properties)
+				var type = parameterObject.GetType();
+
+				if (!ObjectDestructurer.IsSimpleType(type))
 				{
-					logEvent.Properties[property.Key] = property.Value;
+					var properties = ObjectDestructurer.Destructure(parameterObject);
+					foreach (var property in properties)
+					{
+						logEvent.Properties[property.Key] = property.Value;
+					}
+				}
+				else
+				{
+					// If it's a simple type, just add it as a single property.
+					logEvent.Properties["ParameterValue"] = parameterObject;
 				}
 			}
 		}
+
 		// 4. Add all custom properties from our LogModel to NLog's event properties
 		// This is the key to structured logging!
 		logEvent.Properties["ApplicationName"] = logModel.ApplicationName;

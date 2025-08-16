@@ -22,7 +22,7 @@ public abstract class LoggerBase
 		StackTraceResolverOptions? stackTraceResolverOptions = null) : base()
 	{
 		HttpContextAccessor = httpContextAccessor;
-		CallerInfoResolver = callerInfoResolver ?? new SmartStackTraceResolver(stackTraceResolverOptions ?? new StackTraceResolverOptions());
+		CallerInfoResolver = callerInfoResolver ?? new EmptyStackTraceResolver();
 	}
 	#endregion /Constructor
 

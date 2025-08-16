@@ -12,6 +12,20 @@ internal static class ObjectDestructurer
 	// A thread-safe cache for our compiled destructuring functions.
 	private static readonly ConcurrentDictionary<Type, Func<object, IEnumerable<KeyValuePair<string, object?>>>> _cache = new();
 
+	private static readonly HashSet<Type> _simpleTypes = new HashSet<Type>
+	{
+		typeof(string),
+		typeof(decimal),
+		typeof(DateTime),
+		typeof(DateTimeOffset),
+		typeof(TimeSpan),
+		typeof(Guid),
+		typeof(Uri), // Uri is often treated as a simple value
+		typeof(DateOnly), // .NET 6+
+		typeof(TimeOnly), // .NET 6+
+		typeof(DBNull),
+	};
+
 	public static IEnumerable<KeyValuePair<string, object?>> Destructure(object obj)
 	{
 		var type = obj.GetType();
@@ -47,5 +61,20 @@ internal static class ObjectDestructurer
 		// Compile the expression tree into a super-fast delegate and return it.
 		var lambda = Expression.Lambda<Func<object, IEnumerable<KeyValuePair<string, object?>>>>(arrayExpression, objParameter);
 		return lambda.Compile();
+	}
+
+	public static bool IsSimpleType(Type type)
+	{
+		// 1. Check for nullable value types and get the underlying type
+		// For example, if type is `int?`, underlyingType will be `int`.
+		var underlyingType = Nullable.GetUnderlyingType(type);
+
+		if (underlyingType != null)
+			type = underlyingType;
+
+		// 2. Check for primitive types (int, bool, double, char, etc.), enums, and our predefined simple types.
+		return type.IsPrimitive ||
+			   type.IsEnum ||
+			   _simpleTypes.Contains(type);
 	}
 }
