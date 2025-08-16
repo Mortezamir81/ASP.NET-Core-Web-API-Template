@@ -18,7 +18,7 @@
     <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.0" />
     <PackageReference Include="AutoMapper" Version="15.0.1" />
     <PackageReference Include="Bit.SourceGenerators" Version="9.11.3" />
-    <PackageReference Include="DNTCommon.Web.Core" Version="8.4.0" />
+    <PackageReference Include="DNTCommon.Web.Core" Version="11.8.2" />
     <PackageReference Include="EasyCaching.InMemory" Version="1.9.2" />
     <PackageReference Include="EFCoreSecondLevelCacheInterceptor" Version="5.3.1" />
     <PackageReference Include="EFCoreSecondLevelCacheInterceptor.MemoryCache" Version="5.3.1" />
