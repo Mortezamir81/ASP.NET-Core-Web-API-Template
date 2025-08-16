@@ -38,11 +38,6 @@
     <PackageReference Include="Scrutor" Version="6.0.0" />
     <PackageReference Include="Softmax.ZarinPal" Version="1.1.0" />
     <PackageReference Include="Stax.SwaggerAuthorization" Version="1.0.1" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="7.2.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="8.0.2" />
-    <PackageReference Include="Swashbuckle.AspNetCore.Filters.Abstractions" Version="8.0.2" />
-    <PackageReference Include="Swashbuckle.AspNetCore.SchemaBuilder" Version="1.6.0" />
   </ItemGroup>
 
   <ItemGroup>
