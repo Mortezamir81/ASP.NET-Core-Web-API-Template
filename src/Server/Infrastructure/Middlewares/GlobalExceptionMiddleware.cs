@@ -2,7 +2,7 @@
 
 public class GlobalExceptionMiddleware
 {
-	public GlobalExceptionMiddleware(RequestDelegate next, Dtat.Logging.ILogger<GlobalExceptionMiddleware> logger) : base()
+	public GlobalExceptionMiddleware(RequestDelegate next, ILogger<GlobalExceptionMiddleware> logger) : base()
 	{
 		Next = next;
 		Logger = logger;
@@ -10,7 +10,7 @@ public class GlobalExceptionMiddleware
 
 
 	protected RequestDelegate Next { get; }
-	public Dtat.Logging.ILogger<GlobalExceptionMiddleware> Logger { get; }
+	public ILogger<GlobalExceptionMiddleware> Logger { get; }
 
 
 	public async Task InvokeAsync(HttpContext httpContext)

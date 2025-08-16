@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.0" />
+    <PackageReference Include="AutoMapper" Version="15.0.1" />
     <PackageReference Include="Bit.SourceGenerators" Version="9.3.0" />
     <PackageReference Include="DNTCommon.Web.Core" Version="8.4.0" />
     <PackageReference Include="EasyCaching.InMemory" Version="1.9.2" />
@@ -35,6 +36,7 @@
     </PackageReference>
     <PackageReference Include="Pluralize.NET" Version="1.0.2" />
     <PackageReference Include="Scrutor" Version="6.0.0" />
+    <PackageReference Include="Softmax.ZarinPal" Version="1.1.0" />
     <PackageReference Include="Stax.SwaggerAuthorization" Version="1.0.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="7.2.0" />
@@ -53,8 +55,6 @@
     <ProjectReference Include="..\Shared\Resources\Resources.csproj" />
     <ProjectReference Include="..\Shared\Shared\Shared.csproj" />
     <ProjectReference Include="..\Shared\Softmax Libraries\Softmax.Abstractions\Softmax.Abstractions.csproj" />
-    <ProjectReference Include="..\Shared\Softmax Libraries\Softmax.Logging.NLog\Dtat.Logging.NLogAdapter.csproj" />
-    <ProjectReference Include="..\Shared\Softmax Libraries\Softmax.Logging\Dtat.Logging.csproj" />
     <ProjectReference Include="..\Shared\Softmax Libraries\Softmax.Mail\Softmax.Mail.csproj" />
     <ProjectReference Include="..\Shared\Softmax Libraries\Softmax.Result\Softmax.Result.csproj" />
     <ProjectReference Include="..\Shared\Softmax Libraries\Softmax.Swagger\Softmax.Swagger.csproj" />

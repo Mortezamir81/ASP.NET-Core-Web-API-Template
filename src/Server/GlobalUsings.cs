@@ -1,7 +1,7 @@
 ﻿global using DNTCommon.Web.Core;
 global using Domain;
-global using Dtat.Logging;
-global using Dtat.Logging.NLogAdapter;
+global using Softmax.Logging;
+global using Softmax.Logging.NLogAdapter;
 global using EasyCaching.Core;
 global using Infrastructure;
 global using Infrastructure.Attributes;

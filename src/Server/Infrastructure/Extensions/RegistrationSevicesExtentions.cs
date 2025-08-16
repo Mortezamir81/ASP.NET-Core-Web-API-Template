@@ -43,7 +43,13 @@ public static class RegistrationSevicesExtentions
 
 		services.AddAutoDetectedServices();
 
-		services.AddAutoMapper(typeof(Program));
+		services.AddAutoMapper(options =>
+		{
+			options.AddMaps(new[]
+			{
+				typeof(Program), // This assembly contains the mapping profiles
+			});
+		});
 
 		services.AddCustomEFSecondLevelCache();
 

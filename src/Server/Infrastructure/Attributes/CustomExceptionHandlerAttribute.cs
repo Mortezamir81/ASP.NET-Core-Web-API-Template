@@ -1,6 +1,4 @@
-﻿using Dtat.Logging;
-
-namespace Infrastructure.Attributes;
+﻿namespace Infrastructure.Attributes;
 
 public class CustomExceptionHandlerAttribute : ActionFilterAttribute
 {

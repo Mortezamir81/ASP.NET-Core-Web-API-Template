@@ -11,8 +11,8 @@
     <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Softmax.Logging\Dtat.Logging.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+    	<FrameworkReference Include="Microsoft.AspNetCore.App" />
+    </ItemGroup>
 
 </Project>
